@@ -1,3 +1,4 @@
+using AutoTf.AdminPanel.Models.Requests;
 using Docker.DotNet;
 using Docker.DotNet.Models;
 
@@ -21,6 +22,45 @@ public class DockerManager
         
         // This is honestly easier than figuring out the filter argument from the docker package.
         return containers.Where(x => x.Labels.ContainsKey("com.docker.compose.project") && x.Labels["com.docker.compose.project"] == "centralserver").ToList();
+    }
+
+    public async Task<CreateContainerResponse> CreateContainer(CreateContainer parameters, Dictionary<string, EndpointSettings> networks)
+    {
+        
+        Dictionary<string, EmptyStruct> exposedPorts = new Dictionary<string, EmptyStruct>();
+        Dictionary<string, IList<PortBinding>> portBindings = new Dictionary<string, IList<PortBinding>>();
+        
+        foreach (KeyValuePair<string, string> portMapping in parameters.PortMappings)
+        {
+            string hostPort = portMapping.Key;
+            string containerPort = portMapping.Value;
+
+            exposedPorts[containerPort + "/tcp"] = new EmptyStruct();
+
+            if (!portBindings.ContainsKey(containerPort + "/tcp"))
+                portBindings[containerPort + "/tcp"] = new List<PortBinding>();
+            
+            portBindings[containerPort + "/tcp"].Add(new PortBinding { HostPort = hostPort });
+        }
+        
+        return await _dockerClient.Containers.CreateContainerAsync(new CreateContainerParameters()
+        {
+            Name = parameters.ContainerName,
+            Image = parameters.Image,
+            ExposedPorts = exposedPorts,
+            HostConfig = new HostConfig
+            {
+                PortBindings = portBindings,
+                RestartPolicy = new RestartPolicy()
+                {
+                    Name = RestartPolicyKind.UnlessStopped
+                }
+            },
+            NetworkingConfig = new NetworkingConfig()
+            {
+                EndpointsConfig = networks
+            }
+        });
     }
     
     public async Task StartContainer(string containerId)

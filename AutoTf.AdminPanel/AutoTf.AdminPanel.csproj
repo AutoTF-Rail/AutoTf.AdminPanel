@@ -10,4 +10,8 @@
       <PackageReference Include="Docker.DotNet" Version="3.125.15" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\AutoTf.AdminPanel.Models\AutoTf.AdminPanel.Models.csproj" />
+    </ItemGroup>
+
 </Project>
