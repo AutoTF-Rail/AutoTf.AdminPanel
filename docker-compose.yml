@@ -9,6 +9,8 @@ services:
       - Username=${Username}
       - Password=${Password}
       - AuthUrl=${AuthUrl}
+      - CloudflareZone=${CloudflareZone}
+      - CloudflareKey=${CloudflareKey}
     networks:
       authinstall_default: {}
     ports:
@@ -16,6 +18,7 @@ services:
       - "8481:81"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/local/plesk/bin:/usr/local/plesk/bin
         
 networks:
   authinstall_default:

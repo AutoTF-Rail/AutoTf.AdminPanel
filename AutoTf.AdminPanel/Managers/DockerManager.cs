@@ -1,9 +1,8 @@
 using AutoTf.AdminPanel.Models.Requests;
 using Docker.DotNet;
 using Docker.DotNet.Models;
-using Microsoft.AspNetCore.Mvc;
 
-namespace AutoTf.AdminPanel;
+namespace AutoTf.AdminPanel.Managers;
 
 public class DockerManager
 {

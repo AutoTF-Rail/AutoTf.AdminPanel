@@ -1,3 +1,7 @@
+using AutoTf.AdminPanel.Extensions;
+using AutoTf.AdminPanel.Managers;
+using AutoTf.AdminPanel.Models;
+
 namespace AutoTf.AdminPanel;
 
 public class Program
@@ -11,6 +15,18 @@ public class Program
         builder.Services.AddControllers();
 
         builder.Services.AddSingleton<DockerManager>();
+        
+        builder.Services.AddHostedSingleton<CloudflareManager>();
+        
+        // stored in appsettings.Development.json or set manually in .env
+        builder.Services.Configure<Credentials>(options =>
+        {
+            options.ClientId = builder.Configuration["ClientId"] ?? "key";
+            options.Username = builder.Configuration["Username"] ?? "key";
+            options.Password = builder.Configuration["Password"] ?? "key";
+            options.CloudflareZone = builder.Configuration["CloudflareZone"] ?? "key";
+            options.CloudflareKey = builder.Configuration["CloudflareKey"] ?? "key";
+        });
 
         WebApplication app = builder.Build();
 

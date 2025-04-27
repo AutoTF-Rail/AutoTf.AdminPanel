@@ -1,0 +1,48 @@
+using AutoTf.AdminPanel.Managers;
+using AutoTf.AdminPanel.Models.Requests;
+using Microsoft.AspNetCore.Mvc;
+
+namespace AutoTf.AdminPanel.Controllers;
+
+[ApiController]
+[Route("/api/cloudflare")]
+public class CloudflareController : ControllerBase
+{
+    private readonly CloudflareManager _cloudflare;
+
+    public CloudflareController(CloudflareManager cloudflare)
+    {
+        _cloudflare = cloudflare;
+    }
+
+    [HttpPost("create")]
+    public async Task<ActionResult<bool>> CreateRecord([FromBody] CreateDnsRecord record)
+    {
+        return await _cloudflare.CreateNewEntry(record);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult<bool>> DeleteRecord(string id)
+    {
+        // This not only ensures that nothing is deleted that doesn't exist, but it also ensures that nothing is deleted that isnt a Admin Panel managed record.
+        if (!_cloudflare.DoesEntryExist(id))
+            return NotFound();
+        
+        return await _cloudflare.DeleteEntry(id);
+    }
+
+    [HttpGet("{id}")]
+    public ActionResult<DnsRecord> GetRecord(string id)
+    {
+        if (!_cloudflare.DoesEntryExist(id))
+            return NotFound();
+        
+        return _cloudflare.GetRecord(id)!;
+    }
+
+    [HttpGet("all")]
+    public ActionResult<List<DnsRecord>> GetAll()
+    {
+        return _cloudflare.Records;
+    }
+}
