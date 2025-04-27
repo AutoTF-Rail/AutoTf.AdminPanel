@@ -18,7 +18,9 @@ public class DockerManager
         {
             All = true
         });
-        return containers.ToList();
+        
+        // This is honestly easier than figuring out the filter argument from the docker package.
+        return containers.Where(x => x.Labels["com.docker.compose.project"] == "centralserver").ToList();
     }
     
     public async Task StartContainer(string containerId)
