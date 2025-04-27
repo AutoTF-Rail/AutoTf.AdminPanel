@@ -14,7 +14,7 @@ public class CreateContainer
     public string DefaultIp { get; set; } = null!;
     
     [JsonPropertyName("AdditionalNetwork")]
-    public string AdditionalNetwork { get; set; } = string.Empty;
+    public string? AdditionalNetwork { get; set; }
     
     [Required]
     [JsonPropertyName("image")]
@@ -22,11 +22,11 @@ public class CreateContainer
     
     [JsonPropertyName("portMappings")]
     public List<KeyValuePair<string, string>> PortMappings { get; set; } = new List<KeyValuePair<string, string>>();
-    
+
     [Required]
     [JsonPropertyName("evuName")]
-    public string EvuName { get; set; }
+    public string EvuName { get; set; } = string.Empty;
     
     [JsonPropertyName("containerName")]
-    public string ContainerName { get; set; }
+    public string? ContainerName { get; set; }
 }
