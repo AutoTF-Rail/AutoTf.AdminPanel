@@ -19,6 +19,13 @@ public class DockerManager
             All = true
         });
         
+        foreach (ContainerListResponse container in containers)
+        {
+            foreach (KeyValuePair<string,string> label in container.Labels)
+            {
+                Console.WriteLine(label.Key + " - " + label.Value);
+            }
+        }
         // This is honestly easier than figuring out the filter argument from the docker package.
         return containers.Where(x => x.Labels["com.docker.compose.project"] == "centralserver").ToList();
     }
