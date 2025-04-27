@@ -1,9 +1,7 @@
-using System.Diagnostics;
 using System.Net.Http.Headers;
-using System.Runtime.InteropServices;
 using System.Text.Json;
 
-namespace AutoTf.AdminPanel;
+namespace AutoTf.AdminPanel.Statics;
 
 public static class HttpHelper
 {

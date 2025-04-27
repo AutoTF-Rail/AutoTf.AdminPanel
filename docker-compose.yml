@@ -18,7 +18,7 @@ services:
       - "8481:81"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /usr/local/plesk/bin:/usr/local/plesk/bin
+      - /usr/sbin/plesk:/usr/sbin/plesk
         
 networks:
   authinstall_default:

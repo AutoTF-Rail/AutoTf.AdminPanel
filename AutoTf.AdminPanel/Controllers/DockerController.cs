@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using AutoTf.AdminPanel.Managers;
 using AutoTf.AdminPanel.Models.Requests;
+using AutoTf.AdminPanel.Statics;
 using Docker.DotNet.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,7 +9,7 @@ namespace AutoTf.AdminPanel.Controllers;
 
 [ApiController]
 [Route("/api/docker")]
-public class DockerController : AuthentikController
+public class DockerController : ControllerBase
 {
     private readonly DockerManager _docker;
 

@@ -4,7 +4,7 @@ using AutoTf.AdminPanel.Managers;
 using AutoTf.AdminPanel.Models.Requests;
 using Docker.DotNet.Models;
 
-namespace AutoTf.AdminPanel;
+namespace AutoTf.AdminPanel.Statics;
 
 public static class DockerHelper
 {
