@@ -19,10 +19,10 @@ public class CloudflareManager : IHostedService
         _credentials = options.Value;
     }
 
-    public Task StartAsync(CancellationToken cancellationToken)
+    public async Task StartAsync(CancellationToken cancellationToken)
     {
         StartCacheTimer();
-        return Task.CompletedTask;
+        await UpdateCache();
     }
 
     private void StartCacheTimer()
