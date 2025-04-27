@@ -22,6 +22,7 @@ services:
       - /usr/local/plesk:/usr/local/plesk
       - /usr/local/psa:/usr/local/psa
       - /opt/plesk:/opt/plesk
+      - /opt/psa:/opt/psa
         
 networks:
   authinstall_default:
