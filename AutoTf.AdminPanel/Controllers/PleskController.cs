@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace AutoTf.AdminPanel.Controllers;
 
 [ApiController]
-[Route("plesk")]
+[Route("api/plesk")]
 public class PleskController : ControllerBase
 {
     private readonly PleskManager _plesk;
