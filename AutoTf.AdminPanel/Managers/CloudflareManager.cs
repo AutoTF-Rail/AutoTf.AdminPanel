@@ -55,6 +55,7 @@ public class CloudflareManager : IHostedService
             }
             
             Records.Add(result.Result);
+            return true;
         }
         catch (Exception e)
         {
