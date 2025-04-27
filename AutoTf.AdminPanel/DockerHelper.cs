@@ -25,9 +25,21 @@ public static class DockerHelper
             IPAddress = newIp,
             Gateway = defaultNetwork.IPAM.Config.First().Gateway,
         });
+
+        if (string.IsNullOrEmpty(parameters.AdditionalNetwork)) 
+            return dict;
         
-        if (!string.IsNullOrEmpty(parameters.AdditionalNetwork))
-            dict.Add(parameters.AdditionalNetwork, new EndpointSettings()); // authinstall_default
+        // Configure additional network
+        NetworkResponse? additionalNetwork = await dockerManager.GetNetwork(parameters.DefaultNetwork);
+        if (additionalNetwork == null)
+            throw new Exception("Could not find additional network.");
+
+        string additionalIp = GetFreeIp(additionalNetwork);
+        dict.Add(parameters.AdditionalNetwork, new EndpointSettings()
+        {
+            IPAddress = additionalIp,
+            Gateway = defaultNetwork.IPAM.Config.First().Gateway
+        });
 
         return dict;
     }

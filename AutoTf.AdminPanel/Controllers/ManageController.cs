@@ -52,4 +52,11 @@ public class ManageController : ControllerBase
     {
         return await _docker.StopContainer(id);
     }
+
+    [HttpPost("delete")]
+    public async Task<IActionResult> DeleteContainer([FromBody, Required] string id)
+    {
+        await _docker.DeleteContainer(id);
+        return Ok();
+    }
 }

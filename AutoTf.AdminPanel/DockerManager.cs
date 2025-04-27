@@ -1,6 +1,7 @@
 using AutoTf.AdminPanel.Models.Requests;
 using Docker.DotNet;
 using Docker.DotNet.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace AutoTf.AdminPanel;
 
@@ -71,6 +72,11 @@ public class DockerManager
     public async Task<bool> StopContainer(string containerId)
     {
         return await _dockerClient.Containers.StopContainerAsync(containerId, new ContainerStopParameters());
+    }
+
+    public async Task DeleteContainer(string containerId)
+    {
+        await _dockerClient.Containers.RemoveContainerAsync(containerId, new ContainerRemoveParameters());
     }
 
     public async Task<NetworkResponse?> GetNetwork(string name)
