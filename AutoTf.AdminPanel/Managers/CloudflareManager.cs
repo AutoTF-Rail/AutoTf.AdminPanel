@@ -41,7 +41,7 @@ public class CloudflareManager : IHostedService
             
             HttpContent content = new StringContent(JsonSerializer.Serialize(record), Encoding.UTF8, "application/json");
             
-            CreateDnsRecordResult? result = await HttpHelper.SendPostCloudflare<CreateDnsRecordResult>($"https://api.cloudflare.com/client/v4/zones/{_credentials.CloudflareZone}/dns_records", content, _credentials.CloudflareKey);
+            CreateDnsRecordResult? result = await HttpHelper.SendPostCloudflare<CreateDnsRecordResult>($"https://api.cloudflare.com/client/v4/zones/{_credentials.CloudflareZone}/dns_records", content, _credentials.CloudflareKey, true);
 
             if (result == null)
             {
