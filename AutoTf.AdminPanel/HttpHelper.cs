@@ -84,7 +84,7 @@ public static class HttpHelper
         {
             using HttpClient client = new HttpClient();
             client.Timeout = TimeSpan.FromSeconds(timeoutSeconds);
-            client.DefaultRequestHeaders.Add("X-Auth-Key", apiKey);
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
             
             HttpResponseMessage response = await client.DeleteAsync(endpoint);
 
@@ -109,7 +109,7 @@ public static class HttpHelper
         {
             using HttpClient client = new HttpClient();
             client.Timeout = TimeSpan.FromSeconds(timeoutSeconds);
-            client.DefaultRequestHeaders.Add("X-Auth-Key", apiKey);
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
             
             HttpResponseMessage response = await client.GetAsync(endpoint);
             response.EnsureSuccessStatusCode();
@@ -131,7 +131,7 @@ public static class HttpHelper
         {
             using HttpClient client = new HttpClient();
             client.Timeout = TimeSpan.FromSeconds(timeoutSeconds);
-            content.Headers.Add("X-Auth-Key", apiKey);
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
             
             HttpResponseMessage response = await client.PostAsync(endpoint, content);
             response.EnsureSuccessStatusCode();
