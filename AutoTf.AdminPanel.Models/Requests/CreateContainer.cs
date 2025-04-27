@@ -12,9 +12,9 @@ public class CreateContainer
     [Required]
     [JsonPropertyName("defaultIp")]
     public string DefaultIp { get; set; } = null!;
-    
+
     [JsonPropertyName("AdditionalNetwork")]
-    public string? AdditionalNetwork { get; set; }
+    public string AdditionalNetwork { get; set; } = string.Empty;
     
     [Required]
     [JsonPropertyName("image")]
@@ -26,7 +26,7 @@ public class CreateContainer
     [Required]
     [JsonPropertyName("evuName")]
     public string EvuName { get; set; } = string.Empty;
-    
+
     [JsonPropertyName("containerName")]
-    public string? ContainerName { get; set; }
+    public string ContainerName { get; set; } = string.Empty;
 }
