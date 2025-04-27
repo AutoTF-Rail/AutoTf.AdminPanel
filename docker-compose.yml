@@ -23,7 +23,10 @@ services:
       - /usr/local/psa:/usr/local/psa
       - /opt/plesk:/opt/plesk
       - /opt/psa:/opt/psa
+      - /usr/bin/sw-engine
         
 networks:
   authinstall_default:
     external: true
+    
+    useradd -r -u 999 -m psaadm

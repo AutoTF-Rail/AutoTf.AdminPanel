@@ -5,6 +5,9 @@ EXPOSE 81
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 
+RUN apt-get update
+RUN apt-get install libidn12
+
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["AutoTf.AdminPanel/AutoTf.AdminPanel.csproj", "AutoTf.AdminPanel/"]
