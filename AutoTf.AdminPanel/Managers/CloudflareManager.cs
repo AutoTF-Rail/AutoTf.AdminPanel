@@ -40,23 +40,40 @@ public class CloudflareManager : IHostedService
             
             HttpContent content = new StringContent(JsonSerializer.Serialize(record), Encoding.UTF8, "application/json");
             
-            await HttpHelper.SendPostCloudflare<bool>($"https://api.cloudflare.com/client/v4/zones/{_credentials.CloudflareZone}/dns_records", content, _credentials.CloudflareKey);
+            CreateDnsRecordResult? result = await HttpHelper.SendPostCloudflare<CreateDnsRecordResult>($"https://api.cloudflare.com/client/v4/zones/{_credentials.CloudflareZone}/dns_records", content, _credentials.CloudflareKey);
+
+            if (result == null)
+            {
+                Console.WriteLine("Failed to create DNS entry:");
+                foreach (object error in result.Errors)
+                {
+                    Console.WriteLine(error.ToString());
+                }
+
+                return false;
+            }
             
-            return true;
+            Records.Add(result.Result);
         }
         catch (Exception e)
         {
             Console.WriteLine($"Something went wrong when configuring the DNS entry for {record.Name}:");
             Console.WriteLine(e.ToString());
-            return false;
         }
+        
+        return false;
     }
 
     public async Task<bool> DeleteEntry(string id)
     {
         try
         {
-            return await HttpHelper.SendCloudflareDelete($"https://api.cloudflare.com/client/v4/zones/{_credentials.CloudflareZone}/dns_records", _credentials.CloudflareKey);
+            if (!await HttpHelper.SendCloudflareDelete($"https://api.cloudflare.com/client/v4/zones/{_credentials.CloudflareZone}/dns_records", _credentials.CloudflareKey)) 
+                return false;
+            
+            Records.RemoveAll(x => x.Id == id);
+            
+            return true;
         }
         catch (Exception e)
         {
