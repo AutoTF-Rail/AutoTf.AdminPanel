@@ -60,6 +60,10 @@ public class DockerManager
             NetworkingConfig = new NetworkingConfig()
             {
                 EndpointsConfig = networks
+            },
+            Env = new List<string>()
+            {
+                $"evuName={parameters.EvuName}"
             }
         });
     }
