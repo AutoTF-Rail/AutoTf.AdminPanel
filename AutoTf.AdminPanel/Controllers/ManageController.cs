@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using AutoTf.AdminPanel.Models.Requests;
 using Docker.DotNet.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -24,12 +25,31 @@ public class ManageController : ControllerBase
     [HttpPost("create")]
     public async Task<ActionResult<CreateContainerResponse>> CreateContainer([FromBody] CreateContainer parameters)
     {
-        // TODO: Get default values if any are empty
-        Dictionary<string,EndpointSettings> endpoints = DockerHelper.AssembleEndpoints(parameters);
+        try
+        {
+            // TODO: Get default values if any are empty
+            Dictionary<string,EndpointSettings> networks = await DockerHelper.ConfigureNetwork(parameters, _docker);
 
-        if (string.IsNullOrEmpty(parameters.ContainerName))
-            parameters.ContainerName = parameters.EvuName;
+            if (string.IsNullOrEmpty(parameters.ContainerName))
+                parameters.ContainerName = parameters.EvuName;
 
-        return await _docker.CreateContainer(parameters, endpoints);
+            return await _docker.CreateContainer(parameters, networks);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
+
+    [HttpPost("start")]
+    public async Task<ActionResult<bool>> StartContainer([FromBody, Required] string id)
+    {
+        return await _docker.StartContainer(id);
+    }
+
+    [HttpPost("stop")]
+    public async Task<ActionResult<bool>> StopContainer([FromBody, Required] string id)
+    {
+        return await _docker.StopContainer(id);
     }
 }

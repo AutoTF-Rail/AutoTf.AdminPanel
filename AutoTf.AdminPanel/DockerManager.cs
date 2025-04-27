@@ -63,13 +63,18 @@ public class DockerManager
         });
     }
     
-    public async Task StartContainer(string containerId)
+    public async Task<bool> StartContainer(string containerId)
     {
-        await _dockerClient.Containers.StartContainerAsync(containerId, new ContainerStartParameters());
+        return await _dockerClient.Containers.StartContainerAsync(containerId, new ContainerStartParameters());
     }
 
-    public async Task StopContainer(string containerId)
+    public async Task<bool> StopContainer(string containerId)
     {
-        await _dockerClient.Containers.StopContainerAsync(containerId, new ContainerStopParameters());
+        return await _dockerClient.Containers.StopContainerAsync(containerId, new ContainerStopParameters());
+    }
+
+    public async Task<NetworkResponse?> GetNetwork(string name)
+    {
+        return (await _dockerClient.Networks.ListNetworksAsync()).FirstOrDefault(x => x.Name == name);
     }
 }
