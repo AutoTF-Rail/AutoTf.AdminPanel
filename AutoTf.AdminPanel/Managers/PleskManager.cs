@@ -42,7 +42,7 @@ public class PleskManager
     {
         string dir = $"/var/www/vhosts/system/{subDomain}.{rootDomain}/conf";
         Directory.CreateDirectory(dir);
-        File.WriteAllText($"{dir}/{subDomain}.{rootDomain}/conf/vhost_nginx.conf", AssembleAuthentikConfig(authentikHost));
+        File.WriteAllText($"{dir}/vhost_nginx.conf", AssembleAuthentikConfig(authentikHost));
     }
 
     private bool IssueCertificate(string subDomain, string rootDomain, string email)
