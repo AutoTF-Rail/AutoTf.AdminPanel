@@ -10,7 +10,7 @@ public class PleskManager
     public bool CreateSubdomain(string subDomain, string rootDomain, string email, string authentikHost)
     {
         string result = CommandExecuter.ExecuteCommand(
-            $"/usr/sbin/plesk bin subdomain --create {subDomain} -domain {rootDomain} -admin-description \"Externally managed by AutoTF\"");
+            $"plesk bin subdomain --create {subDomain} -domain {rootDomain} -admin-description \"Externally managed by AutoTF\"");
 
         if (!result.Contains("SUCCESS: Creation of"))
             return false;
@@ -30,7 +30,7 @@ public class PleskManager
             return false;
 
         string certResult =
-            CommandExecuter.ExecuteCommand($"/usr/sbin/plesk bin certificate --remove \"Lets Encrypt {subDomain}.{rootDomain}\" -domain {rootDomain}");
+            CommandExecuter.ExecuteCommand($"plesk bin certificate --remove \"Lets Encrypt {subDomain}.{rootDomain}\" -domain {rootDomain}");
 
         if (!certResult.Contains("was successfully removed"))
             return false;
@@ -45,7 +45,7 @@ public class PleskManager
 
     private bool IssueCertificate(string subDomain, string rootDomain, string email)
     {
-        string result = CommandExecuter.ExecuteCommand($"/usr/sbin/plesk bin extension --exec letsencrypt cli.php -d {subDomain}.{rootDomain} -m {email}");
+        string result = CommandExecuter.ExecuteCommand($"plesk bin extension --exec letsencrypt cli.php -d {subDomain}.{rootDomain} -m {email}");
 
         return string.IsNullOrEmpty(result.Trim());
     }
