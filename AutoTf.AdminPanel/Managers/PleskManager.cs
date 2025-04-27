@@ -38,9 +38,11 @@ public class PleskManager
         return true;
     }
 
-    private void PointToAuthentik(string subDomain, string rootDOmain, string authentikHost)
+    private void PointToAuthentik(string subDomain, string rootDomain, string authentikHost)
     {
-        File.WriteAllText($"/var/www/vhosts/system/{subDomain}.{rootDOmain}/conf/vhost_nginx.conf", AssembleAuthentikConfig(authentikHost));
+        string dir = $"/var/www/vhosts/system/{subDomain}.{rootDomain}/conf";
+        Directory.CreateDirectory(dir);
+        File.WriteAllText($"{dir}/{subDomain}.{rootDomain}/conf/vhost_nginx.conf", AssembleAuthentikConfig(authentikHost));
     }
 
     private bool IssueCertificate(string subDomain, string rootDomain, string email)
