@@ -28,5 +28,3 @@ services:
 networks:
   authinstall_default:
     external: true
-    
-    useradd -r -u 999 -m psaadm
