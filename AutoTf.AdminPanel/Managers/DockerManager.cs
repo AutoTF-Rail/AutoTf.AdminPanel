@@ -22,11 +22,16 @@ public class DockerManager
         });
         
         // This is honestly easier than figuring out the filter argument from the docker package.
-        return containers.Where(x => x.Labels.ContainsKey("com.docker.compose.project") && x.Labels["com.docker.compose.project"] == "centralserver").ToList();
+        return containers.Where(x => x.Labels.ContainsKey("app.id") && x.Labels["app.id"] == "central-server-app").ToList();
     }
 
     public async Task<bool> DoesContainerExist(string id)
     {
+        List<ContainerListResponse> containers = await GetContainers();
+        foreach (ContainerListResponse container in containers)
+        {
+            Console.WriteLine(container.ID);
+        }
         return (await GetContainers()).Any(x => x.ID == id);
     }
 
