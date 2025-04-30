@@ -116,7 +116,7 @@ public class CloudflareManager : IHostedService
 
             return await HttpHelper.SendPatchCloudflare<string>(
                 $"https://api.cloudflare.com/client/v4/zones/{_credentials.CloudflareZone}/dns_records/{id}", content,
-                _credentials.CloudflareKey) ?? "";
+                _credentials.CloudflareKey, true) ?? "";
         }
         catch (Exception e)
         {
