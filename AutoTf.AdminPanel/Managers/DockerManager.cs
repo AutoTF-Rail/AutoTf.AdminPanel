@@ -27,11 +27,6 @@ public class DockerManager
 
     public async Task<bool> ContainerExists(string id)
     {
-        List<ContainerListResponse> containers = await GetContainers();
-        foreach (ContainerListResponse container in containers)
-        {
-            Console.WriteLine(container.ID);
-        }
         return (await GetContainers()).Any(x => x.ID == id);
     }
 
@@ -100,6 +95,9 @@ public class DockerManager
     {
         if (!await ContainerExists(containerId))
             return false;
+
+        if (!await ContainerRunning(containerId))
+            return false;
         
         return await _dockerClient.Containers.StopContainerAsync(containerId, new ContainerStopParameters());
     }
@@ -120,9 +118,6 @@ public class DockerManager
     public async Task DeleteContainer(string containerId)
     {
         if (!await ContainerExists(containerId))
-            return;
-
-        if (!await ContainerRunning(containerId))
             return;
         
         await _dockerClient.Containers.RemoveContainerAsync(containerId, new ContainerRemoveParameters());
