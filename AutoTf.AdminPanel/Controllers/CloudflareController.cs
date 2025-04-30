@@ -18,6 +18,7 @@ public class CloudflareController : ControllerBase
     [HttpPost("create")]
     public async Task<ActionResult<bool>> CreateRecord([FromBody] CreateDnsRecord record)
     {
+        // TODO: Check that the new values don't already exist
         return await _cloudflare.CreateNewEntry(record);
     }
 
@@ -38,6 +39,16 @@ public class CloudflareController : ControllerBase
             return NotFound("Could not find DNS entry.");
         
         return _cloudflare.GetRecord(id)!;
+    }
+
+    [HttpPost("{id}")]
+    public async Task<ActionResult<string>> UpdateRecord(string id, [FromBody] CreateDnsRecord record)
+    {
+        if (!_cloudflare.DoesEntryExist(id))
+            return NotFound("Could not find DNS entry.");
+        
+        // TODO: Check that the new values don't already exist
+        return await _cloudflare.UpdateRecord(id, record);
     }
 
     [HttpGet("all")]

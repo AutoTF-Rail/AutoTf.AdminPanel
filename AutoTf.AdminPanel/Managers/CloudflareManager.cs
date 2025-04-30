@@ -37,7 +37,7 @@ public class CloudflareManager : IHostedService
     {
         try
         {
-            record.Comment = "Managed by AutoTF Admin Panel." + record.Comment;
+            record.Comment = "Managed by AutoTF Admin Panel. " + record.Comment;
             
             HttpContent content = new StringContent(JsonSerializer.Serialize(record), Encoding.UTF8, "application/json");
             
@@ -103,6 +103,28 @@ public class CloudflareManager : IHostedService
     public DnsRecord? GetRecord(string id)
     {
         return Records.FirstOrDefault(x => x.Id == id);
+    }
+
+    public async Task<string> UpdateRecord(string id, CreateDnsRecord record)
+    {
+        try
+        {
+            if (!record.Comment.Contains("Managed by AutoTF Admin Panel."))
+                record.Comment = "Managed by AutoTF Admin Panel. " + record.Comment;
+            
+            HttpContent content = new StringContent(JsonSerializer.Serialize(record), Encoding.UTF8, "application/json");
+
+            return await HttpHelper.SendPatchCloudflare<string>(
+                $"https://api.cloudflare.com/client/v4/zones/{_credentials.CloudflareZone}/dns_records/{id}", content,
+                _credentials.CloudflareKey) ?? "";
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Something went wrong when updating the DNS Record: ");
+            Console.WriteLine(e.ToString());
+        }
+        
+        return "";
     }
 
     private async Task UpdateCache()
