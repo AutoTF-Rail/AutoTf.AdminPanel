@@ -8,16 +8,16 @@ public class OutpostConfig
     public string LogLevel { get; set; }
     
     [JsonPropertyName("docker_labels")]
-    public List<object> DockerLabels { get; set; }
+    public List<object>? DockerLabels { get; set; }
     
     [JsonPropertyName("authentik_host")]
     public string AuthentikHost { get; set; }
     
     [JsonPropertyName("docker_network")]
-    public object DockerNetwork { get; set; }
+    public object? DockerNetwork { get; set; }
     
     [JsonPropertyName("container_image")]
-    public object ContainerImage { get; set; }
+    public object? ContainerImage { get; set; }
     
     [JsonPropertyName("docker_map_ports")]
     public bool DockerMapPorts { get; set; }
@@ -41,7 +41,7 @@ public class OutpostConfig
     public bool AuthentikHostInsecure { get; set; }
     
     [JsonPropertyName("kubernetes_json_patches")]
-    public object KubernetesJsonPatches { get; set; }
+    public object? KubernetesJsonPatches { get; set; }
     
     [JsonPropertyName("kubernetes_service_type")]
     public string KubernetesServiceType { get; set; }
@@ -50,7 +50,7 @@ public class OutpostConfig
     public List<object> KubernetesImagePullSecrets { get; set; }
     
     [JsonPropertyName("kubernetes_ingress_class_name")]
-    public object KubernetesImagePullSecret { get; set; }
+    public object? KubernetesIngressClassName { get; set; }
     
     [JsonPropertyName("kubernetes_disabled_components")]
     public List<object> KubernetesDisabledComponents { get; set; }
