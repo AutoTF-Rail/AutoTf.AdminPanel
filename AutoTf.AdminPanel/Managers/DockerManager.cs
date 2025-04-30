@@ -25,7 +25,7 @@ public class DockerManager
         return containers.Where(x => x.Labels.ContainsKey("app.id") && x.Labels["app.id"] == "central-server-app").ToList();
     }
 
-    public async Task<bool> DoesContainerExist(string id)
+    public async Task<bool> ContainerExists(string id)
     {
         List<ContainerListResponse> containers = await GetContainers();
         foreach (ContainerListResponse container in containers)
@@ -33,6 +33,13 @@ public class DockerManager
             Console.WriteLine(container.ID);
         }
         return (await GetContainers()).Any(x => x.ID == id);
+    }
+
+    public async Task<bool> ContainerRunning(string id)
+    {
+        ContainerInspectResponse container = await _dockerClient.Containers.InspectContainerAsync(id);
+        
+        return container.State.Status == "running";
     }
 
     public async Task<CreateContainerResponse> CreateContainer(CreateContainer parameters, Dictionary<string, EndpointSettings> networks)
@@ -83,7 +90,7 @@ public class DockerManager
     
     public async Task<bool> StartContainer(string containerId)
     {
-        if (!await DoesContainerExist(containerId))
+        if (!await ContainerExists(containerId))
             return false;
         
         return await _dockerClient.Containers.StartContainerAsync(containerId, new ContainerStartParameters());
@@ -91,7 +98,7 @@ public class DockerManager
 
     public async Task<bool> StopContainer(string containerId)
     {
-        if (!await DoesContainerExist(containerId))
+        if (!await ContainerExists(containerId))
             return false;
         
         return await _dockerClient.Containers.StopContainerAsync(containerId, new ContainerStopParameters());
@@ -99,7 +106,10 @@ public class DockerManager
 
     public async Task<bool> KillContainer(string containerId)
     {
-        if (!await DoesContainerExist(containerId))
+        if (!await ContainerExists(containerId))
+            return false;
+        
+        if (!await ContainerRunning(containerId))
             return false;
         
         await _dockerClient.Containers.KillContainerAsync(containerId, new ContainerKillParameters());
@@ -109,7 +119,10 @@ public class DockerManager
 
     public async Task DeleteContainer(string containerId)
     {
-        if (!await DoesContainerExist(containerId))
+        if (!await ContainerExists(containerId))
+            return;
+
+        if (!await ContainerRunning(containerId))
             return;
         
         await _dockerClient.Containers.RemoveContainerAsync(containerId, new ContainerRemoveParameters());

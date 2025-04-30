@@ -61,6 +61,18 @@ public class DockerController : ControllerBase
         return await _docker.KillContainer(id);
     }
 
+    [HttpPost("exists")]
+    public async Task<ActionResult<bool>> Exists([FromBody, Required] string id)
+    {
+        return await _docker.ContainerExists(id);
+    }
+
+    [HttpPost("running")]
+    public async Task<ActionResult<bool>> Running([FromBody, Required] string id)
+    {
+        return await _docker.ContainerRunning(id);
+    }
+
     [HttpPost("delete")]
     public async Task<IActionResult> DeleteContainer([FromBody, Required] string id)
     {
