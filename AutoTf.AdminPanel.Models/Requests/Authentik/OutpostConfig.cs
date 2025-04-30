@@ -23,7 +23,7 @@ public class OutpostConfig
     public bool DockerMapPorts { get; set; }
     
     [JsonPropertyName("refresh_interval")]
-    public int RefreshInterval { get; set; }
+    public string RefreshInterval { get; set; }
     
     [JsonPropertyName("kubernetes_replicas")]
     public int KubernetesReplicas { get; set; }
