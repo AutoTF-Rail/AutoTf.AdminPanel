@@ -131,8 +131,19 @@ public class AuthManager : IHostedService
     {
         try
         {
-            return await ApiHttpHelper.SendGet<ProviderPaginationResult>($"{_credentials.AuthUrl}/api/v3/providers/proxy/?application__isnull=false&ordering=name&page=1&page_size=20&search=",
+            ProviderPaginationResult? providerPaginationResult = await ApiHttpHelper.SendGet<ProviderPaginationResult>($"{_credentials.AuthUrl}/api/v3/providers/proxy/?application__isnull=false&ordering=name&page=1&page_size=20&search=",
                 _apiKey, true);
+            
+            if (providerPaginationResult == null)
+                return null;
+
+            if (!providerPaginationResult.Results.Any())
+                return providerPaginationResult;
+
+            providerPaginationResult.Results =
+                providerPaginationResult.Results.Where(x => x.Name.Contains("Managed provider for")).ToList();
+
+            return providerPaginationResult;
         }
         catch (Exception e)
         {
