@@ -5,7 +5,7 @@ namespace AutoTf.AdminPanel.Models.Requests.Authentik;
 public class OutpostModel
 {
     [JsonPropertyName("Pk")] 
-    public string Pk { get; set; } = "";
+    public string? Pk { get; set; } = null;
     
     [JsonPropertyName("name")]
     public string Name { get; set; }
@@ -18,7 +18,7 @@ public class OutpostModel
     public List<string> Providers { get; set; } = [];
 
     [JsonPropertyName("providers_obj")] 
-    public List<object> ProvidersObject { get; set; } = [];
+    public List<object>? ProvidersObject { get; set; } = null;
     
     [JsonPropertyName("service_connection")]
     public string ServiceConnection { get; set; }
