@@ -85,12 +85,12 @@ public class AuthentikController : ControllerBase
     }
 
     [HttpGet("providers")]
-    public async Task<ActionResult<string>> Providers()
+    public async Task<ActionResult<ProviderPaginationResult>> Providers()
     {
-        string? result = await _auth.GetProviders();
+        ProviderPaginationResult? result = await _auth.GetProviders();
         
         if (result == null)
-            return Problem(result);
+            return Problem("Failed to send the request to authentik.");
 
         return result;
     }
