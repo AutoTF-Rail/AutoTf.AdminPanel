@@ -33,8 +33,6 @@ public class DockerManager
 
     public async Task<ContainerListResponse?> GetContainerByName(string name)
     {
-        List<ContainerListResponse> containerListResponses = await GetContainers();
-        
         ContainerListResponse? containerListResponse = (await GetContainers()).FirstOrDefault(x => x.Names.Any(y => y.Contains(name.ToLower())));
 
         if (containerListResponse == null)

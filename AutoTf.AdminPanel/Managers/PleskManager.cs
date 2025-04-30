@@ -98,7 +98,8 @@ public class PleskManager
             string[] result = CommandExecuter.ExecuteCommand($"plesk bin subdomain -i {subDomain}").Split(Environment.NewLine);
             string adminComment = result.First(x => x.Contains("Description for the administrator:"));
 
-            return adminComment.Contains("Externally managed by AutoTF");
+            // weird plesk bug?
+            return adminComment.Contains("Externally managed by AutoTF") || adminComment == "Externally";
         }
         catch
         {

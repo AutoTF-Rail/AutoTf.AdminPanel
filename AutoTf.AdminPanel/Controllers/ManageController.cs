@@ -37,12 +37,18 @@ public class ManageController : ControllerBase
         if (request.Container.ContainerName == "")
             request.Container.ContainerName = request.Container.EvuName;
 
-        ContainerListResponse? containerId = await _docker.GetContainerByName(request.Container.ContainerName);
+        ContainerListResponse? container = await _docker.GetContainerByName(request.Container.ContainerName);
 
-        if (containerId == null)
+        if (container == null)
             return Problem("The created container could not be found.");
+        
+        await _docker.StartContainer(container.ID);
+        container = await _docker.GetContainerByName(request.Container.ContainerName);
+        
+        if (container == null)
+            return Problem("The created container could not be found after it was started.");
 
-        if (!containerId.NetworkSettings.Networks.TryGetValue(request.Container.DefaultNetwork, out EndpointSettings? endpoint))
+        if (!container.NetworkSettings.Networks.TryGetValue(request.Container.DefaultNetwork, out EndpointSettings? endpoint))
             return Problem("Something went wrong during the network creation.");
 
         // Authentik
