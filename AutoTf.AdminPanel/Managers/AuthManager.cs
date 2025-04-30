@@ -98,7 +98,7 @@ public class AuthManager : IHostedService
         
         HttpContent content = new FormUrlEncodedContent(headers);
 
-        TokenRequestModel response = await HttpHelper.SendPost<TokenRequestModel>("/application/o/token/", content, false) ?? new TokenRequestModel();
+        TokenRequestModel response = await HttpHelper.SendPost<TokenRequestModel>($"{_credentials.AuthUrl}/application/o/token/", content, false) ?? new TokenRequestModel();
         
         if (response.ExpiresIn == 0)
         {
