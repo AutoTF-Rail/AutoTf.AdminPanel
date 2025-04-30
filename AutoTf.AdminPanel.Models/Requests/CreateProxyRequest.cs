@@ -17,7 +17,7 @@ public class CreateProxyRequest
     [JsonPropertyName("invalidationFlow")]
     public string InvalidationFlow { get; set; }
     
-    [JsonPropertyName("InternalHost")]
+    [JsonPropertyName("internalHost")]
     public string InternalHost { get; set; }
     
     [JsonPropertyName("externalHost")]

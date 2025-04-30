@@ -6,6 +6,7 @@ using AutoTf.AdminPanel.Models.Requests;
 using AutoTf.AdminPanel.Models.Requests.Authentik;
 using AutoTf.AdminPanel.Statics;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Timer = System.Timers.Timer;
 
@@ -71,6 +72,71 @@ public class AuthManager : IHostedService
         catch (Exception e)
         {
             Console.WriteLine("Something went wrong when creating a application with proxy:");
+            Console.WriteLine(e.ToString());
+        }
+
+        return null;
+    }
+
+    public async Task<string?> GetOutposts()
+    {
+        try
+        {
+            return await ApiHttpHelper.SendGet<string>($"{_credentials.AuthUrl}/api/v3/outposts/instances/?ordering=name&page=1&page_size=200&search=",
+                _apiKey, true);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Something went wrong when getting all outposts:");
+            Console.WriteLine(e.ToString());
+        }
+
+        return null;
+    }
+
+    public async Task<string?> GetOutpost(string id)
+    {
+        try
+        {
+            return await ApiHttpHelper.SendGet<string>($"{_credentials.AuthUrl}/api/v3/outposts/instances/{id}/",
+                _apiKey, true);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Something went wrong when getting outpost {id}:");
+            Console.WriteLine(e.ToString());
+        }
+
+        return null;
+    }
+
+    public async Task<string?> UpdateOutpost(string id, OutpostConfig config)
+    {
+        try
+        {
+            HttpContent content = new StringContent(JsonSerializer.Serialize(config), Encoding.UTF8, "application/json");
+            
+            return await ApiHttpHelper.SendPut($"{_credentials.AuthUrl}/api/v3/outposts/instances/{id}/", content, _apiKey, true);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Something went wrong when getting outpost {id}:");
+            Console.WriteLine(e.ToString());
+        }
+
+        return null;
+    }
+
+    public async Task<string?> GetProviders()
+    {
+        try
+        {
+            return await ApiHttpHelper.SendGet<string>($"{_credentials.AuthUrl}/api/v3/providers/proxy/?application__isnull=false&ordering=name&page=1&page_size=20&search=",
+                _apiKey, true);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Something went wrong when getting all providers:");
             Console.WriteLine(e.ToString());
         }
 
