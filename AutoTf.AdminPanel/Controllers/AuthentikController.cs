@@ -29,6 +29,46 @@ public class AuthentikController : ControllerBase
         return result;
     }
 
+    [HttpPost("outpost/{id}/assign")]
+    public async Task<ActionResult<string>> AssignToOutpost(string id, [FromBody, Required] string providerPk)
+    {
+        // TODO: Check for existance
+        OutpostModel? outpostModel = await _auth.GetOutpost(id);
+        
+        if (outpostModel == null)
+            return Problem($"Could not find outpost {id}.");
+        
+        // TODO: Check for provider existance 
+        outpostModel.Providers.Add(providerPk);
+        
+        string? result = await _auth.UpdateOutpost(id, outpostModel);
+        
+        if (result == null)
+            return Problem("Could not update outpost.");
+
+        return result;
+    }
+
+    [HttpPost("outpost/{id}/unassign")]
+    public async Task<ActionResult<string>> UnassignFromOutpost(string id, [FromBody, Required] string providerPk)
+    {
+        // TODO: Check for existance
+        OutpostModel? outpostModel = await _auth.GetOutpost(id);
+        
+        if (outpostModel == null)
+            return Problem($"Could not find outpost {id}.");
+        
+        // TODO: Check for provider existance 
+        outpostModel.Providers.Remove(providerPk);
+        
+        string? result = await _auth.UpdateOutpost(id, outpostModel);
+        
+        if (result == null)
+            return Problem("Could not update outpost.");
+
+        return result;
+    }
+
     [HttpGet("outposts")]
     public async Task<ActionResult<string>> Outposts()
     {
@@ -41,12 +81,12 @@ public class AuthentikController : ControllerBase
     }
 
     [HttpGet("outpost/{id}")]
-    public async Task<ActionResult<string>> Outpost(string id)
+    public async Task<ActionResult<OutpostModel>> Outpost(string id)
     {
-        string? result = await _auth.GetOutpost(id);
+        OutpostModel? result = await _auth.GetOutpost(id);
         
         if (result == null)
-            return Problem(result);
+            return Problem("Could not find outpost.");
 
         return result;
     }

@@ -94,12 +94,12 @@ public class AuthManager : IHostedService
         return null;
     }
 
-    public async Task<string?> GetOutpost(string id)
+    public async Task<OutpostModel?> GetOutpost(string id)
     {
         try
         {
-            return await ApiHttpHelper.SendGet($"{_credentials.AuthUrl}/api/v3/outposts/instances/{id}/",
-                _apiKey, true);
+            return await ApiHttpHelper.SendGet<OutpostModel>($"{_credentials.AuthUrl}/api/v3/outposts/instances/{id}/",
+                _apiKey, true) ?? null;
         }
         catch (Exception e)
         {
