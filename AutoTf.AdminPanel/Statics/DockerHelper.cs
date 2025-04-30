@@ -53,17 +53,11 @@ public static class DockerHelper
         if (string.IsNullOrEmpty(subnet))
             throw new Exception("Missing subnet in network config");
 
-        foreach (string usedIp in usedIps)
-        {
-            Console.WriteLine(usedIp);
-        }
         string baseIp = subnet.Split('.')[0] + "." + subnet.Split('.')[1] + "." + subnet.Split('.')[2];
 
         for (int i = 2; i < 255; i++) 
         {
             string candidate = $"{baseIp}.{i}";
-            Console.WriteLine(candidate);
-            Console.WriteLine(usedIps.Contains(candidate));
             if (!usedIps.Contains(candidate))
                 return candidate;
         }
