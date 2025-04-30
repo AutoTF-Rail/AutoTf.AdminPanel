@@ -94,4 +94,15 @@ public class AuthentikController : ControllerBase
 
         return result;
     }
+
+    [HttpGet("providerId")]
+    public async Task<ActionResult<string>> ProviderByExternalHost([FromBody, Required] string externalHost)
+    {
+        string? result = await _auth.GetProviderIdByExternalHost(externalHost);
+        
+        if (result == null)
+            return Problem("Failed to find the provider.");
+
+        return result;
+    }
 }
