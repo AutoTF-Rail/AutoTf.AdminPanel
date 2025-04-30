@@ -5,34 +5,14 @@ namespace AutoTf.AdminPanel.Models;
 
 public class StringConverter : JsonConverter<string>
 {
-    public override string Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override string? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        string result = string.Empty;
-
-        if (reader.TokenType != JsonTokenType.StartArray)
+        return reader.TokenType switch
         {
-            throw new JsonException("Expected start of array");
-        }
-
-        while (reader.Read())
-        {
-            if (reader.TokenType == JsonTokenType.EndArray)
-                break;
-
-            switch (reader.TokenType)
-            {
-                case JsonTokenType.String:
-                    return reader.GetString()!;
-                    break;
-                case JsonTokenType.Number:
-                    return reader.GetInt32().ToString();
-                    break;
-                default:
-                    throw new JsonException("Unsupported type in array");
-            }
-        }
-
-        return result;
+            JsonTokenType.String => reader.GetString(),
+            JsonTokenType.Number => reader.GetInt32().ToString(),
+            _ => throw new JsonException($"Unexpected token {reader.TokenType} when parsing string.")
+        };
     }
 
     public override void Write(Utf8JsonWriter writer, string value, JsonSerializerOptions options)
