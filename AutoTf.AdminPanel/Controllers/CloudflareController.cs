@@ -60,4 +60,11 @@ public class CloudflareController : ControllerBase
     {
         return _cloudflare.Records;
     }
+
+    [HttpPost("update")]
+    public async Task<IActionResult> Update()
+    {
+        await _cloudflare.UpdateCache();
+        return Ok();
+    }
 }

@@ -10,7 +10,7 @@ namespace AutoTf.AdminPanel.Managers;
 
 public class CloudflareManager : IHostedService
 {
-    private Timer _timer = new Timer(TimeSpan.FromMinutes(10));
+    private Timer _timer = new Timer(TimeSpan.FromMinutes(5));
     private Credentials _credentials;
 
     public List<DnsRecord> Records { get; private set; } = [];
@@ -127,7 +127,7 @@ public class CloudflareManager : IHostedService
         return null;
     }
 
-    private async Task UpdateCache()
+    public async Task UpdateCache()
     {
         try
         {
