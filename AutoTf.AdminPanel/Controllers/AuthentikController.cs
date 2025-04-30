@@ -52,7 +52,7 @@ public class AuthentikController : ControllerBase
     }
 
     [HttpPut("outpost/{id}")]
-    public async Task<ActionResult<string>> UpdateOutpost(string id, [FromBody, Required] OutpostConfig config)
+    public async Task<ActionResult<string>> UpdateOutpost(string id, [FromBody, Required] OutpostModel config)
     {
         string? result = await _auth.UpdateOutpost(id, config);
         

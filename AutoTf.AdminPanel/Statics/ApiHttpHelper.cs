@@ -30,6 +30,28 @@ public class ApiHttpHelper
         }
     }
     
+    public static async Task<string?> SendGet(string endpoint, string apiKey, bool reThrow = false, int timeoutSeconds = 5)
+    {
+        try
+        {
+            using HttpClient client = new HttpClient();
+            client.Timeout = TimeSpan.FromSeconds(timeoutSeconds);
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
+            
+            HttpResponseMessage response = await client.GetAsync(endpoint);
+            response.EnsureSuccessStatusCode();
+
+            return await response.Content.ReadAsStringAsync();
+        }
+        catch
+        {
+            if(reThrow)
+                throw;
+
+            return default;
+        }
+    }
+    
     public static async Task<T?> SendGet<T>(string endpoint, string apiKey, bool reThrow = false, int timeoutSeconds = 5)
     {
         try

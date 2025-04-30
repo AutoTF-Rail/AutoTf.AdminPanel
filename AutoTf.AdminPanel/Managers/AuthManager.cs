@@ -82,7 +82,7 @@ public class AuthManager : IHostedService
     {
         try
         {
-            return await ApiHttpHelper.SendGet<string>($"{_credentials.AuthUrl}/api/v3/outposts/instances/?ordering=name&page=1&page_size=200&search=",
+            return await ApiHttpHelper.SendGet($"{_credentials.AuthUrl}/api/v3/outposts/instances/?ordering=name&page=1&page_size=200&search=",
                 _apiKey, true);
         }
         catch (Exception e)
@@ -98,7 +98,7 @@ public class AuthManager : IHostedService
     {
         try
         {
-            return await ApiHttpHelper.SendGet<string>($"{_credentials.AuthUrl}/api/v3/outposts/instances/{id}/",
+            return await ApiHttpHelper.SendGet($"{_credentials.AuthUrl}/api/v3/outposts/instances/{id}/",
                 _apiKey, true);
         }
         catch (Exception e)
@@ -110,7 +110,7 @@ public class AuthManager : IHostedService
         return null;
     }
 
-    public async Task<string?> UpdateOutpost(string id, OutpostConfig config)
+    public async Task<string?> UpdateOutpost(string id, OutpostModel config)
     {
         try
         {
@@ -131,7 +131,7 @@ public class AuthManager : IHostedService
     {
         try
         {
-            return await ApiHttpHelper.SendGet<string>($"{_credentials.AuthUrl}/api/v3/providers/proxy/?application__isnull=false&ordering=name&page=1&page_size=20&search=",
+            return await ApiHttpHelper.SendGet($"{_credentials.AuthUrl}/api/v3/providers/proxy/?application__isnull=false&ordering=name&page=1&page_size=20&search=",
                 _apiKey, true);
         }
         catch (Exception e)
