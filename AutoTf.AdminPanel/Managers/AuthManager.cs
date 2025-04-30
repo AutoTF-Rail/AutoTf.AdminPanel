@@ -30,7 +30,7 @@ public class AuthManager : IHostedService
         StartTimer(300);
     }
 
-    public async Task<string?> CreateProxy(CreateProxyRequest request)
+    public async Task<TransactionalCreationResponse?> CreateProxy(CreateProxyRequest request)
     {
         try
         {
@@ -67,7 +67,7 @@ public class AuthManager : IHostedService
 
             HttpContent content = new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json");
 
-            return await ApiHttpHelper.SendPut($"{_credentials.AuthUrl}/api/v3/core/transactional/applications/", content, _apiKey, true);
+            return await ApiHttpHelper.SendPut<TransactionalCreationResponse>($"{_credentials.AuthUrl}/api/v3/core/transactional/applications/", content, _apiKey, true);
         }
         catch (Exception e)
         {

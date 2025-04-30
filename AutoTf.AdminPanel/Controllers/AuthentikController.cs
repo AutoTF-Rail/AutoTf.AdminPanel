@@ -19,12 +19,12 @@ public class AuthentikController : ControllerBase
     }
 
     [HttpPost("create")]
-    public async Task<ActionResult<string>> Create([FromBody, Required] CreateProxyRequest request)
+    public async Task<ActionResult<TransactionalCreationResponse>> Create([FromBody, Required] CreateProxyRequest request)
     {
-        string? result = await _auth.CreateProxy(request);
+        TransactionalCreationResponse? result = await _auth.CreateProxy(request);
         
         if (result == null)
-            return Problem(result);
+            return Problem("Something went wrong when creating the proxy.");
 
         return result;
     }

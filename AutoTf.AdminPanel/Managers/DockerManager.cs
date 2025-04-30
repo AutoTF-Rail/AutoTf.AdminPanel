@@ -30,6 +30,19 @@ public class DockerManager
         return (await GetContainers()).Any(x => x.ID == id);
     }
 
+    public async Task<ContainerListResponse?> GetContainerByName(string name)
+    {
+        ContainerListResponse? containerListResponse = (await GetContainers()).FirstOrDefault(x => x.Names.Contains(name));
+
+        if (containerListResponse == null)
+        {
+            Console.WriteLine($"Could not create site because the created container was not found by name {name}.");
+            return null;
+        }
+
+        return containerListResponse;
+    }
+
     public async Task<bool> ContainerRunning(string id)
     {
         ContainerInspectResponse container = await _dockerClient.Containers.InspectContainerAsync(id);
