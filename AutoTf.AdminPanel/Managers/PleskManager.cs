@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using AutoTf.AdminPanel.Statics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging.Console;
@@ -68,8 +69,33 @@ public class PleskManager
                "}";
     }
 
-    public IActionResult GetAll()
+    public List<string> GetAll()
     {
-        throw new NotImplementedException();
+        string[] result = CommandExecuter.ExecuteCommand("plesk bin subdomain -l").Split(Environment.NewLine);
+
+        ConcurrentBag<string> managedDomains = new ConcurrentBag<string>();
+        
+        Parallel.ForEach(result, subDomain =>
+        {
+            if (IsManaged(subDomain))
+                managedDomains.Add(subDomain);
+        });
+
+        return managedDomains.ToList();
+    }
+
+    private bool IsManaged(string subDomain)
+    {
+        try
+        {
+            string[] result = CommandExecuter.ExecuteCommand($"plesk bin subdomain -i {subDomain}").Split(Environment.NewLine);
+            string adminComment = result.First(x => x.Contains("Description for the administrator:"));
+
+            return adminComment.Contains("Externally managed by AutoTF");
+        }
+        catch
+        {
+            return false;
+        }
     }
 }

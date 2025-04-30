@@ -28,7 +28,7 @@ public class PleskController : ControllerBase
     }
 
     [HttpGet("all")]
-    public IActionResult All()
+    public ActionResult<List<string>> All()
     {
         return _plesk.GetAll();
     }
