@@ -38,7 +38,7 @@ public class PleskManager
             return false;
 
         string certResult =
-            CommandExecuter.ExecuteCommand($"plesk bin certificate --remove \"Lets Encrypt {subDomain}.{rootDomain}\" -domain {rootDomain}");
+            CommandExecuter.ExecuteCommand($"plesk bin certificate --remove 'Lets Encrypt {subDomain}.{rootDomain}' -domain {rootDomain}");
 
         if (!certResult.Contains("was successfully removed"))
             return false;
@@ -99,7 +99,7 @@ public class PleskManager
             string adminComment = result.First(x => x.Contains("Description for the administrator:"));
 
             // weird plesk bug?
-            return adminComment.Contains("Externally managed by AutoTF") || adminComment == "Externally";
+            return adminComment.Contains("Externally managed by AutoTF") || adminComment.Contains("Externally");
         }
         catch
         {
