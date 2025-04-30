@@ -12,32 +12,30 @@ namespace AutoTf.AdminPanel.Controllers;
 [Route("/api/manage")]
 public class ManageController : ControllerBase
 {
-    private readonly DockerController _docker;
     private readonly AuthManager _auth;
-    private readonly CloudflareController _cloudflare;
-    private readonly PleskController _plesk;
-    private readonly DockerManager _dockerManager;
+    private readonly CloudflareManager _cloudflare;
+    private readonly PleskManager _plesk;
+    private readonly DockerManager _docker;
 
-    public ManageController(DockerController docker, AuthManager auth, CloudflareController cloudflare, PleskController plesk, DockerManager dockerManager)
+    public ManageController(DockerManager docker, AuthManager auth, CloudflareManager cloudflare, PleskManager plesk)
     {
-        _docker = docker;
         _auth = auth;
         _cloudflare = cloudflare;
         _plesk = plesk;
-        _dockerManager = dockerManager;
+        _docker = docker;
     }
 
     [HttpPost("create")]
     public async Task<ActionResult<bool>> Create([FromBody, Required] TotalCreationRequest request)
     {
-        await _cloudflare.CreateRecord(request.DnsRecord);
+        await _cloudflare.CreateNewEntry(request.DnsRecord);
 
         await _docker.CreateContainer(request.Container);
         
         if (request.Container.ContainerName == "")
             request.Container.ContainerName = request.Container.EvuName;
 
-        ContainerListResponse? containerId = await _dockerManager.GetContainerByName(request.Container.ContainerName);
+        ContainerListResponse? containerId = await _docker.GetContainerByName(request.Container.ContainerName);
 
         if (containerId == null)
             return Problem("The created container could not be found.");
@@ -50,10 +48,11 @@ public class ManageController : ControllerBase
         TransactionalCreationResponse? proxyResult = await _auth.CreateProxy(proxy);
         
         if (proxyResult == null)
-            return Problem($"Failed while creating the proxy.");
-        else if (proxyResult.Applied == false)
-            return Problem($"Failed while creating the proxy. Logs: {string.Join(Environment.NewLine, proxyResult.Logs)}");
+            return Problem("Failed while creating the proxy.");
         
-        return _plesk.Create(request.Plesk);
+        if (proxyResult.Applied == false)
+            return Problem($"Failed while creating the proxy. Logs: {string.Join(Environment.NewLine, proxyResult.Logs)}");
+
+        return _plesk.CreateSubdomain(request.Plesk.SubDomain, request.Plesk.RootDomain, request.Plesk.Email, request.Plesk.AuthentikHost);
     }
 }

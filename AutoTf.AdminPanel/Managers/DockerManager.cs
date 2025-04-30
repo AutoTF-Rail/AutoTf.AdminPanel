@@ -1,4 +1,5 @@
 using AutoTf.AdminPanel.Models.Requests;
+using AutoTf.AdminPanel.Statics;
 using Docker.DotNet;
 using Docker.DotNet.Models;
 
@@ -50,9 +51,13 @@ public class DockerManager
         return container.State.Status == "running";
     }
 
-    public async Task<CreateContainerResponse> CreateContainer(CreateContainer parameters, Dictionary<string, EndpointSettings> networks)
+    public async Task<CreateContainerResponse> CreateContainer(CreateContainer parameters)
     {
-        
+        Dictionary<string,EndpointSettings> networks = await DockerHelper.ConfigureNetwork(parameters, this);
+
+        if (string.IsNullOrEmpty(parameters.ContainerName))
+            parameters.ContainerName = parameters.EvuName;
+
         Dictionary<string, EmptyStruct> exposedPorts = new Dictionary<string, EmptyStruct>();
         Dictionary<string, IList<PortBinding>> portBindings = new Dictionary<string, IList<PortBinding>>();
         
