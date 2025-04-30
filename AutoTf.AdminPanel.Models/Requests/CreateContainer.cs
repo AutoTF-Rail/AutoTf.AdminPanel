@@ -10,7 +10,7 @@ public class CreateContainer
     public string DefaultNetwork { get; set; } = null!;
     
     [JsonPropertyName("defaultIp")]
-    public string DefaultIp { get; set; } = null!;
+    public string DefaultIp { get; set; } = string.Empty;
 
     [JsonPropertyName("additionalNetwork")]
     public string AdditionalNetwork { get; set; } = string.Empty;
