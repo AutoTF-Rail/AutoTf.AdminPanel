@@ -49,9 +49,11 @@ public class ManageController : ControllerBase
         
         if (proxyResult == null)
             return Problem("Failed while creating the proxy.");
-        
+
         if (proxyResult.Applied == false)
-            return Problem($"Failed while creating the proxy. Logs: {string.Join(Environment.NewLine, proxyResult.Logs)}");
+        {
+            return Problem(proxyResult.Logs.Any() ? $"Failed while creating the proxy. Logs: {string.Join(Environment.NewLine, proxyResult.Logs)}" : "Failed while creating the proxy. No logs");
+        }
 
         string? providerId = await _auth.GetProviderIdByExternalHost(request.Proxy.ExternalHost);
 
