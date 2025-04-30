@@ -5,6 +5,7 @@ namespace AutoTf.AdminPanel.Models.Requests.Authentik;
 public class OutpostModel
 {
     [JsonPropertyName("Pk")] 
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Pk { get; set; } = null;
     
     [JsonPropertyName("name")]
@@ -18,23 +19,28 @@ public class OutpostModel
     public List<string> Providers { get; set; } = [];
 
     [JsonPropertyName("providers_obj")] 
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public List<object>? ProvidersObject { get; set; } = null;
     
     [JsonPropertyName("service_connection")]
     public string ServiceConnection { get; set; }
 
     [JsonPropertyName("service_connection_obj")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public object? ServiceConnectionObject { get; set; } = null;
 
     [JsonPropertyName("refresh_interval_s")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public int? RefreshIntervalS { get; set; } = null;
 
     [JsonPropertyName("token_identifier")] 
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? TokenIdentifier { get; set; } = null;
     
     [JsonPropertyName("config")]
     public OutpostConfig Config { get; set; }
 
     [JsonPropertyName("managed")] 
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Managed { get; set; } = null;
 }
