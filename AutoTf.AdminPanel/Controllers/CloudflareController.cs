@@ -41,7 +41,7 @@ public class CloudflareController : ControllerBase
         return _cloudflare.GetRecord(id)!;
     }
 
-    [HttpPost("{id}")]
+    [HttpPatch("{id}")]
     public async Task<ActionResult<string>> UpdateRecord(string id, [FromBody] CreateDnsRecord record)
     {
         if (!_cloudflare.DoesEntryExist(id))
