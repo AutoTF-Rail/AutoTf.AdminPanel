@@ -26,7 +26,7 @@ public class CloudflareController : ControllerBase
     {
         // This not only ensures that nothing is deleted that doesn't exist, but it also ensures that nothing is deleted that isnt a Admin Panel managed record.
         if (!_cloudflare.DoesEntryExist(id))
-            return NotFound();
+            return NotFound("Could not find DNS entry.");
         
         return await _cloudflare.DeleteEntry(id);
     }
@@ -35,7 +35,7 @@ public class CloudflareController : ControllerBase
     public ActionResult<DnsRecord> GetRecord(string id)
     {
         if (!_cloudflare.DoesEntryExist(id))
-            return NotFound();
+            return NotFound("Could not find DNS entry.");
         
         return _cloudflare.GetRecord(id)!;
     }
