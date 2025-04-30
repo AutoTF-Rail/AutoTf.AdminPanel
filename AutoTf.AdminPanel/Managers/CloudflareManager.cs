@@ -70,7 +70,7 @@ public class CloudflareManager : IHostedService
     {
         try
         {
-            if (!await HttpHelper.SendCloudflareDelete($"https://api.cloudflare.com/client/v4/zones/{_credentials.CloudflareZone}/dns_records", _credentials.CloudflareKey)) 
+            if (!await HttpHelper.SendCloudflareDelete($"https://api.cloudflare.com/client/v4/zones/{_credentials.CloudflareZone}/dns_records/{id}", _credentials.CloudflareKey)) 
                 return false;
             
             Records.RemoveAll(x => x.Id == id);
@@ -79,7 +79,7 @@ public class CloudflareManager : IHostedService
         }
         catch (Exception e)
         {
-            Console.WriteLine($"Something went wrong when configuring the DNS entry {id}:");
+            Console.WriteLine($"Something went wrong when deleting the DNS entry {id}:");
             Console.WriteLine(e.ToString());
             return false;
         }
