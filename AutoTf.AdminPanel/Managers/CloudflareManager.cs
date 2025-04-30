@@ -105,7 +105,7 @@ public class CloudflareManager : IHostedService
         return Records.FirstOrDefault(x => x.Id == id);
     }
 
-    public async Task<string> UpdateRecord(string id, CreateDnsRecord record)
+    public async Task<string?> UpdateRecord(string id, CreateDnsRecord record)
     {
         try
         {
@@ -114,9 +114,9 @@ public class CloudflareManager : IHostedService
             
             HttpContent content = new StringContent(JsonSerializer.Serialize(record), Encoding.UTF8, "application/json");
 
-            return await HttpHelper.SendPatchCloudflare<string>(
+            return await HttpHelper.SendPatchCloudflare(
                 $"https://api.cloudflare.com/client/v4/zones/{_credentials.CloudflareZone}/dns_records/{id}", content,
-                _credentials.CloudflareKey, true) ?? "";
+                _credentials.CloudflareKey, true);
         }
         catch (Exception e)
         {
@@ -124,7 +124,7 @@ public class CloudflareManager : IHostedService
             Console.WriteLine(e.ToString());
         }
         
-        return "";
+        return null;
     }
 
     private async Task UpdateCache()

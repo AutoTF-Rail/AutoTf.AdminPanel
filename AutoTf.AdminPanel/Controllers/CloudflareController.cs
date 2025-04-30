@@ -48,7 +48,11 @@ public class CloudflareController : ControllerBase
             return NotFound("Could not find DNS entry.");
         
         // TODO: Check that the new values don't already exist
-        return await _cloudflare.UpdateRecord(id, record);
+        string? result = await _cloudflare.UpdateRecord(id, record);
+        if (result == null)
+            return Problem(result);
+
+        return result;
     }
 
     [HttpGet("all")]

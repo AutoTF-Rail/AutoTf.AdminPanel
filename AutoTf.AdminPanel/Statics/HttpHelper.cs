@@ -176,8 +176,7 @@ public static class HttpHelper
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
             
             HttpResponseMessage response = await client.PatchAsync(endpoint, content);
-            response.EnsureSuccessStatusCode();
-
+            
             return await response.Content.ReadAsStringAsync();
         }
         catch
