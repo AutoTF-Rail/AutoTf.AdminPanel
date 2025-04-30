@@ -41,7 +41,7 @@ public class CloudflareManager : IHostedService
             
             HttpContent content = new StringContent(JsonSerializer.Serialize(record), Encoding.UTF8, "application/json");
             
-            CreateDnsRecordResult? result = await HttpHelper.SendPostCloudflare<CreateDnsRecordResult>($"https://api.cloudflare.com/client/v4/zones/{_credentials.CloudflareZone}/dns_records", content, _credentials.CloudflareKey, true);
+            CreateDnsRecordResult? result = await ApiHttpHelper.SendPost<CreateDnsRecordResult>($"https://api.cloudflare.com/client/v4/zones/{_credentials.CloudflareZone}/dns_records", content, _credentials.CloudflareKey, true);
 
             if (result == null)
             {
@@ -70,7 +70,7 @@ public class CloudflareManager : IHostedService
     {
         try
         {
-            if (!await HttpHelper.SendCloudflareDelete($"https://api.cloudflare.com/client/v4/zones/{_credentials.CloudflareZone}/dns_records/{id}", _credentials.CloudflareKey)) 
+            if (!await ApiHttpHelper.SendDelete($"https://api.cloudflare.com/client/v4/zones/{_credentials.CloudflareZone}/dns_records/{id}", _credentials.CloudflareKey)) 
                 return false;
             
             Records.RemoveAll(x => x.Id == id);
@@ -114,7 +114,7 @@ public class CloudflareManager : IHostedService
             
             HttpContent content = new StringContent(JsonSerializer.Serialize(record), Encoding.UTF8, "application/json");
 
-            return await HttpHelper.SendPatchCloudflare(
+            return await ApiHttpHelper.SendPatch(
                 $"https://api.cloudflare.com/client/v4/zones/{_credentials.CloudflareZone}/dns_records/{id}", content,
                 _credentials.CloudflareKey, true);
         }
@@ -133,7 +133,7 @@ public class CloudflareManager : IHostedService
         {
             Console.WriteLine("Updating cloudflare records cache.");
             
-            DnsRecords? dnsRecords = await HttpHelper.SendGetCloudflare<DnsRecords>($"https://api.cloudflare.com/client/v4/zones/{_credentials.CloudflareZone}/dns_records", _credentials.CloudflareKey, true);
+            DnsRecords? dnsRecords = await ApiHttpHelper.SendGet<DnsRecords>($"https://api.cloudflare.com/client/v4/zones/{_credentials.CloudflareZone}/dns_records", _credentials.CloudflareKey, true);
 
             if (dnsRecords == null)
                 throw new Exception("Empty return from Cloudflare API.");

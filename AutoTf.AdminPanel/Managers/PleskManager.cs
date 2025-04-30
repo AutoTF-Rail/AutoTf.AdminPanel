@@ -1,4 +1,6 @@
 using AutoTf.AdminPanel.Statics;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging.Console;
 
 namespace AutoTf.AdminPanel.Managers;
 
@@ -64,5 +66,10 @@ public class PleskManager
                    "proxy_set_header X-Forwarded-Proto $scheme;" +
                    "proxy_cache_bypass $http_upgrade;" +
                "}";
+    }
+
+    public IActionResult GetAll()
+    {
+        throw new NotImplementedException();
     }
 }
