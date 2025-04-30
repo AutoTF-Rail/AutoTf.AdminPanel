@@ -56,9 +56,10 @@ public class DockerManager
     public async Task<CreateContainerResponse> CreateContainer(CreateContainer parameters)
     {
         Dictionary<string,EndpointSettings> networks = await DockerHelper.ConfigureNetwork(parameters, this);
-
+        parameters.ContainerName = parameters.ContainerName.ToLower();
+        
         if (string.IsNullOrEmpty(parameters.ContainerName))
-            parameters.ContainerName = parameters.EvuName;
+            parameters.ContainerName = parameters.EvuName.ToLower();
 
         Dictionary<string, EmptyStruct> exposedPorts = new Dictionary<string, EmptyStruct>();
         Dictionary<string, IList<PortBinding>> portBindings = new Dictionary<string, IList<PortBinding>>();

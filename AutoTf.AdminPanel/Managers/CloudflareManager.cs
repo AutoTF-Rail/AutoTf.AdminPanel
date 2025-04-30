@@ -38,6 +38,7 @@ public class CloudflareManager : IHostedService
         try
         {
             record.Comment = "Managed by AutoTF Admin Panel. " + record.Comment;
+            record.Name = record.Name.ToLower();
             
             HttpContent content = new StringContent(JsonSerializer.Serialize(record), Encoding.UTF8, "application/json");
             
@@ -111,6 +112,8 @@ public class CloudflareManager : IHostedService
         {
             if (!record.Comment.Contains("Managed by AutoTF Admin Panel."))
                 record.Comment = "Managed by AutoTF Admin Panel. " + record.Comment;
+
+            record.Name = record.Name.ToLower();
             
             HttpContent content = new StringContent(JsonSerializer.Serialize(record), Encoding.UTF8, "application/json");
 

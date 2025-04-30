@@ -36,9 +36,9 @@ public class AuthManager : IHostedService
         {
             CreateAppWithProviderModel model = new CreateAppWithProviderModel();
             model.App.Name = request.Name;
-            model.App.Slug = Regex.Replace(request.LaunchUrl.ToLower(), "[^a-z]", "");
+            model.App.Slug = Regex.Replace(request.Name.ToLower(), "[^a-z]", "");
             model.App.OpenInNewTab = false;
-            model.App.MetaLaunchUrl = request.LaunchUrl;
+            model.App.MetaLaunchUrl = request.LaunchUrl.ToLower();
             model.App.PolicyEngineMode = "any";
             model.App.Group = "AutoTF-Managed";
 
@@ -47,8 +47,8 @@ public class AuthManager : IHostedService
             model.Provider.AuthorizationFlow = request.AuthorizationFlow;
             model.Provider.InvalidationFlow = request.InvalidationFlow;
             model.Provider.PropertyMappings = [];
-            model.Provider.InternalHost = request.InternalHost;
-            model.Provider.ExternalHost = request.ExternalHost;
+            model.Provider.InternalHost = request.InternalHost.ToLower();
+            model.Provider.ExternalHost = request.ExternalHost.ToLower();
             model.Provider.InternalHostSslValidation = true;
             model.Provider.Certificate = null;
             model.Provider.SkipPathRegex = "";
@@ -150,7 +150,7 @@ public class AuthManager : IHostedService
         if (providers == null || !providers.Results.Any())
             return null;
 
-        Provider? provider = providers.Results.FirstOrDefault(x => x.Name.Contains("Managed provider for") && x.ExternalHost == externalHost);
+        Provider? provider = providers.Results.FirstOrDefault(x => x.Name.Contains("Managed provider for") && x.ExternalHost.ToLower() == externalHost);
        
         if (provider == null)
             return null;
