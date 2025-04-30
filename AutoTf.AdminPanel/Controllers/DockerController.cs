@@ -55,6 +55,12 @@ public class DockerController : ControllerBase
         return await _docker.StopContainer(id);
     }
 
+    [HttpPost("kill")]
+    public async Task<ActionResult<bool>> KillContainer([FromBody, Required] string id)
+    {
+        return await _docker.KillContainer(id);
+    }
+
     [HttpPost("delete")]
     public async Task<IActionResult> DeleteContainer([FromBody, Required] string id)
     {
