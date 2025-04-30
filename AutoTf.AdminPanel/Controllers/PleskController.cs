@@ -18,7 +18,7 @@ public class PleskController : ControllerBase
     [HttpPost("create")]
     public ActionResult<bool> Create([FromBody] CreateSubdomainRequest request)
     {
-        return _plesk.CreateSubdomain(request.SubDomain, request.RootDomain.ToLower(), request.Email, request.AuthentikHost);
+        return _plesk.CreateSubdomain(request.SubDomain.ToLower(), request.RootDomain.ToLower(), request.Email, request.AuthentikHost);
     }
 
     [HttpDelete("{rootDomain}/{subDomain}")]

@@ -8,5 +8,5 @@ public class TransactionalCreationResponse
     public bool Applied { get; set; }
     
     [JsonPropertyName("logs")]
-    public List<string> Logs { get; set; }
+    public List<string>? Logs { get; set; }
 }

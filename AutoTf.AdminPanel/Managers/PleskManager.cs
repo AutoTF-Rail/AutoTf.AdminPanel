@@ -12,6 +12,9 @@ public class PleskManager
     /// </summary>
     public bool CreateSubdomain(string subDomain, string rootDomain, string email, string authentikHost)
     {
+        subDomain = subDomain.ToLower();
+        rootDomain = rootDomain.ToLower();
+        
         string result = CommandExecuter.ExecuteCommand(
             $"plesk bin subdomain --create {subDomain} -domain {rootDomain} -admin-description \"Externally managed by AutoTF\"");
 
@@ -27,6 +30,8 @@ public class PleskManager
 
     public bool DeleteSubDomain(string rootDomain, string subDomain)
     {
+        subDomain = subDomain.ToLower();
+        rootDomain = rootDomain.ToLower();
         string result = CommandExecuter.ExecuteCommand($"plesk bin subdomain --remove {subDomain} -domain {rootDomain}");
 
         if (!result.Contains("SUCCESS: Removal of"))
@@ -37,7 +42,8 @@ public class PleskManager
 
         if (!certResult.Contains("was successfully removed"))
             return false;
-        
+
+        CommandExecuter.ExecuteCommand("systemctl reload nginx");
         return true;
     }
 
@@ -46,6 +52,7 @@ public class PleskManager
         string dir = $"/var/www/vhosts/system/{subDomain}.{rootDomain}/conf";
         Directory.CreateDirectory(dir);
         File.WriteAllText($"{dir}/vhost_nginx.conf", AssembleAuthentikConfig(authentikHost));
+        CommandExecuter.ExecuteCommand("systemctl reload nginx");
     }
 
     private bool IssueCertificate(string subDomain, string rootDomain, string email)
