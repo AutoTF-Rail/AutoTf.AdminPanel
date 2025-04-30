@@ -14,6 +14,7 @@ public class OutpostModel
     public string Type { get; set; }
 
     [JsonPropertyName("providers")] 
+    [JsonConverter(typeof(StringListConverter))]
     public List<string> Providers { get; set; } = [];
 
     [JsonPropertyName("providers_obj")] 
