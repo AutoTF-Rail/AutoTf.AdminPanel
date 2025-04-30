@@ -23,6 +23,9 @@ public class Proxy
     
     [JsonPropertyName("policyBindings")]
     public List<PolicyBinding> PolicyBindings { get; set; }
+    
+    [JsonPropertyName("outpostId")]
+    public string OutpostId { get; set; }
 
     public CreateProxyRequest ConvertToRequest(string ipAddress)
     {

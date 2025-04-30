@@ -53,6 +53,17 @@ public class ManageController : ControllerBase
         if (proxyResult.Applied == false)
             return Problem($"Failed while creating the proxy. Logs: {string.Join(Environment.NewLine, proxyResult.Logs)}");
 
+        string? providerId = await _auth.GetProviderIdByExternalHost(request.Proxy.ExternalHost);
+
+        if (providerId == null)
+            return Problem("Failed to find the created provider.");
+
+        // idk how to validate this properly yet
+        string? assignResult = await _auth.AssignToOutpost(request.Proxy.OutpostId, providerId);
+        
+        if (assignResult == null)
+            return Problem("Failed while assigning the provider to the outpost");
+
         return _plesk.CreateSubdomain(request.Plesk.SubDomain, request.Plesk.RootDomain, request.Plesk.Email, request.Plesk.AuthentikHost);
     }
 }

@@ -11,7 +11,7 @@ public class CreateAppWithProviderModel
     public string ProviderModel { get; set; } = "authentik_providers_proxy.proxyprovider";
 
     [JsonPropertyName("provider")] 
-    public AppProviderModel Provider { get; set; } = new AppProviderModel();
+    public Provider Provider { get; set; } = new Provider();
 
     [JsonPropertyName("policy_bindings")] 
     public List<PolicyBinding> PolicyBindings { get; set; } = new List<PolicyBinding>();

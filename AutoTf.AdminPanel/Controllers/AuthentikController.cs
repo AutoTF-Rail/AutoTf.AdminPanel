@@ -32,16 +32,7 @@ public class AuthentikController : ControllerBase
     [HttpPost("outpost/{id}/assign")]
     public async Task<ActionResult<string>> AssignToOutpost(string id, [FromBody, Required] string providerPk)
     {
-        // TODO: Check for existance
-        OutpostModel? outpostModel = await _auth.GetOutpost(id);
-        
-        if (outpostModel == null)
-            return Problem($"Could not find outpost {id}.");
-        
-        // TODO: Check for provider existance 
-        outpostModel.Providers.Add(providerPk);
-        
-        string? result = await _auth.UpdateOutpost(id, outpostModel);
+        string? result = await _auth.AssignToOutpost(id, providerPk);
         
         if (result == null)
             return Problem("Could not update outpost.");
@@ -52,16 +43,7 @@ public class AuthentikController : ControllerBase
     [HttpPost("outpost/{id}/unassign")]
     public async Task<ActionResult<string>> UnassignFromOutpost(string id, [FromBody, Required] string providerPk)
     {
-        // TODO: Check for existance
-        OutpostModel? outpostModel = await _auth.GetOutpost(id);
-        
-        if (outpostModel == null)
-            return Problem($"Could not find outpost {id}.");
-        
-        // TODO: Check for provider existance 
-        outpostModel.Providers.Remove(providerPk);
-        
-        string? result = await _auth.UpdateOutpost(id, outpostModel);
+        string? result = await _auth.UnassignFromOutpost(id, providerPk);
         
         if (result == null)
             return Problem("Could not update outpost.");

@@ -2,8 +2,12 @@ using System.Text.Json.Serialization;
 
 namespace AutoTf.AdminPanel.Models.Requests.Authentik;
 
-public class AppProviderModel
+public class Provider
 {
+    [JsonPropertyName("Pk")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Pk { get; set; } = null;
+
     [JsonPropertyName("name")]
     public string Name { get; set; }
 
@@ -17,7 +21,7 @@ public class AppProviderModel
     public string InvalidationFlow { get; set; }
 
     [JsonPropertyName("property_mappings")]
-    public List<object> PropertyMappings { get; set; }
+    public List<string> PropertyMappings { get; set; }
 
     [JsonPropertyName("internal_host")]
     public string InternalHost { get; set; }

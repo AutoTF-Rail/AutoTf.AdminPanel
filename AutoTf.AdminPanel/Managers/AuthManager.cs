@@ -127,22 +127,64 @@ public class AuthManager : IHostedService
         return null;
     }
 
-    public async Task<string?> GetProviders()
+    public async Task<ProviderPaginationResult?> GetProviders()
     {
         try
         {
-            return await ApiHttpHelper.SendGet($"{_credentials.AuthUrl}/api/v3/providers/proxy/?application__isnull=false&ordering=name&page=1&page_size=20&search=",
+            return await ApiHttpHelper.SendGet<ProviderPaginationResult>($"{_credentials.AuthUrl}/api/v3/providers/proxy/?application__isnull=false&ordering=name&page=1&page_size=20&search=",
                 _apiKey, true);
         }
         catch (Exception e)
         {
-            Console.WriteLine($"Something went wrong when getting all providers:");
+            Console.WriteLine("Something went wrong when getting all providers:");
             Console.WriteLine(e.ToString());
         }
 
         return null;
     }
-    
+
+    public async Task<string?> GetProviderIdByExternalHost(string externalHost)
+    {
+        ProviderPaginationResult? providers = await GetProviders();
+        
+        if (providers == null || !providers.Results.Any())
+            return null;
+
+        Provider? provider = providers.Results.FirstOrDefault(x => x.Name.Contains("Managed provider for") && x.ExternalHost == externalHost);
+       
+        if (provider == null)
+            return null;
+        
+        return provider.Pk;
+    }
+
+    public async Task<string?> AssignToOutpost(string outpostId, string providerPk)
+    {
+        // TODO: Check for existance
+        OutpostModel? outpostModel = await GetOutpost(outpostId);
+        
+        if (outpostModel == null)
+            return $"Could not find outpost {outpostId}.";
+        
+        // TODO: Check for provider existance 
+        outpostModel.Providers.Add(providerPk);
+
+        return await UpdateOutpost(outpostId, outpostModel);
+    }
+
+    public async Task<string?> UnassignFromOutpost(string outpostId, string providerPk)
+    {
+        // TODO: Check for existance
+        OutpostModel? outpostModel = await GetOutpost(outpostId);
+        
+        if (outpostModel == null)
+            return $"Could not find outpost {outpostId}.";
+        
+        // TODO: Check for provider existance 
+        outpostModel.Providers.Remove(providerPk);
+
+        return await UpdateOutpost(outpostId, outpostModel);
+    }
     
     #region Core
 
