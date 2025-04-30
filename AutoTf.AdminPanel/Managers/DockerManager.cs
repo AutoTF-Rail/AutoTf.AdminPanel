@@ -35,11 +35,11 @@ public class DockerManager
     {
         List<ContainerListResponse> containerListResponses = await GetContainers();
         
-        ContainerListResponse? containerListResponse = (await GetContainers()).FirstOrDefault(x => x.Names.Any(y => y.Contains(name)));
+        ContainerListResponse? containerListResponse = (await GetContainers()).FirstOrDefault(x => x.Names.Any(y => y.Contains(name.ToLower())));
 
         if (containerListResponse == null)
         {
-            Console.WriteLine($"Could not create site because the created container was not found by name {name}.");
+            Console.WriteLine($"Could not create site because the created container was not found by name {name.ToLower()}.");
             return null;
         }
 

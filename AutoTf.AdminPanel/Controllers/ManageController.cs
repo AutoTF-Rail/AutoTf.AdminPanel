@@ -28,8 +28,10 @@ public class ManageController : ControllerBase
     [HttpPost("create")]
     public async Task<ActionResult<bool>> Create([FromBody, Required] TotalCreationRequest request)
     {
+        // Cloudflare
         await _cloudflare.CreateNewEntry(request.DnsRecord);
 
+        // Docker
         await _docker.CreateContainer(request.Container);
         
         if (request.Container.ContainerName == "")
@@ -43,6 +45,7 @@ public class ManageController : ControllerBase
         if (!containerId.NetworkSettings.Networks.TryGetValue(request.Container.DefaultNetwork, out EndpointSettings? endpoint))
             return Problem("Something went wrong during the network creation.");
 
+        // Authentik
         CreateProxyRequest proxy = request.Proxy.ConvertToRequest(endpoint.IPAddress);
 
         TransactionalCreationResponse? proxyResult = await _auth.CreateProxy(proxy);
@@ -65,7 +68,8 @@ public class ManageController : ControllerBase
         
         if (assignResult == null)
             return Problem("Failed while assigning the provider to the outpost");
-
+        
+        // Plesk
         return _plesk.CreateSubdomain(request.Plesk.SubDomain, request.Plesk.RootDomain, request.Plesk.Email, request.Plesk.AuthentikHost);
     }
 }

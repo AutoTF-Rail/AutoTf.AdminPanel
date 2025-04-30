@@ -66,4 +66,15 @@ public class DockerController : ControllerBase
         await _docker.DeleteContainer(id);
         return Ok();
     }
+
+    [HttpGet("getByName")]
+    public async Task<ActionResult<ContainerListResponse>> GetByName([FromBody, Required] string name)
+    {
+        ContainerListResponse? containerListResponse = await _docker.GetContainerByName(name);
+        
+        if (containerListResponse == null)
+            return Problem("Could not find container.");
+
+        return containerListResponse;
+    }
 }
