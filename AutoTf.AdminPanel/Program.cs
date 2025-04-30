@@ -18,6 +18,7 @@ public class Program
         builder.Services.AddSingleton<PleskManager>();
         
         builder.Services.AddHostedSingleton<CloudflareManager>();
+        builder.Services.AddHostedSingleton<AuthManager>();
         
         // stored in appsettings.Development.json or set manually in .env
         builder.Services.Configure<Credentials>(options =>
