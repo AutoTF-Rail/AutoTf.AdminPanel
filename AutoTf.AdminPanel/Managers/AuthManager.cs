@@ -150,7 +150,7 @@ public class AuthManager : IHostedService
         if (providers == null || !providers.Results.Any())
             return null;
 
-        Provider? provider = providers.Results.FirstOrDefault(x => x.Name.Contains("Managed provider for") && x.ExternalHost.ToLower() == externalHost);
+        Provider? provider = providers.Results.FirstOrDefault(x => x.Name.Contains("Managed provider for") && x.ExternalHost.ToLower() == externalHost.ToLower());
        
         if (provider == null)
             return null;
