@@ -25,6 +25,7 @@ public class Program
             options.ClientId = builder.Configuration["ClientId"] ?? "key";
             options.Username = builder.Configuration["Username"] ?? "key";
             options.Password = builder.Configuration["Password"] ?? "key";
+            options.AuthUrl = builder.Configuration["AuthUrl"] ?? "key";
             options.CloudflareZone = builder.Configuration["CloudflareZone"] ?? "key";
             options.CloudflareKey = builder.Configuration["CloudflareKey"] ?? "key";
         });
