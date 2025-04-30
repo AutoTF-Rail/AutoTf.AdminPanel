@@ -154,6 +154,21 @@ public class AuthManager : IHostedService
         return null;
     }
 
+    public async Task<bool> DeleteProvider(string id)
+    {
+        try
+        {
+            return await ApiHttpHelper.SendDelete($"{_credentials.AuthUrl}/api/v3/providers/proxy/{id}/", _apiKey, true);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Something went wrong when deleting provider {id}:");
+            Console.WriteLine(e.ToString());
+        }
+
+        return false;
+    }
+
     public async Task<string?> GetProviderIdByExternalHost(string externalHost)
     {
         ProviderPaginationResult? providers = await GetProviders();

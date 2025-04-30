@@ -105,4 +105,11 @@ public class AuthentikController : ControllerBase
 
         return result;
     }
+
+    [HttpDelete("provider/{id}")]
+    public async Task<ActionResult<bool>> DeleteProvider(string id)
+    {
+        // TODO: Check for existance
+        return await _auth.DeleteProvider(id);
+    }
 }
