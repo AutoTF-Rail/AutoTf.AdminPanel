@@ -4,7 +4,8 @@ namespace AutoTf.AdminPanel.Models.Requests.Authentik;
 
 public class Provider
 {
-    [JsonPropertyName("Pk")]
+    [JsonPropertyName("pk")]
+    [JsonConverter(typeof(StringConverter))]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Pk { get; set; } = null;
 
