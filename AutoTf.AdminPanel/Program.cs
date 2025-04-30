@@ -36,10 +36,9 @@ public class Program
         app.UseHttpsRedirection();
 
         app.UseAuthorization();
-
-
+        
         app.MapControllers();
-
-        app.Run("http://0.0.0.0:80");
+        
+        app.Run("http://127.0.0.1:80");
     }
 }
