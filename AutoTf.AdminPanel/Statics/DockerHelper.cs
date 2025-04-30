@@ -12,6 +12,7 @@ public static class DockerHelper
     {
         Dictionary<string, EndpointSettings> dict = new Dictionary<string, EndpointSettings>();
         NetworkResponse? defaultNetwork = await dockerManager.GetNetwork(parameters.DefaultNetwork);
+        IEnumerable<string> containersInNetwork = (await dockerManager.GetContainers()).Where(x => x.NetworkSettings.Networks.ContainsKey(parameters.DefaultNetwork)).Select(x => x.NetworkSettings.Networks[parameters.DefaultNetwork].IPAddress);
 
         if (defaultNetwork == null)
             throw new Exception("Could not find network.");
@@ -19,7 +20,7 @@ public static class DockerHelper
         string newIp = parameters.DefaultIp;
 
         if (string.IsNullOrEmpty(newIp))
-            newIp = GetFreeIp(defaultNetwork); 
+            newIp = GetFreeIp(defaultNetwork, containersInNetwork); 
         
         dict.Add(parameters.DefaultNetwork!, new EndpointSettings()
         {
@@ -31,11 +32,12 @@ public static class DockerHelper
             return dict;
         
         // Configure additional network
-        NetworkResponse? additionalNetwork = await dockerManager.GetNetwork(parameters.DefaultNetwork);
+        NetworkResponse? additionalNetwork = await dockerManager.GetNetwork(parameters.AdditionalNetwork);
         if (additionalNetwork == null)
             throw new Exception("Could not find additional network.");
+        IEnumerable<string> containersInAdditionalNetwork = (await dockerManager.GetContainers()).Where(x => x.NetworkSettings.Networks.ContainsKey(parameters.AdditionalNetwork)).Select(x => x.NetworkSettings.Networks[parameters.AdditionalNetwork].IPAddress);
 
-        string additionalIp = GetFreeIp(additionalNetwork);
+        string additionalIp = GetFreeIp(additionalNetwork, containersInAdditionalNetwork);
         dict.Add(parameters.AdditionalNetwork, new EndpointSettings()
         {
             IPAddress = additionalIp,
@@ -45,68 +47,27 @@ public static class DockerHelper
         return dict;
     }
 
-    private static string GetFreeIp(NetworkResponse network)
+    private static string GetFreeIp(NetworkResponse network, IEnumerable<string> usedIps)
     {
         string? subnet = network.IPAM.Config.FirstOrDefault()?.Subnet;
-        string? gateway = network.IPAM.Config.FirstOrDefault()?.Gateway;
-        
-        if (string.IsNullOrEmpty(subnet) || string.IsNullOrEmpty(gateway))
-            throw new Exception("Invalid network config");
-        
-        string[] parts = subnet.Split('/');
-        
-        IPAddress baseIp = IPAddress.Parse(parts[0]);
-        int prefix = int.Parse(parts[1]);
-        
-        
-        HashSet<string> usedIps = new HashSet<string>(
-            (network.Containers.Values.Select(c => c.IPv4Address?.Split('/')[0]))!
-        );
+        if (string.IsNullOrEmpty(subnet))
+            throw new Exception("Missing subnet in network config");
 
-        IEnumerable<IPAddress> allIps = GetAllIps(baseIp, prefix);
-        foreach (IPAddress ip in allIps)
+        foreach (string usedIp in usedIps)
         {
-            string ipStr = ip.ToString();
-            
-            if (ipStr == gateway) 
-                continue; 
-            
-            if (!usedIps.Contains(ipStr))
-                return ipStr;
+            Console.WriteLine(usedIp);
+        }
+        string baseIp = subnet.Split('.')[0] + "." + subnet.Split('.')[1] + "." + subnet.Split('.')[2];
+
+        for (int i = 2; i < 255; i++) 
+        {
+            string candidate = $"{baseIp}.{i}";
+            Console.WriteLine(candidate);
+            Console.WriteLine(usedIps.Contains(candidate));
+            if (!usedIps.Contains(candidate))
+                return candidate;
         }
 
-        throw new Exception("No IPs available in the network.");
-    }
-    
-    private static IEnumerable<IPAddress> GetAllIps(IPAddress baseIp, int prefixLength)
-    {
-        if (baseIp.AddressFamily != AddressFamily.InterNetwork)
-            throw new ArgumentException("Only IPv4 supported");
-
-        uint ipAsUint = IpToUint(baseIp);
-        uint mask = uint.MaxValue << (32 - prefixLength);
-        uint networkAddress = ipAsUint & mask;
-        uint broadcastAddress = networkAddress | ~mask;
-
-        for (uint ip = networkAddress + 2; ip < broadcastAddress; ip++) // +2 to skip .0 and .1
-        {
-            yield return UintToIp(ip);
-        }
-    }
-    
-    private static uint IpToUint(IPAddress ip)
-    {
-        byte[] bytes = ip.GetAddressBytes();
-        if (BitConverter.IsLittleEndian)
-            Array.Reverse(bytes);
-        return BitConverter.ToUInt32(bytes, 0);
-    }
-
-    private static IPAddress UintToIp(uint ip)
-    {
-        byte[] bytes = BitConverter.GetBytes(ip);
-        if (BitConverter.IsLittleEndian)
-            Array.Reverse(bytes);
-        return new IPAddress(bytes);
+        throw new Exception("No free IPs found in the subnet.");
     }
 }
