@@ -34,7 +34,7 @@ public class DockerStatsController : ControllerBase
         return stats;
     }
 
-    [HttpGet("memory/{containerId}")]
+    [HttpGet("{containerId}/memory")]
     public async Task<ActionResult<MemoryStats>> Memory(string containerId)
     {
         MemoryStats? stats = await _docker.Memory(containerId);
@@ -45,7 +45,7 @@ public class DockerStatsController : ControllerBase
         return stats;
     }
 
-    [HttpGet("network/{containerId}")]
+    [HttpGet("{containerId}/network")]
     public async Task<ActionResult<NetworkStats>> Network(string containerId)
     {
         NetworkStats? stats = await _docker.Network(containerId);
@@ -56,7 +56,7 @@ public class DockerStatsController : ControllerBase
         return stats;
     }
 
-    [HttpGet("cpu/{containerId}")]
+    [HttpGet("{containerId}/cpu")]
     public async Task<ActionResult<double>> Cpu(string containerId)
     {
         double? stats = await _docker.Cpu(containerId);
