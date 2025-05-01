@@ -160,12 +160,11 @@ async function fetchDockerStats() {
     const memoryPercentage = +(stats.memory.memoryPercentage).toFixed(2);
 
     const netRecv = +(stats.network.totalReceived / (1024 ** 3)).toFixed(2); 
-    const netSend = +(stats.network.totalSend / (1024 ** 3)).toFixed(2); 
+    const netSend = +(stats.network.totalSend / (1024 ** 3)).toFixed(2);
 
     new Chart(document.getElementById('cpuChart'), {
         type: 'doughnut',
         data: {
-            labels: ['CPU Used', 'Remaining'],
             datasets: [{
                 data: [cpu, 100 - cpu],
                 backgroundColor: ['#007bff', '#e0e0e0'],
@@ -176,7 +175,7 @@ async function fetchDockerStats() {
             cutout: '70%',
             plugins: {
                 tooltip: { enabled: false },
-                legend: { display: false },
+                legend: { display: false }
             }
         }
     });
@@ -208,12 +207,12 @@ async function fetchDockerStats() {
         data: {
             labels: ['Received', 'Sent'],
             datasets: [{
-                label: 'Network (GB)',
                 data: [netRecv, netSend],
                 backgroundColor: ['#17a2b8', '#ffc107']
             }]
         },
         options: {
+            responsive: true,
             plugins: {
                 legend: { display: false }
             },
