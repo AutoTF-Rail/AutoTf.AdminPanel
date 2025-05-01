@@ -1,21 +1,87 @@
 body {
     font-family: Arial, sans-serif;
+    background: #f4f4f4;
     margin: 0;
     padding: 0;
-    background: #f4f4f4;
 }
 
 .container {
-    max-width: 700px;
-    margin: 40px auto;
-    background: #fff;
+    max-width: 800px;
+    margin: 30px auto;
+    background: white;
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 h1 {
     text-align: center;
+    margin-bottom: 30px;
+}
+
+.section {
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.section-header {
+    background: #007bff;
+    color: white;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    border-radius: 8px 8px 0 0;
+}
+
+.section-content {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: none;
+}
+
+.container-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #eee;
+    padding: 12px 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+.container-item:hover {
+    background: #ddd;
+}
+
+.container-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+}
+
+.container-name {
+    font-weight: bold;
+}
+
+.container-state {
+    font-size: 0.9em;
+    color: #555;
+}
+
+.delete-btn {
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+    cursor: pointer;
+}
+
+.delete-btn:hover {
+    background: #b52b37;
 }
 
 .actions {
@@ -44,52 +110,7 @@ button:hover {
     padding: 0;
 }
 
-.container-item {
-    display: flex;
-    justify-content: space-between;
-    background: #e9e9e9;
-    margin-bottom: 10px;
-    padding: 15px;
-    border-radius: 6px;
-    cursor: pointer;
-    align-items: center;
-}
-
-.container-item:hover {
-    background-color: #d0d0d0;
-}
-
 .container-id {
     flex: 1;
     word-break: break-all;
-}
-
-.delete-btn {
-    background-color: #dc3545;
-    padding: 6px 12px;
-    border: none;
-    color: white;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.delete-btn:hover {
-    background-color: #c82333;
-}
-
-.container-info {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    cursor: pointer;
-}
-
-.container-name {
-    font-weight: bold;
-    font-size: 1.1em;
-}
-
-.container-state {
-    font-size: 0.9em;
-    color: #555;
 }

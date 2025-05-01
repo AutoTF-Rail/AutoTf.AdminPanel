@@ -3,17 +3,46 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <title>Docker Container Manager</title>
+        <title>Management Panel</title>
         <link rel="stylesheet" href="style.css" />
     </head>
     <body>
     <div class="container">
-        <h1>Docker Containers</h1>
-        <div class="actions">
-            <button id="createBtn">Create</button>
-            <button id="refreshBtn">Refresh</button>
+    
+        <h1>AutoTF Admin Panel</h1>
+    
+        <div class="section" id="dockerSection">
+            <div class="section-header" onclick="toggleSection('dockerContent')">
+                <h2>Docker Containers</h2>
+                <button onclick="event.stopPropagation(); fetchDocker()">Refresh</button>
+            </div>
+            <ul id="dockerContent" class="section-content"></ul>
         </div>
-        <ul id="containerList"></ul>
+    
+        <div class="section" id="pleskSection">
+            <div class="section-header" onclick="toggleSection('pleskContent')">
+                <h2>Plesk Domains</h2>
+                <button onclick="event.stopPropagation(); fetchPlesk()">Refresh</button>
+            </div>
+            <ul id="pleskContent" class="section-content"></ul>
+        </div>
+    
+        <div class="section" id="authentikSection">
+            <div class="section-header" onclick="toggleSection('authentikContent')">
+                <h2>Authentik Providers</h2>
+                <button onclick="event.stopPropagation(); fetchAuthentik()">Refresh</button>
+            </div>
+            <ul id="authentikContent" class="section-content"></ul>
+        </div>
+    
+        <div class="section" id="cloudflareSection">
+            <div class="section-header" onclick="toggleSection('cloudflareContent')">
+                <h2>Cloudflare DNS</h2>
+                <button onclick="event.stopPropagation(); fetchCloudflare()">Refresh</button>
+            </div>
+            <ul id="cloudflareContent" class="section-content"></ul>
+        </div>
+    
     </div>
     
     <script src="script.js"></script>
