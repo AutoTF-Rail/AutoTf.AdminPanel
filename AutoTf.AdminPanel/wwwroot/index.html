@@ -5,46 +5,69 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
         <title>Management Panel</title>
         <link rel="stylesheet" href="style.css" />
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     </head>
     <body>
-    <div class="container">
-    
-        <h1>AutoTF Admin Panel</h1>
-    
-        <div class="section" id="dockerSection">
-            <div class="section-header" onclick="toggleSection('dockerContent')">
-                <h2>Docker Containers</h2>
-                <button onclick="event.stopPropagation(); fetchDocker()">Refresh</button>
+        <div class="stats-container">
+            <div class="stat-box">
+                <canvas id="cpuChart" width="100" height="100"></canvas>
             </div>
-            <ul id="dockerContent" class="section-content"></ul>
-        </div>
     
-        <div class="section" id="pleskSection">
-            <div class="section-header" onclick="toggleSection('pleskContent')">
-                <h2>Plesk Domains</h2>
-                <button onclick="event.stopPropagation(); fetchPlesk()">Refresh</button>
+            <div class="stat-box">
+                <div class="memory-container">
+                    <canvas id="memoryChart" width="100" height="100"></canvas>
+                    <div class="memory-center">
+                        <div id="memoryPercent" class="percent">0%</div>
+                    </div>
+                    <div class="memory-bottom">
+                        <div id="memoryUsed" class="label-left">0 GB</div>
+                        <div id="memoryTotal" class="label-right">0 GB</div>
+                    </div>
+                </div>
             </div>
-            <ul id="pleskContent" class="section-content"></ul>
-        </div>
     
-        <div class="section" id="authentikSection">
-            <div class="section-header" onclick="toggleSection('authentikContent')">
-                <h2>Authentik Providers</h2>
-                <button onclick="event.stopPropagation(); fetchAuthentik()">Refresh</button>
+            <div class="stat-box">
+                <canvas id="networkChart" width="150" height="100"></canvas>
             </div>
-            <ul id="authentikContent" class="section-content"></ul>
         </div>
-    
-        <div class="section" id="cloudflareSection">
-            <div class="section-header" onclick="toggleSection('cloudflareContent')">
-                <h2>Cloudflare DNS</h2>
-                <button onclick="event.stopPropagation(); fetchCloudflare()">Refresh</button>
+        <div class="container">
+        
+            <h1>AutoTF Admin Panel</h1>
+        
+            <div class="section" id="dockerSection">
+                <div class="section-header" onclick="toggleSection('dockerContent')">
+                    <h2>Docker Containers</h2>
+                    <button onclick="event.stopPropagation(); fetchDocker()">Refresh</button>
+                </div>
+                <ul id="dockerContent" class="section-content"></ul>
             </div>
-            <ul id="cloudflareContent" class="section-content"></ul>
+        
+            <div class="section" id="pleskSection">
+                <div class="section-header" onclick="toggleSection('pleskContent')">
+                    <h2>Plesk Domains</h2>
+                    <button onclick="event.stopPropagation(); fetchPlesk()">Refresh</button>
+                </div>
+                <ul id="pleskContent" class="section-content"></ul>
+            </div>
+        
+            <div class="section" id="authentikSection">
+                <div class="section-header" onclick="toggleSection('authentikContent')">
+                    <h2>Authentik Providers</h2>
+                    <button onclick="event.stopPropagation(); fetchAuthentik()">Refresh</button>
+                </div>
+                <ul id="authentikContent" class="section-content"></ul>
+            </div>
+        
+            <div class="section" id="cloudflareSection">
+                <div class="section-header" onclick="toggleSection('cloudflareContent')">
+                    <h2>Cloudflare DNS</h2>
+                    <button onclick="event.stopPropagation(); fetchCloudflare()">Refresh</button>
+                </div>
+                <ul id="cloudflareContent" class="section-content"></ul>
+            </div>
+        
         </div>
-    
-    </div>
-    
-    <script src="script.js"></script>
+        
+        <script src="script.js"></script>
     </body>
 </html>

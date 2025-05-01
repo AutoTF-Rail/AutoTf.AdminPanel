@@ -115,3 +115,46 @@ button:hover {
     flex: 1;
     word-break: break-all;
 }
+
+
+
+/*stats*/
+
+.stats-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin: 30px auto;
+    gap: 20px;
+}
+
+.stat-box {
+    text-align: center;
+    position: relative;
+}
+
+.memory-container {
+    position: relative;
+    display: inline-block;
+}
+
+.memory-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.memory-bottom {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    margin-top: 8px;
+}
+
+.label-left, .label-right {
+    width: 45%;
+}
