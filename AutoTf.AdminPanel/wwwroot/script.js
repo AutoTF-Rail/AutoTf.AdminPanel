@@ -161,6 +161,8 @@ async function fetchDockerStats() {
 
     const netRecv = +(stats.network.totalReceived / (1024 ** 3)).toFixed(2); 
     const netSend = +(stats.network.totalSend / (1024 ** 3)).toFixed(2);
+    
+    document.getElementById('cpuPercent').innerText = `${cpu}%`;
 
     new Chart(document.getElementById('cpuChart'), {
         type: 'doughnut',

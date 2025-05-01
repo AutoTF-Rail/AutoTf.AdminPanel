@@ -160,3 +160,9 @@ button:hover {
 .label-left, .label-right {
     width: 45%;
 }
+
+.network-container {
+    width: 200px;
+    height: 150px;
+    margin: 0 auto;
+}

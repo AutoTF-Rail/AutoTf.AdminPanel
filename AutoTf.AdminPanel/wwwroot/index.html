@@ -11,7 +11,12 @@
         <div class="stats-container">
             <div class="stat-box">
                 <div>CPU Usage</div>
-                <canvas id="cpuChart" width="100" height="100"></canvas>
+                <div class="memory-container">
+                    <canvas id="cpuChart" width="100" height="100"></canvas>
+                    <div class="memory-center">
+                        <div id="cpuPercent" class="percent">0%</div>
+                    </div>
+                </div>
             </div>
     
             <div class="stat-box">
@@ -27,10 +32,12 @@
                     </div>
                 </div>
             </div>
-    
+
             <div class="stat-box">
                 <div>Network Usage</div>
-                <canvas id="networkChart" width="150" height="100"></canvas>
+                <div class="network-container">
+                    <canvas id="networkChart" width="200" height="150"></canvas>
+                </div>
             </div>
         </div>
         <div class="container">
