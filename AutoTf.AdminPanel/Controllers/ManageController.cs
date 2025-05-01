@@ -25,56 +25,11 @@ public class ManageController : ControllerBase
         _docker = docker;
     }
 
-    private async Task<string> RevertChanges(string error, string? recordId = null, string? containerId = null, string? externalHost = null, string? subDomain = null, string? rootDomain = null)
-    {
-        bool entryDeletionSuccess = false;
-        bool containerKillSuccess = false;
-        bool proxyDeletionSuccess = false;
-        bool pleskDeletionSuccess = false;
-        
-        if (recordId != null)
-            entryDeletionSuccess = await _cloudflare.DeleteEntry(recordId);
-
-        if (entryDeletionSuccess)
-            error += entryDeletionSuccess ? " Deleted Dns Entry." : "";
-
-
-        if (containerId != null)
-        {
-            containerKillSuccess = await _docker.KillContainer(containerId);
-
-            if (containerKillSuccess)
-            {
-                await _docker.DeleteContainer(containerId);
-                error += containerKillSuccess ? " Deleted container." : "";
-            }
-        }
-
-        if (externalHost != null)
-        {
-            string? providerId = await _auth.GetProviderIdByExternalHost(externalHost);
-            
-            if (providerId != null)
-                proxyDeletionSuccess = await _auth.DeleteProvider(providerId);
-        }
-        
-        if (proxyDeletionSuccess)
-            error += proxyDeletionSuccess ? " Deleted proxy." : "";
-
-        
-        if (subDomain != null && rootDomain != null)
-            pleskDeletionSuccess = _plesk.DeleteSubDomain(rootDomain, subDomain);
-        
-        if (pleskDeletionSuccess)
-            error += pleskDeletionSuccess ? " Deleted plesk site." : "";
-
-        return error;
-    }
-
-    private async Task<ActionResult> AssembleProblem(string error, string? recordId = null, string? containerId = null, string? externalHost = null)
-    {
-        return Problem(await RevertChanges(error, recordId, containerId, externalHost));
-    }
+    // [HttpGet("stats")]
+    // public async Task<ActionResult> Stats()
+    // {
+    //     List<ContainerListResponse> containers = await _docker.GetContainers();
+    // }
 
     [HttpDelete]
     public async Task<ActionResult> Delete([FromBody, Required] DeletionRequest request)
@@ -148,5 +103,56 @@ public class ManageController : ControllerBase
             return await AssembleProblem("Something went wrong when creating the subdomain in plesk.", record.Id, container.ID, request.Proxy.ExternalHost);
 
         return Ok();
+    }
+
+    private async Task<string> RevertChanges(string error, string? recordId = null, string? containerId = null, string? externalHost = null, string? subDomain = null, string? rootDomain = null)
+    {
+        bool entryDeletionSuccess = false;
+        bool containerKillSuccess = false;
+        bool proxyDeletionSuccess = false;
+        bool pleskDeletionSuccess = false;
+        
+        if (recordId != null)
+            entryDeletionSuccess = await _cloudflare.DeleteEntry(recordId);
+
+        if (entryDeletionSuccess)
+            error += entryDeletionSuccess ? " Deleted Dns Entry." : "";
+
+
+        if (containerId != null)
+        {
+            containerKillSuccess = await _docker.KillContainer(containerId);
+
+            if (containerKillSuccess)
+            {
+                await _docker.DeleteContainer(containerId);
+                error += containerKillSuccess ? " Deleted container." : "";
+            }
+        }
+
+        if (externalHost != null)
+        {
+            string? providerId = await _auth.GetProviderIdByExternalHost(externalHost);
+            
+            if (providerId != null)
+                proxyDeletionSuccess = await _auth.DeleteProvider(providerId);
+        }
+        
+        if (proxyDeletionSuccess)
+            error += proxyDeletionSuccess ? " Deleted proxy." : "";
+
+        
+        if (subDomain != null && rootDomain != null)
+            pleskDeletionSuccess = _plesk.DeleteSubDomain(rootDomain, subDomain);
+        
+        if (pleskDeletionSuccess)
+            error += pleskDeletionSuccess ? " Deleted plesk site." : "";
+
+        return error;
+    }
+
+    private async Task<ActionResult> AssembleProblem(string error, string? recordId = null, string? containerId = null, string? externalHost = null)
+    {
+        return Problem(await RevertChanges(error, recordId, containerId, externalHost));
     }
 }

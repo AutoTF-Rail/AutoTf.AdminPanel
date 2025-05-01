@@ -4,6 +4,7 @@ using AutoTf.AdminPanel.Models.Requests;
 using AutoTf.AdminPanel.Statics;
 using Docker.DotNet.Models;
 using Microsoft.AspNetCore.Mvc;
+using MemoryStats = AutoTf.AdminPanel.Models.Requests.MemoryStats;
 
 namespace AutoTf.AdminPanel.Controllers;
 
@@ -87,5 +88,30 @@ public class DockerController : ControllerBase
             return Problem("Could not find container.");
         
         return response;
+    }
+
+    [HttpGet("stats/{id}/memoryUsage")]
+    public async Task<ActionResult<MemoryStats>> MemoryStats(string id)
+    {
+        ContainerStatsResponse? response = await _docker.GetContainerStats(id);
+        
+        if (response == null)
+            return Problem("Could not find container.");
+        
+        double memoryUsageBytes = response.MemoryStats.Usage;
+        double memoryLimitBytes = response.MemoryStats.Limit;
+        
+        double memoryUsageMb = memoryUsageBytes / (1024 * 1024);
+        double memoryLimitMb = memoryLimitBytes / (1024 * 1024);
+        double memoryPercentage = (memoryUsageBytes / memoryLimitBytes) * 100;
+
+        MemoryStats stats = new MemoryStats()
+        {
+            MemoryUsageMb = memoryUsageMb,
+            MemoryLimitMb = memoryLimitMb,
+            MemoryPercentage = memoryPercentage
+        };
+        
+        return stats;
     }
 }
