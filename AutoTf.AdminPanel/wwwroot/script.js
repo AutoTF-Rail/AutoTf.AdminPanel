@@ -199,9 +199,7 @@ async function fetchDockerStats() {
     const netSend = +(stats.network.totalSend / 1024).toFixed(2);
 
     document.getElementById('cpuPercent').innerText = `${cpu}%`;
-    if (cpuChartInstance) cpuChartInstance.destroy();
-    if (memoryChartInstance) memoryChartInstance.destroy();
-    if (networkChartInstance) networkChartInstance.destroy();
+    
 
     if (!cpuChartInstance) {
         cpuChartInstance = new Chart(document.getElementById('cpuChart'), {
