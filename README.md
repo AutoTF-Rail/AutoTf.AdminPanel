@@ -5,4 +5,4 @@ Hosted at [admin.autotf.de](https://admin.autotf.de).
 
 
 ## UI
-<img width="1619" alt="image" src="https://github.com/user-attachments/assets/d66d70de-7a64-43d4-ba6c-45832b2db642" />
+<img width="1809" alt="image" src="https://github.com/user-attachments/assets/7a6f91c3-541e-4d9b-85c5-d4a57677321f" />
