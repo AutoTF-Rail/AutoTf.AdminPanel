@@ -28,7 +28,7 @@ public class ManageController : ControllerBase
     }
 
     [HttpGet("stats/memory")]
-    public async Task<ActionResult<MemoryStats>> Statsmemory()
+    public async Task<ActionResult<MemoryStats>> StatsMemory()
     {
         List<ContainerListResponse> containers = await _docker.GetContainers();
 
@@ -39,9 +39,9 @@ public class ManageController : ControllerBase
             statsBag.Add((await _docker.GetMemoryStats(container.ID))!);
         });
 
-        double memoryUsageMb = 0.0f;
-        double memoryPercentage = 0.0f;
-        double memoryLimitMb = statsBag.Any() ? statsBag.First().MemoryLimitMb : 0.0;
+        float memoryUsageMb = 0.0f;
+        float memoryPercentage = 0.0f;
+        float memoryLimitMb = statsBag.Any() ? statsBag.First().MemoryLimitMb : 0.0f;
         
         foreach (MemoryStats stat in statsBag)
         {
@@ -51,9 +51,9 @@ public class ManageController : ControllerBase
 
         return new MemoryStats()
         {
-            MemoryPercentage = memoryPercentage,
-            MemoryLimitMb = memoryLimitMb,
-            MemoryUsageMb = memoryUsageMb
+            MemoryPercentage = MathF.Round(memoryPercentage, 2),
+            MemoryLimitMb = MathF.Round(memoryLimitMb, 2),
+            MemoryUsageMb = MathF.Round(memoryUsageMb, 2)
         };
     }
 

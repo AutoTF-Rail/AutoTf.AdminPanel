@@ -51,12 +51,12 @@ public class DockerManager
         if (response == null)
             return null;
         
-        double memoryUsageBytes = response.MemoryStats.Usage;
-        double memoryLimitBytes = response.MemoryStats.Limit;
+        float memoryUsageBytes = response.MemoryStats.Usage;
+        float memoryLimitBytes = response.MemoryStats.Limit;
         
-        double memoryUsageMb = memoryUsageBytes / (1024 * 1024);
-        double memoryLimitMb = memoryLimitBytes / (1024 * 1024);
-        double memoryPercentage = (memoryUsageBytes / memoryLimitBytes) * 100;
+        float memoryUsageMb = memoryUsageBytes / (1024 * 1024);
+        float memoryLimitMb = memoryLimitBytes / (1024 * 1024);
+        float memoryPercentage = (memoryUsageBytes / memoryLimitBytes) * 100;
 
         MemoryStats stats = new MemoryStats()
         {
