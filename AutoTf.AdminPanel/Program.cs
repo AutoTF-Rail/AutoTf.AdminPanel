@@ -31,6 +31,27 @@ public class Program
             options.AuthUrl = builder.Configuration["AuthUrl"] ?? "key";
             options.CloudflareZone = builder.Configuration["CloudflareZone"] ?? "key";
             options.CloudflareKey = builder.Configuration["CloudflareKey"] ?? "key";
+
+            options.DefaultConfig = new ServerConfig()
+            {
+                DefaultDnsType = builder.Configuration["DefaultDnsType"] ?? "key",
+                DefaultTarget = builder.Configuration["DefaultTarget"] ?? "key",
+                DefaultProxySetting = bool.Parse(builder.Configuration["DefaultProxySetting"] ?? "false"),
+                DefaultTtl = int.Parse(builder.Configuration["DefaultTtl"] ?? "3600"),
+
+                DefaultNetwork = builder.Configuration["DefaultNetwork"] ?? "key",
+                DefaultAdditionalNetwork = builder.Configuration["DefaultAdditionalNetwork"] ?? "key",
+                DefaultImage = builder.Configuration["DefaultImage"] ?? "key",
+
+                DefaultAuthorizationFlow = builder.Configuration["DefaultAuthorizationFlow"] ?? "key",
+                DefaultInvalidationFlow = builder.Configuration["DefaultInvalidationFlow"] ?? "key",
+
+                DefaultOutpost = builder.Configuration["DefaultOutpost"] ?? "key",
+
+                DefaultCertificateEmail = builder.Configuration["DefaultCertificateEmail"] ?? "key",
+
+                DefaultAuthentikHost = builder.Configuration["DefaultAuthentikHost"] ?? "key",
+            };
         });
 
         WebApplication app = builder.Build();

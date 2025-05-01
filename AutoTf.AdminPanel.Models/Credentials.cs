@@ -8,4 +8,6 @@ public class Credentials
     public string AuthUrl { get; set; }
     public string CloudflareZone { get; set; }
     public string CloudflareKey { get; set; }
+    
+    public ServerConfig DefaultConfig { get; set; }
 }
