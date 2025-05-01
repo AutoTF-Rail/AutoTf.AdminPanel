@@ -291,6 +291,7 @@ async function fetchDockerStats() {
 toggleSection('managedContent');
 
 Promise.all([
+    fetchDockerStats(),
     fetchManaged(),
     fetchDocker(),
     fetchPlesk(),
