@@ -1,12 +1,29 @@
 using System.Collections.Concurrent;
 using AutoTf.AdminPanel.Statics;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging.Console;
+using Timer = System.Timers.Timer;
 
 namespace AutoTf.AdminPanel.Managers;
 
-public class PleskManager
+public class PleskManager : IHostedService
 {
+    private Timer _timer = new Timer(TimeSpan.FromMinutes(5));
+
+    public List<string> Records { get; private set; } = [];
+
+    public Task StartAsync(CancellationToken cancellationToken)
+    {
+        StartCacheTimer();
+        UpdateCache();
+        return Task.CompletedTask;
+    }
+
+    private void StartCacheTimer()
+    {
+        _timer.AutoReset = true;
+        _timer.Elapsed += (_, _) => UpdateCache();
+        _timer.Start();
+    }
+    
     /// <summary>
     /// Creates a subdomain in plesk and automatically issues a lets encrypt certificate for it.
     /// </summary>
@@ -25,6 +42,7 @@ public class PleskManager
             return false;
 
         PointToAuthentik(subDomain, rootDomain, authentikHost);
+        Records.Add($"https://{subDomain}.{rootDomain}");
         return true;
     }
 
@@ -76,8 +94,10 @@ public class PleskManager
                "}";
     }
 
-    public List<string> GetAll()
+    public void UpdateCache()
     {
+        Console.WriteLine("Updating plesk site cache.");
+        
         string[] result = CommandExecuter.ExecuteCommand("plesk bin subdomain -l").Split(Environment.NewLine);
 
         ConcurrentBag<string> managedDomains = new ConcurrentBag<string>();
@@ -88,7 +108,9 @@ public class PleskManager
                 managedDomains.Add(subDomain);
         });
 
-        return managedDomains.ToList();
+        Records = managedDomains.ToList();
+        
+        Console.WriteLine($"Finished updating plesk site cache with {Records.Count} sites.");
     }
 
     private bool IsManaged(string subDomain)
@@ -105,5 +127,11 @@ public class PleskManager
         {
             return false;
         }
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        _timer.Dispose();
+        return Task.CompletedTask;
     }
 }

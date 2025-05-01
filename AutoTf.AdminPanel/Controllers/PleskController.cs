@@ -30,6 +30,13 @@ public class PleskController : ControllerBase
     [HttpGet("all")]
     public ActionResult<List<string>> All()
     {
-        return _plesk.GetAll();
+        return _plesk.Records;
+    }
+
+    [HttpGet("updateCache")]
+    public IActionResult UpdateCache()
+    {
+        _plesk.UpdateCache();
+        return Ok();
     }
 }

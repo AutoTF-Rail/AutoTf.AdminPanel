@@ -33,7 +33,7 @@ public class ManageController : ControllerBase
         List<ContainerListResponse> managedContainers = new List<ContainerListResponse>();
         
         List<ContainerListResponse> containers = await _docker.GetAll();
-        List<string> pleskDomains = _plesk.GetAll();
+        List<string> pleskDomains = _plesk.Records;
         
         ProviderPaginationResult? authResult = await _auth.GetProviders();
         if (authResult == null)
