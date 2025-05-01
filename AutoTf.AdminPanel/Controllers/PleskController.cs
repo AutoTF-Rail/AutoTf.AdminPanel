@@ -33,7 +33,7 @@ public class PleskController : ControllerBase
         return _plesk.Records;
     }
 
-    [HttpGet("updateCache")]
+    [HttpPost("updateCache")]
     public IActionResult UpdateCache()
     {
         _plesk.UpdateCache();

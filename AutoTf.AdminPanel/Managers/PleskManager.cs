@@ -10,11 +10,10 @@ public class PleskManager : IHostedService
 
     public List<string> Records { get; private set; } = [];
 
-    public Task StartAsync(CancellationToken cancellationToken)
+    public async Task StartAsync(CancellationToken cancellationToken)
     {
+        await Task.Run(UpdateCache, cancellationToken);
         StartCacheTimer();
-        UpdateCache();
-        return Task.CompletedTask;
     }
 
     private void StartCacheTimer()
