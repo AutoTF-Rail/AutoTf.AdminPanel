@@ -2,6 +2,7 @@ using AutoTf.AdminPanel.Models.Requests;
 using AutoTf.AdminPanel.Statics;
 using Docker.DotNet;
 using Docker.DotNet.Models;
+using MemoryStats = AutoTf.AdminPanel.Models.Requests.MemoryStats;
 
 namespace AutoTf.AdminPanel.Managers;
 
@@ -41,6 +42,30 @@ public class DockerManager
         }
 
         return containerListResponse;
+    }
+
+    public async Task<MemoryStats?> GetMemoryStats(string id)
+    {
+        ContainerStatsResponse? response = await GetContainerStats(id);
+
+        if (response == null)
+            return null;
+        
+        double memoryUsageBytes = response.MemoryStats.Usage;
+        double memoryLimitBytes = response.MemoryStats.Limit;
+        
+        double memoryUsageMb = memoryUsageBytes / (1024 * 1024);
+        double memoryLimitMb = memoryLimitBytes / (1024 * 1024);
+        double memoryPercentage = (memoryUsageBytes / memoryLimitBytes) * 100;
+
+        MemoryStats stats = new MemoryStats()
+        {
+            MemoryUsageMb = memoryUsageMb,
+            MemoryLimitMb = memoryLimitMb,
+            MemoryPercentage = memoryPercentage
+        };
+
+        return stats;
     }
 
     public async Task<ContainerStatsResponse?> GetContainerStats(string id)

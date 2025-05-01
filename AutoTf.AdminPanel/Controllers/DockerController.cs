@@ -93,25 +93,11 @@ public class DockerController : ControllerBase
     [HttpGet("stats/{id}/memory")]
     public async Task<ActionResult<MemoryStats>> MemoryStats(string id)
     {
-        ContainerStatsResponse? response = await _docker.GetContainerStats(id);
+        MemoryStats? response = await _docker.GetMemoryStats(id);
         
         if (response == null)
             return Problem("Could not find container.");
         
-        double memoryUsageBytes = response.MemoryStats.Usage;
-        double memoryLimitBytes = response.MemoryStats.Limit;
-        
-        double memoryUsageMb = memoryUsageBytes / (1024 * 1024);
-        double memoryLimitMb = memoryLimitBytes / (1024 * 1024);
-        double memoryPercentage = (memoryUsageBytes / memoryLimitBytes) * 100;
-
-        MemoryStats stats = new MemoryStats()
-        {
-            MemoryUsageMb = memoryUsageMb,
-            MemoryLimitMb = memoryLimitMb,
-            MemoryPercentage = memoryPercentage
-        };
-        
-        return stats;
+        return response;
     }
 }

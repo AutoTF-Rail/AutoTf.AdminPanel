@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.ComponentModel.DataAnnotations;
 using AutoTf.AdminPanel.Managers;
 using AutoTf.AdminPanel.Models.Manage;
@@ -5,6 +6,7 @@ using AutoTf.AdminPanel.Models.Requests;
 using AutoTf.AdminPanel.Models.Requests.Authentik;
 using Docker.DotNet.Models;
 using Microsoft.AspNetCore.Mvc;
+using MemoryStats = AutoTf.AdminPanel.Models.Requests.MemoryStats;
 
 namespace AutoTf.AdminPanel.Controllers;
 
@@ -25,11 +27,35 @@ public class ManageController : ControllerBase
         _docker = docker;
     }
 
-    // [HttpGet("stats")]
-    // public async Task<ActionResult> Stats()
-    // {
-    //     List<ContainerListResponse> containers = await _docker.GetContainers();
-    // }
+    [HttpGet("stats/memory")]
+    public async Task<ActionResult<MemoryStats>> Statsmemory()
+    {
+        List<ContainerListResponse> containers = await _docker.GetContainers();
+
+        ConcurrentBag<MemoryStats> statsBag = new ConcurrentBag<MemoryStats>();
+        
+        await Parallel.ForEachAsync(containers, async (container, token) =>
+        {
+            statsBag.Add((await _docker.GetMemoryStats(container.ID))!);
+        });
+
+        double memoryUsageMb = 0.0f;
+        double memoryPercentage = 0.0f;
+        double memoryLimitMb = statsBag.Any() ? statsBag.First().MemoryLimitMb : 0.0;
+        
+        foreach (MemoryStats stat in statsBag)
+        {
+            memoryUsageMb += stat.MemoryUsageMb;
+            memoryPercentage += stat.MemoryPercentage;
+        }
+
+        return new MemoryStats()
+        {
+            MemoryPercentage = memoryPercentage,
+            MemoryLimitMb = memoryLimitMb,
+            MemoryUsageMb = memoryUsageMb
+        };
+    }
 
     [HttpDelete]
     public async Task<ActionResult> Delete([FromBody, Required] DeletionRequest request)
