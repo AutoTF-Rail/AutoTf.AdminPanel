@@ -207,7 +207,7 @@ async function fetchDockerStats() {
     new Chart(document.getElementById('networkChart'), {
         type: 'bar',
         data: {
-            labels: ['Received GB', 'Sent GB'],
+            labels: ['Received', 'Sent'],
             datasets: [{
                 data: [ netRecv, netSend ],
                 backgroundColor: [
