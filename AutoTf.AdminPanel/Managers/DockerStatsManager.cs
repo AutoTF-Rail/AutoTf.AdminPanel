@@ -30,7 +30,8 @@ public class DockerStatsManager
         MemoryStats memory = new MemoryStats()
         {
             MemoryLimitMb = -1
-        }
+        };
+        
         double cpuUsage = 0.1f;
 
         Parallel.ForEach(stats, stat =>
