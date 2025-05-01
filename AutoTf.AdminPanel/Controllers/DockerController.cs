@@ -74,7 +74,18 @@ public class DockerController : ControllerBase
         
         if (containerListResponse == null)
             return Problem("Could not find container.");
-
+        
         return containerListResponse;
+    }
+
+    [HttpGet("stats/{id}")]
+    public async Task<ActionResult<ContainerStatsResponse>> Stats(string id)
+    {
+        ContainerStatsResponse? response = await _docker.GetContainerStats(id);
+        
+        if (response == null)
+            return Problem("Could not find container.");
+        
+        return response;
     }
 }

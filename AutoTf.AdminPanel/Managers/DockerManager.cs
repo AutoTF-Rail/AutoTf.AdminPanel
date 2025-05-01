@@ -43,6 +43,34 @@ public class DockerManager
         return containerListResponse;
     }
 
+    public async Task<ContainerStatsResponse?> GetContainerStats(string id)
+    {
+        if (!await ContainerExists(id))
+            return null;
+
+        CancellationTokenSource cts = new CancellationTokenSource();
+        ContainerStatsResponse stats = null;
+        
+        Progress<ContainerStatsResponse> progress = new Progress<ContainerStatsResponse>(s =>
+        {
+            stats = s;
+            cts.Cancel(); // Stop streaming after the first result
+        });
+
+        try
+        {
+            await _dockerClient.Containers.GetContainerStatsAsync(id, new ContainerStatsParameters { Stream = true }, progress, cts.Token);
+        }
+        catch (OperationCanceledException)
+        {
+            // Expected, we canceled after getting the first stat
+        }
+        
+        cts.Dispose();
+
+        return stats;
+    }
+
     public async Task<bool> ContainerRunning(string id)
     {
         ContainerInspectResponse container = await _dockerClient.Containers.InspectContainerAsync(id);
