@@ -161,7 +161,7 @@ button:hover {
 .network-middle {
     display: flex;
     justify-content: space-between;
-    font-size: 12px;
+    font-size: 10px;
     margin-top: 15px;
 }
 

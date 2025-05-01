@@ -236,8 +236,8 @@ async function fetchDockerStats() {
         }
     });
     
-    document.getElementById('totalReceived').innerText = `${memoryUsed.toFixed(2)} GB`;
-    document.getElementById('totalSend').innerText = `${memoryTotal.toFixed(2)} GB`;
+    document.getElementById('totalReceived').innerText = `RX ${memoryUsed.toFixed(2)} GB`;
+    document.getElementById('totalSend').innerText = `TX ${memoryTotal.toFixed(2)} GB`;
 }
 
 fetchDockerStats();
