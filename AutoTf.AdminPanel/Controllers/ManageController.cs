@@ -114,7 +114,13 @@ public class ManageController : ControllerBase
             return await AssembleProblem("Something went wrong when creating the provider.", record.Id, container.ID);
 
         if (proxyResult.Applied == false)
-            return await AssembleProblem("Something went wrong when creating the provider. The operation was not successful.", record.Id, container.ID);
+        {
+            if(proxyResult.Logs != null && proxyResult.Logs.Any())
+                return await AssembleProblem($"Something went wrong when creating the provider. Logs: {string.Join(Environment.NewLine, proxyResult.Logs)}", record.Id,
+                    container.ID);
+            return await AssembleProblem("Something went wrong when creating the provider. The operation was not successful.", record.Id,
+                container.ID);
+        }
 
         string? providerId = await _auth.GetProviderIdByExternalHost(request.Proxy.ExternalHost);
 
