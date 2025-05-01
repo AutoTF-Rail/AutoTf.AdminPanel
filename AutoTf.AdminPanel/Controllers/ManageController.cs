@@ -34,20 +34,25 @@ public class ManageController : ControllerBase
         
         List<ContainerListResponse> containers = await _docker.GetAll();
         List<string> pleskDomains = _plesk.GetAll();
-
-        // Gets all containers, whichs name (without the autotf- at the start) is in the plesk domains list.
-        managedContainers = containers.Where(x => pleskDomains.Any(y => y.StartsWith(x.Names.First().Replace("autotf-", "")))).ToList();
-
-        ProviderPaginationResult? authResult = await _auth.GetProviders();
         
+        ProviderPaginationResult? authResult = await _auth.GetProviders();
         if (authResult == null)
             return Problem("Something went wrong when getting the authentik providers.");
         
         List<Provider> providers = authResult.Results;
-
-        managedContainers = managedContainers.Where(x => providers.Any(y => y.Name.ToLower() == x.Names.First().Replace("autotf-", ""))).ToList();
         
-        
+        foreach (ContainerListResponse container in containers)
+        {
+            string name = container.Names.First().Replace("autotf-", "");
+            
+            if (!pleskDomains.Any(x => x.StartsWith(name)))
+                continue;
+            
+            if (!providers.Any(x => x.Name.StartsWith(name)))
+                continue;
+            
+            managedContainers.Add(container);
+        }
 
         return managedContainers;
     }
