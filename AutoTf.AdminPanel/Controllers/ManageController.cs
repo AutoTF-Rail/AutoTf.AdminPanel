@@ -43,12 +43,11 @@ public class ManageController : ControllerBase
         
         foreach (ContainerListResponse container in containers)
         {
-            string name = container.Names.First().Replace("autotf-", "");
-            
+            string name = container.Names.First().Replace("/autotf-", "");
             if (!pleskDomains.Any(x => x.StartsWith(name)))
                 continue;
             
-            if (!providers.Any(x => x.Name.StartsWith(name)))
+            if (!providers.Any(x => x.Name.ToLower().Replace("managed provider for ", "").StartsWith(name)))
                 continue;
             
             managedContainers.Add(container);
