@@ -51,7 +51,7 @@ public class ManageController : ControllerBase
             if (!providers.Any(x => x.Name.ToLower().Replace("managed provider for ", "").StartsWith(name)))
                 continue;
             
-            if (_cloudflare.Records.Any(x => x.Name.StartsWith(name)))
+            if (!_cloudflare.Records.Any(x => x.Name.StartsWith(name)))
                 continue;
             
             managedContainers.Add(container);
