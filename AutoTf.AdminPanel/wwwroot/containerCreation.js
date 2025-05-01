@@ -6,7 +6,6 @@ function openCreateDialog() {
         .then(response => response.json())
         .then(config => {
             document.getElementById('dnsContent').value = config.defaultTarget;
-            document.getElementById('proxied').value = config.defaultProxySetting ? 'true' : 'false';
             document.getElementById('ttl').value = config.defaultTtl;
             document.getElementById('dnsComment').value = '';
 
