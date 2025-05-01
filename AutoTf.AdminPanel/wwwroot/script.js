@@ -178,12 +178,6 @@ async function fetchCloudflare() {
     });
 }
 
-fetchManaged();
-toggleSection('managedContent');
-fetchDocker();
-fetchPlesk();
-fetchAuthentik();
-fetchCloudflare();
 
 // Stats
 
@@ -197,9 +191,9 @@ async function fetchDockerStats() {
     const memoryTotal = stats.memory.memoryLimitMb / 1024;
     const memoryPercentage = +(stats.memory.memoryPercentage).toFixed(2);
 
-    const netRecv = +(stats.network.totalReceived / 1024).toFixed(2); 
+    const netRecv = +(stats.network.totalReceived / 1024).toFixed(2);
     const netSend = +(stats.network.totalSend / 1024).toFixed(2);
-    
+
     document.getElementById('cpuPercent').innerText = `${cpu}%`;
 
     new Chart(document.getElementById('cpuChart'), {
@@ -274,4 +268,11 @@ async function fetchDockerStats() {
     });
 }
 
-fetchDockerStats();
+toggleSection('managedContent');
+fetchManaged();
+fetchDocker();
+fetchPlesk();
+fetchAuthentik();
+fetchCloudflare();
+
+setInterval(fetchDockerStats, 5000);
