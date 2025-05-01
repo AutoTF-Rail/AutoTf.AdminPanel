@@ -229,7 +229,7 @@ async function fetchDockerStats() {
                 y: {
                     beginAtZero: true,
                     ticks: {
-                        callback: val => `${val} GB`
+                        callback: val => `${val / 1024} GB`
                     }
                 }
             }
