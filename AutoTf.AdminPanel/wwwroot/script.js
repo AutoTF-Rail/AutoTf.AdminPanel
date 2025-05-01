@@ -203,76 +203,91 @@ async function fetchDockerStats() {
     if (memoryChartInstance) memoryChartInstance.destroy();
     if (networkChartInstance) networkChartInstance.destroy();
 
-    cpuChartInstance = new Chart(document.getElementById('cpuChart'), {
-        type: 'doughnut',
-        data: {
-            datasets: [{
-                data: [cpu, 100 - cpu],
-                backgroundColor: ['#007bff', '#e0e0e0'],
-                borderWidth: 0
-            }]
-        },
-        options: {
-            cutout: '70%',
-            plugins: {
-                tooltip: { enabled: false },
-                legend: { display: false }
+    if (!cpuChartInstance) {
+        cpuChartInstance = new Chart(document.getElementById('cpuChart'), {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [cpu, 100 - cpu],
+                    backgroundColor: ['#007bff', '#e0e0e0'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                cutout: '70%',
+                plugins: {
+                    tooltip: { enabled: false },
+                    legend: { display: false }
+                }
             }
-        }
-    });
-
+        });
+    } else {
+        cpuChartInstance.data.datasets[0].data = [cpu, 100 - cpu];
+        cpuChartInstance.update('none'); 
+    }
+    
     document.getElementById('memoryPercent').innerText = `${memoryPercentage}%`;
     document.getElementById('memoryStatTotal').innerText = `${memoryUsed.toFixed(2)}/${memoryTotal.toFixed(2)} GB`;
 
-    memoryChartInstance = new Chart(document.getElementById('memoryChart'), {
-        type: 'doughnut',
-        data: {
-            datasets: [{
-                data: [memoryPercentage, 100 - memoryPercentage],
-                backgroundColor: ['#28a745', '#e0e0e0'],
-                borderWidth: 0
-            }]
-        },
-        options: {
-            cutout: '70%',
-            plugins: {
-                tooltip: { enabled: false },
-                legend: { display: false }
-            }
-        }
-    });
-
-    networkChartInstance = new Chart(document.getElementById('networkChart'), {
-        type: 'bar',
-        data: {
-            labels: ['Received', 'Transmitted'],
-            datasets: [{
-                data: [ netRecv, netSend ],
-                backgroundColor: [
-                    'rgba(255, 99, 132, 0.2)',
-                    'rgba(255, 159, 64, 0.2)'
-                ],
-                borderColor: [
-                    'rgb(255, 99, 132)',
-                    'rgb(255, 159, 64)'
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            plugins: {
-                legend: { display: false }
+    if (!memoryChartInstance) {
+        memoryChartInstance = new Chart(document.getElementById('memoryChart'), {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [memoryPercentage, 100 - memoryPercentage],
+                    backgroundColor: ['#28a745', '#e0e0e0'],
+                    borderWidth: 0
+                }]
             },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: val => `${val} MB`
+            options: {
+                cutout: '70%',
+                plugins: {
+                    tooltip: { enabled: false },
+                    legend: { display: false }
+                }
+            }
+        });
+    } else {
+        memoryChartInstance.data.datasets[0].data = [memoryPercentage, 100 - memoryPercentage];
+        memoryChartInstance.update('none');
+    }
+
+    if (!networkChartInstance) {
+        networkChartInstance = new Chart(document.getElementById('networkChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Received', 'Transmitted'],
+                datasets: [{
+                    data: [ netRecv, netSend ],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgb(255, 99, 132)',
+                        'rgb(255, 159, 64)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: val => `${val} MB`
+                        }
                     }
                 }
             }
-        }
-    });
+        });
+    } else {
+        networkChartInstance.data.datasets[0].data = [netRecv, netSend];
+        networkChartInstance.update('none');
+    }
 }
 
 toggleSection('managedContent');
