@@ -67,7 +67,7 @@ public class ManageController : ControllerBase
     public async Task<ActionResult> Create([FromBody, Required] TotalCreationRequest request)
     {
         // Pre checks
-        if (_cloudflare.DoesEntryExistByName(request.DnsRecord.Name))
+        if (_cloudflare.GetRecordByName(request.DnsRecord.Name, request.DnsRecord.Type) != null)
             return Problem("A DNS entry with this name already exists.");
         
         if (request.Container.ContainerName == "")
@@ -77,9 +77,10 @@ public class ManageController : ControllerBase
             return await RevertChanges("A container with this name already exists.");
         
         // Cloudflare
-        await _cloudflare.CreateNewEntry(request.DnsRecord);
+        if (!await _cloudflare.CreateNewEntry(request.DnsRecord))
+            return await RevertChanges("Failed to create DNS entry.");
 
-        DnsRecord? record = _cloudflare.GetRecordByName(request.DnsRecord.Name, request.DnsRecord.Content);
+        DnsRecord? record = _cloudflare.GetRecordByName(request.DnsRecord.Name, request.DnsRecord.Type);
 
         if (record == null)
             return Problem("Failed to create DNS record.");

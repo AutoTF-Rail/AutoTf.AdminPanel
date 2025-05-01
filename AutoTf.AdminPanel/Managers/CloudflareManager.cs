@@ -96,9 +96,9 @@ public class CloudflareManager : IHostedService
         return Records.Any(x => x.Id == id);
     }
 
-    public DnsRecord? GetRecordByName(string name, string content)
+    public DnsRecord? GetRecordByName(string name, string type)
     {
-        return Records.FirstOrDefault(x => x.Name.StartsWith(name.ToLower()) && x.Content == content.ToLower());
+        return Records.FirstOrDefault(x => x.Name.StartsWith(name.ToLower()) && x.Type == type);
     }
 
     public DnsRecord? GetRecord(string id)
