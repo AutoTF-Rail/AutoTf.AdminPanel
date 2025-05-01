@@ -90,7 +90,7 @@ public class DockerController : ControllerBase
         return response;
     }
 
-    [HttpGet("stats/{id}/memoryUsage")]
+    [HttpGet("stats/{id}/memory")]
     public async Task<ActionResult<MemoryStats>> MemoryStats(string id)
     {
         ContainerStatsResponse? response = await _docker.GetContainerStats(id);
