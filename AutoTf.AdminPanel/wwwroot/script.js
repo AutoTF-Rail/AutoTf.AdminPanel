@@ -229,12 +229,15 @@ async function fetchDockerStats() {
                 y: {
                     beginAtZero: true,
                     ticks: {
-                        callback: val => `${val / 1024} GB`
+                        callback: val => `${val} MB`
                     }
                 }
             }
         }
     });
+    
+    document.getElementById('totalReceived').innerText = `${memoryUsed.toFixed(2)} GB`;
+    document.getElementById('totalSend').innerText = `${memoryTotal.toFixed(2)} GB`;
 }
 
 fetchDockerStats();

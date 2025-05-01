@@ -158,6 +158,13 @@ button:hover {
     margin-top: 8px;
 }
 
+.network-middle {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    margin-top: 15px;
+}
+
 .label-left, .label-right {
     width: 45%;
 }
