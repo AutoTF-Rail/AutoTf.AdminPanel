@@ -62,6 +62,10 @@ h1 {
     margin-top: 8px;
 }
 
+.section-content.show {
+    display: block;
+}
+
 .container-item {
     display: flex;
     justify-content: space-between;
