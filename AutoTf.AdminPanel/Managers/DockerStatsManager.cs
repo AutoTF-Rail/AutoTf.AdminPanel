@@ -29,7 +29,9 @@ public class DockerStatsManager
 
         IEnumerable<Task> statsTasks = containers.Select(container =>
         {
+            Console.WriteLine($"Got {container.ID}");
             ContainerStatsResponse? stat = _docker.GetCachedStats(container.ID);
+            Console.WriteLine($"Have got {container.ID}");
 
             if (stat == null)
                 return Task.CompletedTask;
@@ -48,6 +50,7 @@ public class DockerStatsManager
                 memory.MemoryLimitMb += currMem.MemoryLimitMb;
 
             cpuUsage += currCpu;
+            Console.WriteLine($"Done {container.ID}");
             return Task.CompletedTask;
         });
 
