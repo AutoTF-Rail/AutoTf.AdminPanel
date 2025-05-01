@@ -79,7 +79,7 @@ public class ManageController : ControllerBase
         // Cloudflare
         await _cloudflare.CreateNewEntry(request.DnsRecord);
 
-        DnsRecord? record = _cloudflare.GetRecordByName(request.DnsRecord.Name, request.DnsRecord.Type);
+        DnsRecord? record = _cloudflare.GetRecordByName(request.DnsRecord.Name, request.DnsRecord.Content);
 
         if (record == null)
             return Problem("Failed to create DNS record.");

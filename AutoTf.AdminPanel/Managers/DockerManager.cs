@@ -37,7 +37,6 @@ public class DockerManager
 
         if (containerListResponse == null)
         {
-            Console.WriteLine($"Could not create site because the created container was not found by name {name.ToLower()}.");
             return null;
         }
 
