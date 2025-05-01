@@ -207,7 +207,7 @@ async function fetchDockerStats() {
     new Chart(document.getElementById('networkChart'), {
         type: 'bar',
         data: {
-            labels: ['Received', 'Sent'],
+            labels: ['Received', 'Transmitted'],
             datasets: [{
                 data: [ netRecv, netSend ],
                 backgroundColor: [
@@ -235,9 +235,6 @@ async function fetchDockerStats() {
             }
         }
     });
-    
-    document.getElementById('totalReceived').innerText = `RX ${memoryUsed.toFixed(2)} GB`;
-    document.getElementById('totalSend').innerText = `TX ${memoryTotal.toFixed(2)} GB`;
 }
 
 fetchDockerStats();
