@@ -159,8 +159,8 @@ async function fetchDockerStats() {
     const memoryTotal = stats.memory.memoryLimitMb / 1024;
     const memoryPercentage = +(stats.memory.memoryPercentage).toFixed(2);
 
-    const netRecv = +(stats.network.totalReceived / (1024 ** 3)).toFixed(2); 
-    const netSend = +(stats.network.totalSend / (1024 ** 3)).toFixed(2);
+    const netRecv = +(stats.network.totalReceived / 1024).toFixed(2); 
+    const netSend = +(stats.network.totalSend / 1024).toFixed(2);
     
     document.getElementById('cpuPercent').innerText = `${cpu}%`;
 
@@ -222,6 +222,9 @@ async function fetchDockerStats() {
             }]
         },
         options: {
+            plugins: {
+                legend: { display: false }
+            },
             scales: {
                 y: {
                     beginAtZero: true
