@@ -183,8 +183,7 @@ async function fetchDockerStats() {
     });
 
     document.getElementById('memoryPercent').innerText = `${memoryPercentage}%`;
-    document.getElementById('memoryUsed').innerText = `${memoryUsed.toFixed(2)} GB`;
-    document.getElementById('memoryTotal').innerText = `${memoryTotal.toFixed(2)} GB`;
+    document.getElementById('memoryStatTotal').innerText = `${memoryUsed.toFixed(2)}/${memoryTotal.toFixed(2)} GB`;
 
     new Chart(document.getElementById('memoryChart'), {
         type: 'doughnut',

@@ -14,7 +14,7 @@
             <div class="stat-box">
                 <div>CPU Usage</div>
                 <div class="memory-container">
-                    <canvas id="cpuChart" width="200" height="150"></canvas>
+                    <canvas id="cpuChart" width="175" height="150"></canvas>
                     <div class="memory-center">
                         <div id="cpuPercent" class="percent">0%</div>
                     </div>
@@ -24,13 +24,13 @@
             <div class="stat-box">
                 <div class="statTitle">Memory Usage</div>
                 <div class="memory-container">
-                    <canvas id="memoryChart" width="200" height="150"></canvas>
+                    <canvas id="memoryChart" width="175" height="150"></canvas>
                     <div class="memory-center">
-                        <div id="memoryPercent" class="percent">0%</div>
+                        <div id="memoryPercent" class="percent">0% <br>
+                            <div id="memoryStatTotal">100/100 GB</div>
+                        </div>
                     </div>
                     <div class="memory-bottom">
-                        <div id="memoryUsed" class="label-left">0 GB</div>
-                        <div id="memoryTotal" class="label-right">0 GB</div>
                     </div>
                 </div>
             </div>
@@ -38,7 +38,7 @@
             <div class="stat-box">
                 <div>Network Usage</div>
                 <div class="network-container">
-                    <canvas id="networkChart" width="200" height="150"></canvas>
+                    <canvas id="networkChart" width="175" height="150"></canvas>
                 </div>
             </div>
         </div>
