@@ -41,7 +41,7 @@ public class PleskManager : IHostedService
             return false;
 
         PointToAuthentik(subDomain, rootDomain, authentikHost);
-        Records.Add($"https://{subDomain}.{rootDomain}");
+        Records.Add($"{subDomain}.{rootDomain}");
         return true;
     }
 
