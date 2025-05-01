@@ -17,6 +17,7 @@ public class Program
         builder.Services.AddSingleton<DockerManager>();
         builder.Services.AddSingleton<DockerStatsManager>();
         
+        builder.Services.AddHostedSingleton<DockerCacheManager>();
         builder.Services.AddHostedSingleton<CloudflareManager>();
         builder.Services.AddHostedSingleton<AuthManager>();
         builder.Services.AddHostedSingleton<PleskManager>();
