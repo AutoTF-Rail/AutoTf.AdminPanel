@@ -80,4 +80,10 @@ public class DockerController : ControllerBase
         
         return containerListResponse;
     }
+
+    [HttpGet("networks")]
+    public async Task<ActionResult<List<string>>> GetAllNetworks()
+    {
+        return await _docker.GetNetworks();
+    }
 }

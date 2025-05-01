@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using AutoTf.AdminPanel.Managers;
 using AutoTf.AdminPanel.Models.Manage;
@@ -75,6 +76,9 @@ public class ManageController : ControllerBase
         
         if (request.Container.ContainerName == "")
             request.Container.ContainerName = request.Container.EvuName;
+
+        if (request.Container.ContainerName.StartsWith("AutoTF-"))
+            request.Container.ContainerName = "AutoTF-" + request.Container.ContainerName;
         
         if (await _docker.GetContainerByName(request.Container.ContainerName) != null)
             return await AssembleProblem("A container with this name already exists.");

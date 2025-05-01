@@ -8,6 +8,7 @@ using AutoTf.AdminPanel.Statics;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Group = AutoTf.AdminPanel.Models.Requests.Authentik.Group;
 using Timer = System.Timers.Timer;
 
 namespace AutoTf.AdminPanel.Managers;
@@ -125,6 +126,69 @@ public class AuthManager : IHostedService
         }
 
         return null;
+    }
+
+    public async Task<List<Flow>> GetAuthorizationFlows()
+    {
+        try
+        {
+            FlowPaginationRequest? result = await ApiHttpHelper.SendGet<FlowPaginationRequest>($"{_credentials.AuthUrl}/api/v3/flows/instances/?designation=authorization&ordering=slug",
+                _apiKey, true);
+            
+            if (result == null)
+                return new List<Flow>();
+
+            return result.Results;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Something went wrong when getting all authorization flows:");
+            Console.WriteLine(e.ToString());
+        }
+
+        return new List<Flow>();
+    }
+
+    public async Task<List<Flow>> GetInvalidationFlows()
+    {
+        try
+        {
+            FlowPaginationRequest? result = await ApiHttpHelper.SendGet<FlowPaginationRequest>($"{_credentials.AuthUrl}/api/v3/flows/instances/?designation=invalidation&ordering=slug",
+                _apiKey, true);
+            
+            if (result == null)
+                return new List<Flow>();
+
+            return result.Results;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Something went wrong when getting all invalidation flows:");
+            Console.WriteLine(e.ToString());
+        }
+
+        return new List<Flow>();
+    }
+
+    public async Task<List<Group>> GetGroups()
+    {
+        try
+        {
+            GroupPaginationRequest? result = await ApiHttpHelper.SendGet<GroupPaginationRequest>($"{_credentials.AuthUrl}/api/v3/core/groups/?include_users=false&ordering=name",
+                _apiKey, true);
+            
+            if (result == null)
+                return new List<Group>();
+
+            return result.Results;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Something went wrong when getting all groups:");
+            Console.WriteLine(e.ToString());
+        }
+
+        return new List<Group>();
     }
 
     public async Task<ProviderPaginationResult?> GetProviders()

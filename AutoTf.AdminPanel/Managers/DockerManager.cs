@@ -145,4 +145,9 @@ public class DockerManager
     {
         return (await Client.Networks.ListNetworksAsync()).FirstOrDefault(x => x.Name == name);
     }
+
+    public async Task<List<string>> GetNetworks()
+    {
+        return (await Client.Networks.ListNetworksAsync()).Select(x => x.Name).ToList();
+    }
 }

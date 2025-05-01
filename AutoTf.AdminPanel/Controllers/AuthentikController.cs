@@ -112,4 +112,22 @@ public class AuthentikController : ControllerBase
         // TODO: Check for existance
         return await _auth.DeleteProvider(id);
     }
+
+    [HttpGet("flows/authorization")]
+    public async Task<ActionResult<List<Flow>>> AuthorizationFlows()
+    {
+        return await _auth.GetAuthorizationFlows();
+    }
+
+    [HttpGet("flows/invalidation")]
+    public async Task<ActionResult<List<Flow>>> InvalidationFlows()
+    {
+        return await _auth.GetInvalidationFlows();
+    }
+
+    [HttpGet("groups")]
+    public async Task<ActionResult<List<Group>>> Groups()
+    {
+        return await _auth.GetGroups();
+    }
 }
