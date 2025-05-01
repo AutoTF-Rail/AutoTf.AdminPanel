@@ -11,6 +11,7 @@ body {
     background: white;
     padding: 20px;
     border-radius: 10px;
+    border: 0;
 }
 
 h1 {
@@ -20,19 +21,19 @@ h1 {
 
 .section {
     margin-bottom: 20px;
-    border: 1px solid #ddd;
+    border: 0;
     border-radius: 8px;
 }
 
 .section-header {
-    background: #007bff;
+    background: #198CFF;
     color: white;
-    padding: 15px;
+    padding: 2px 15px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
-    border-radius: 8px 8px 0 0;
+    border-radius: 8px;
 }
 
 .section-content {
@@ -40,15 +41,15 @@ h1 {
     padding: 0;
     margin: 0;
     display: none;
+    border-radius: 8px;
+    background: #eee;
 }
 
 .container-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #eee;
     padding: 12px 15px;
-    border-bottom: 1px solid #ddd;
 }
 
 .container-item:hover {
