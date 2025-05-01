@@ -25,11 +25,12 @@ public class ManageController : ControllerBase
         _docker = docker;
     }
 
-    private async Task<string> RevertChanges(string error, string? recordId = null, string? containerId = null, string? externalHost = null)
+    private async Task<string> RevertChanges(string error, string? recordId = null, string? containerId = null, string? externalHost = null, string? subDomain = null, string? rootDomain = null)
     {
         bool entryDeletionSuccess = false;
         bool containerKillSuccess = false;
         bool proxyDeletionSuccess = false;
+        bool pleskDeletionSuccess = false;
         
         if (recordId != null)
             entryDeletionSuccess = await _cloudflare.DeleteEntry(recordId);
@@ -58,7 +59,14 @@ public class ManageController : ControllerBase
         }
         
         if (proxyDeletionSuccess)
-            error += entryDeletionSuccess ? " Deleted proxy." : "";
+            error += proxyDeletionSuccess ? " Deleted proxy." : "";
+
+        
+        if (subDomain != null && rootDomain != null)
+            pleskDeletionSuccess = _plesk.DeleteSubDomain(rootDomain, subDomain);
+        
+        if (pleskDeletionSuccess)
+            error += pleskDeletionSuccess ? " Deleted plesk site." : "";
 
         return error;
     }
@@ -71,7 +79,7 @@ public class ManageController : ControllerBase
     [HttpDelete]
     public async Task<ActionResult> Delete([FromBody, Required] DeletionRequest request)
     {
-        return Ok(await RevertChanges(string.Empty, request.RecordId, request.ContainerId, request.ExternalHost));
+        return Ok(await RevertChanges(string.Empty, request.RecordId, request.ContainerId, request.ExternalHost, request.SubDomain, request.RootDomain));
     }
 
     [HttpPost("create")]

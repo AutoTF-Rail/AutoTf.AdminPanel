@@ -12,4 +12,10 @@ public class DeletionRequest
     
     [JsonPropertyName("externalHost")]
     public string? ExternalHost { get; set; } = null;
+    
+    [JsonPropertyName("subDomain")]
+    public string? SubDomain { get; set; } = null;
+    
+    [JsonPropertyName("RootDomain")]
+    public string? RootDomain { get; set; } = null;
 }
