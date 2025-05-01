@@ -15,6 +15,87 @@ public class DockerStatsManager
         _docker = docker;
     }
 
+    public async Task<ContainerStats> Stats()
+    {
+        List<ContainerListResponse> containers = await _docker.GetContainers();
+
+        ConcurrentBag<ContainerStatsResponse> stats = new ConcurrentBag<ContainerStatsResponse>();
+        
+        await Parallel.ForEachAsync(containers, async (container, _) =>
+        {
+            stats.Add((await _docker.GetContainerStats(container.ID))!);
+        });
+        
+        NetworkStats network = new NetworkStats();
+        MemoryStats memory = new MemoryStats();
+        double cpuUsage = 0.1f;
+
+        Parallel.ForEach(stats, stat =>
+        {
+            NetworkStats currNet = Network(stat);
+            MemoryStats currMem = Memory(stat);
+            double currCpu = Cpu(stat);
+
+            network.TotalReceived += currNet.TotalReceived;
+            network.TotalSend += currNet.TotalSend;
+
+            memory.MemoryPercentage += currMem.MemoryPercentage;
+            memory.MemoryLimitMb += currMem.MemoryLimitMb;
+            memory.MemoryUsageMb += currMem.MemoryUsageMb;
+
+            cpuUsage += currCpu;
+        });
+        
+        return new ContainerStats()
+        {
+            Network = network,
+            Memory = memory,
+            CpuUsage = cpuUsage
+        };
+    }
+
+    public async Task<MemoryStats> Memory()
+    {
+        List<ContainerListResponse> containers = await _docker.GetContainers();
+
+        ConcurrentBag<ContainerStatsResponse> stats = new ConcurrentBag<ContainerStatsResponse>();
+        
+        await Parallel.ForEachAsync(containers, async (container, _) =>
+        {
+            stats.Add((await _docker.GetContainerStats(container.ID))!);
+        });
+        
+        return Memory(stats);
+    }
+
+    public async Task<double> Cpu()
+    {
+        List<ContainerListResponse> containers = await _docker.GetContainers();
+
+        ConcurrentBag<ContainerStatsResponse> stats = new ConcurrentBag<ContainerStatsResponse>();
+        
+        await Parallel.ForEachAsync(containers, async (container, _) =>
+        {
+            stats.Add((await _docker.GetContainerStats(container.ID))!);
+        });
+
+        return Cpu(stats);
+    }
+
+    public async Task<NetworkStats> Network()
+    {
+        List<ContainerListResponse> containers = await _docker.GetContainers();
+
+        ConcurrentBag<ContainerStatsResponse> stats = new ConcurrentBag<ContainerStatsResponse>();
+        
+        await Parallel.ForEachAsync(containers, async (container, _) =>
+        {
+            stats.Add((await _docker.GetContainerStats(container.ID))!);
+        });
+
+        return Network(stats);
+    }
+
     public async Task<MemoryStats?> Memory(string containerId)
     {
         ContainerStatsResponse? response = await _docker.GetContainerStats(containerId);
@@ -63,18 +144,15 @@ public class DockerStatsManager
             CpuUsage = cpuUsage
         };
     }
-
-    public async Task<MemoryStats> Memory()
+    
+    #region Core
+    
+    private float Safe(float value) => float.IsNaN(value) || float.IsInfinity(value) ? 0.0f : value;
+    
+    #region All
+    
+    private MemoryStats Memory(ConcurrentBag<ContainerStatsResponse> stats)
     {
-        List<ContainerListResponse> containers = await _docker.GetContainers();
-
-        ConcurrentBag<ContainerStatsResponse> stats = new ConcurrentBag<ContainerStatsResponse>();
-        
-        await Parallel.ForEachAsync(containers, async (container, _) =>
-        {
-            stats.Add((await _docker.GetContainerStats(container.ID))!);
-        });
-        
         MemoryStats finalStats = new MemoryStats
         {
             MemoryLimitMb = -1
@@ -92,11 +170,38 @@ public class DockerStatsManager
 
         return finalStats;
     }
+
+    private double Cpu(ConcurrentBag<ContainerStatsResponse> stats)
+    {
+        double totalUsage = 0.0f;
+
+        Parallel.ForEach(stats, x =>
+        {
+            double usage = Cpu(x);
+            totalUsage += usage;
+        });
+
+        return totalUsage;
+    }
+
+    private NetworkStats Network(ConcurrentBag<ContainerStatsResponse> stats)
+    {
+        NetworkStats finalStats = new NetworkStats();
+
+        Parallel.ForEach(stats, x =>
+        {
+            NetworkStats networkStats = Network(x);
+            
+            finalStats.TotalSend += networkStats.TotalSend;
+            finalStats.TotalReceived += networkStats.TotalReceived;
+        });
+
+        return finalStats;
+    }
     
-    #region Core
+    #endregion
     
-    private float Safe(float value) => float.IsNaN(value) || float.IsInfinity(value) ? 0.0f : value;
-    
+    #region singular
     private MemoryStats Memory(ContainerStatsResponse response)
     {
         float memoryUsageBytes = response.MemoryStats.Usage;
@@ -155,6 +260,8 @@ public class DockerStatsManager
             TotalSend = totalTx
         };
     }
+    
+    #endregion
     
     #endregion
 }

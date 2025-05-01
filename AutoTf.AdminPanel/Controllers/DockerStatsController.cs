@@ -15,10 +15,28 @@ public class DockerStatsController : ControllerBase
         _docker = docker;
     }
 
+    [HttpGet]
+    public async Task<ActionResult<ContainerStats>> Stats()
+    {
+        return await _docker.Stats();
+    }
+
     [HttpGet("memory")]
     public async Task<ActionResult<MemoryStats>> Memory()
     {
         return await _docker.Memory();
+    }
+
+    [HttpGet("cpu")]
+    public async Task<ActionResult<double>> Cpu()
+    {
+        return await _docker.Cpu();
+    }
+
+    [HttpGet("network")]
+    public async Task<ActionResult<NetworkStats>> Network()
+    {
+        return await _docker.Network();
     }
     
     #region Container
