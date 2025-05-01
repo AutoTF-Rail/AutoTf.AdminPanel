@@ -131,12 +131,17 @@ button:hover {
 
 .stat-box {
     text-align: center;
+    min-height: 200px;
     position: relative;
 }
 
 .memory-container {
     position: relative;
     display: inline-block;
+}
+
+.statTitle {
+    margin-bottom: 5px
 }
 
 .memory-center {
