@@ -80,29 +80,7 @@ public class DockerController : ControllerBase
         
         return containerListResponse;
     }
-
-    [HttpGet("stats/{id}")]
-    public async Task<ActionResult<ContainerStatsResponse>> Stats(string id)
-    {
-        ContainerStatsResponse? response = await _docker.GetContainerStats(id);
-        
-        if (response == null)
-            return Problem("Could not find container.");
-        
-        return response;
-    }
-
-    [HttpGet("stats/{id}/memory")]
-    public async Task<ActionResult<MemoryStats>> MemoryStats(string id)
-    {
-        MemoryStats? response = await _docker.GetMemoryStats(id);
-        
-        if (response == null)
-            return Problem("Could not find container.");
-        
-        return response;
-    }
-
+    
     [HttpGet("stats/{id}/cpu")]
     public async Task<ActionResult<double>> CpuStats(string id)
     {
@@ -124,40 +102,7 @@ public class DockerController : ControllerBase
         
         return response;
     }
-
-    [HttpGet("stats/memory")]
-    public async Task<ActionResult<MemoryStats>> StatsMemory()
-    {
-        List<ContainerListResponse> containers = await _docker.GetContainers();
-
-        ConcurrentBag<MemoryStats> statsBag = new ConcurrentBag<MemoryStats>();
-        
-        await Parallel.ForEachAsync(containers, async (container, token) =>
-        {
-            statsBag.Add((await _docker.GetMemoryStats(container.ID))!);
-        });
-
-        float memoryUsageMb = 0.0f;
-        float memoryPercentage = 0.0f;
-        float memoryLimitMb = statsBag.Any() ? statsBag.First().MemoryLimitMb : 0.0f;
-        
-        foreach (MemoryStats stat in statsBag)
-        {
-            memoryUsageMb += Safe(stat.MemoryUsageMb);
-            memoryPercentage += Safe(stat.MemoryPercentage);
-        }
-
-        return new MemoryStats()
-        {
-            MemoryPercentage = MathF.Round(Safe(memoryPercentage), 2),
-            MemoryLimitMb = MathF.Round(Safe(memoryLimitMb), 2),
-            MemoryUsageMb = MathF.Round(Safe(memoryUsageMb), 2)
-        };
-
-        float Safe(float value) =>
-            float.IsNaN(value) || float.IsInfinity(value) ? 0.0f : value;
-    }
-
+    
     [HttpGet("stats/cpu")]
     public async Task<ActionResult<double>> StatsCpu()
     {

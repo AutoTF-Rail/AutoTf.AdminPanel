@@ -45,30 +45,6 @@ public class DockerManager
         return containerListResponse;
     }
 
-    public async Task<MemoryStats?> GetMemoryStats(string id)
-    {
-        ContainerStatsResponse? response = await GetContainerStats(id);
-
-        if (response == null)
-            return null;
-        
-        float memoryUsageBytes = response.MemoryStats.Usage;
-        float memoryLimitBytes = response.MemoryStats.Limit;
-        
-        float memoryUsageMb = memoryUsageBytes / (1024 * 1024);
-        float memoryLimitMb = memoryLimitBytes / (1024 * 1024);
-        float memoryPercentage = (memoryUsageBytes / memoryLimitBytes) * 100;
-
-        MemoryStats stats = new MemoryStats()
-        {
-            MemoryUsageMb = memoryUsageMb,
-            MemoryLimitMb = memoryLimitMb,
-            MemoryPercentage = memoryPercentage
-        };
-
-        return stats;
-    }
-
     public async Task<double?> GetCpuUsage(string id)
     {
         ContainerStatsResponse? response = await GetContainerStats(id);
