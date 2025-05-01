@@ -2,24 +2,22 @@ using AutoTf.AdminPanel.Models.Requests;
 using AutoTf.AdminPanel.Statics;
 using Docker.DotNet;
 using Docker.DotNet.Models;
-using MemoryStats = AutoTf.AdminPanel.Models.Requests.MemoryStats;
-using NetworkStats = Docker.DotNet.Models.NetworkStats;
 
 namespace AutoTf.AdminPanel.Managers;
 
 public class DockerManager
 {
-    private readonly DockerClient _dockerClient;
+    public readonly DockerClient Client;
 
     public DockerManager()
     {
-        _dockerClient = new DockerClientConfiguration(new Uri("unix:///var/run/docker.sock")).CreateClient();
+        Client = new DockerClientConfiguration(new Uri("unix:///var/run/docker.sock")).CreateClient();
     }
 
     // TODO: Cache?
     public async Task<List<ContainerListResponse>> GetAll()
     {
-        IList<ContainerListResponse>? containers = await _dockerClient.Containers.ListContainersAsync(new ContainersListParameters()
+        IList<ContainerListResponse>? containers = await Client.Containers.ListContainersAsync(new ContainersListParameters()
         {
             All = true
         });
@@ -45,87 +43,9 @@ public class DockerManager
         return containerListResponse;
     }
 
-    public async Task<double?> GetCpuUsage(string id)
-    {
-        ContainerStatsResponse? response = await GetContainerStats(id);
-
-        if (response == null)
-            return null;
-        
-        ulong cpuDelta = response.CPUStats.CPUUsage.TotalUsage - response.PreCPUStats.CPUUsage.TotalUsage;
-        ulong systemDelta = response.CPUStats.SystemUsage - response.PreCPUStats.SystemUsage;
-        uint cpuCount = response.CPUStats.OnlineCPUs;
-
-        double cpuPercent = 0;
-        
-        if (systemDelta > 0 && cpuDelta > 0)
-        {
-            cpuPercent = ((double)cpuDelta / systemDelta) * cpuCount * 100;
-        }
-
-        return cpuPercent;
-    }
-
-    public async Task<AutoTf.AdminPanel.Models.Requests.NetworkStats?> GetNetworkStats(string id)
-    {
-        ContainerStatsResponse? response = await GetContainerStats(id);
-
-        if (response == null)
-            return null;
-        
-        ulong totalRx = 0;
-        ulong totalTx = 0;
-
-        if (response.Networks == null)
-            return new Models.Requests.NetworkStats();
-            
-        foreach (NetworkStats? net in response.Networks.Values)
-        {
-            if (net == null)
-                continue;
-
-            totalRx += net.RxBytes;
-            totalTx += net.TxBytes;
-        }
-
-        return new Models.Requests.NetworkStats()
-        {
-            TotalReceived = totalRx,
-            TotalSend = totalTx
-        };
-    }
-
-    public async Task<ContainerStatsResponse?> GetContainerStats(string id)
-    {
-        if (!await ContainerExists(id))
-            return null;
-
-        CancellationTokenSource cts = new CancellationTokenSource();
-        ContainerStatsResponse stats = null;
-        
-        Progress<ContainerStatsResponse> progress = new Progress<ContainerStatsResponse>(s =>
-        {
-            stats = s;
-            cts.Cancel(); // Stop streaming after the first result
-        });
-
-        try
-        {
-            await _dockerClient.Containers.GetContainerStatsAsync(id, new ContainerStatsParameters { Stream = true }, progress, cts.Token);
-        }
-        catch (OperationCanceledException)
-        {
-            // Expected, we canceled after getting the first stat
-        }
-        
-        cts.Dispose();
-
-        return stats;
-    }
-
     public async Task<bool> ContainerRunning(string id)
     {
-        ContainerInspectResponse container = await _dockerClient.Containers.InspectContainerAsync(id);
+        ContainerInspectResponse container = await Client.Containers.InspectContainerAsync(id);
         
         return container.State.Status == "running";
     }
@@ -157,7 +77,7 @@ public class DockerManager
             portBindings[containerPort + "/tcp"].Add(new PortBinding { HostPort = hostPort });
         }
         
-        return await _dockerClient.Containers.CreateContainerAsync(new CreateContainerParameters()
+        return await Client.Containers.CreateContainerAsync(new CreateContainerParameters()
         {
             Name = parameters.ContainerName,
             Image = parameters.Image,
@@ -186,7 +106,7 @@ public class DockerManager
         if (!await ContainerExists(containerId))
             return false;
         
-        return await _dockerClient.Containers.StartContainerAsync(containerId, new ContainerStartParameters());
+        return await Client.Containers.StartContainerAsync(containerId, new ContainerStartParameters());
     }
 
     public async Task<bool> StopContainer(string containerId)
@@ -194,7 +114,7 @@ public class DockerManager
         if (!await ContainerExists(containerId))
             return false;
         
-        return await _dockerClient.Containers.StopContainerAsync(containerId, new ContainerStopParameters());
+        return await Client.Containers.StopContainerAsync(containerId, new ContainerStopParameters());
     }
 
     public async Task<bool> KillContainer(string containerId)
@@ -205,7 +125,7 @@ public class DockerManager
         if (!await ContainerRunning(containerId))
             return false;
         
-        await _dockerClient.Containers.KillContainerAsync(containerId, new ContainerKillParameters());
+        await Client.Containers.KillContainerAsync(containerId, new ContainerKillParameters());
 
         return true;
     }
@@ -218,11 +138,11 @@ public class DockerManager
         if (!await ContainerRunning(containerId))
             return;
         
-        await _dockerClient.Containers.RemoveContainerAsync(containerId, new ContainerRemoveParameters());
+        await Client.Containers.RemoveContainerAsync(containerId, new ContainerRemoveParameters());
     }
 
     public async Task<NetworkResponse?> GetNetwork(string name)
     {
-        return (await _dockerClient.Networks.ListNetworksAsync()).FirstOrDefault(x => x.Name == name);
+        return (await Client.Networks.ListNetworksAsync()).FirstOrDefault(x => x.Name == name);
     }
 }
