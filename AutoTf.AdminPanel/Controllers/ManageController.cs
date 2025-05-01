@@ -25,31 +25,81 @@ public class ManageController : ControllerBase
         _docker = docker;
     }
 
-    [HttpPost("create")]
-    public async Task<ActionResult<bool>> Create([FromBody, Required] TotalCreationRequest request)
+    private async Task<ActionResult> RevertChanges(string error, string? recordId = null, string? containerId = null, string? externalHost = null)
     {
-        // Cloudflare
-        await _cloudflare.CreateNewEntry(request.DnsRecord);
+        bool entryDeletionSuccess = false;
+        bool containerKillSuccess = false;
+        bool proxyDeletionSuccess = false;
+        
+        if (recordId != null)
+            entryDeletionSuccess = await _cloudflare.DeleteEntry(recordId);
 
-        // Docker
-        await _docker.CreateContainer(request.Container);
+        if (entryDeletionSuccess)
+            error += entryDeletionSuccess ? " Deleted Dns Entry." : "";
+
+
+        if (containerId != null)
+        {
+            containerKillSuccess = await _docker.KillContainer(containerId);
+
+            if (containerKillSuccess)
+            {
+                await _docker.DeleteContainer(containerId);
+                error += containerKillSuccess ? " Deleted container." : "";
+            }
+        }
+
+        if (externalHost != null)
+        {
+            string? providerId = await _auth.GetProviderIdByExternalHost(externalHost);
+            
+            if (providerId != null)
+                proxyDeletionSuccess = await _auth.DeleteProvider(providerId);
+        }
+        
+        if (proxyDeletionSuccess)
+            error += entryDeletionSuccess ? " Deleted proxy." : "";
+
+        return Problem(error);
+    }
+
+    [HttpPost("create")]
+    public async Task<ActionResult> Create([FromBody, Required] TotalCreationRequest request)
+    {
+        // Pre checks
+        if (_cloudflare.DoesEntryExistByName(request.DnsRecord.Name))
+            return Problem("A DNS entry with this name already exists.");
         
         if (request.Container.ContainerName == "")
             request.Container.ContainerName = request.Container.EvuName;
+        
+        if (await _docker.GetContainerByName(request.Container.ContainerName) != null)
+            return await RevertChanges("A container with this name already exists.");
+        
+        // Cloudflare
+        await _cloudflare.CreateNewEntry(request.DnsRecord);
+
+        DnsRecord? record = _cloudflare.GetRecordByName(request.DnsRecord.Name, request.DnsRecord.Type);
+
+        if (record == null)
+            return Problem("Failed to create DNS record.");
+
+        // Docker
+        await _docker.CreateContainer(request.Container);
 
         ContainerListResponse? container = await _docker.GetContainerByName(request.Container.ContainerName);
 
         if (container == null)
-            return Problem("The created container could not be found.");
-        
+            return await RevertChanges("The created container could not be found.", record.Id);
+
         await _docker.StartContainer(container.ID);
         container = await _docker.GetContainerByName(request.Container.ContainerName);
         
         if (container == null)
-            return Problem("The created container could not be found after it was started.");
+            return await RevertChanges("The created container could not be found after it was started.", record.Id);
 
         if (!container.NetworkSettings.Networks.TryGetValue(request.Container.DefaultNetwork, out EndpointSettings? endpoint))
-            return Problem("Something went wrong during the network creation.");
+            return await RevertChanges("Something went wrong during the network creation.", record.Id, container.ID);
 
         // Authentik
         CreateProxyRequest proxy = request.Proxy.ConvertToRequest(endpoint.IPAddress);
@@ -57,25 +107,26 @@ public class ManageController : ControllerBase
         TransactionalCreationResponse? proxyResult = await _auth.CreateProxy(proxy);
         
         if (proxyResult == null)
-            return Problem("Failed while creating the proxy.");
+            return await RevertChanges("Something went wrong when creating the provider.", record.Id, container.ID);
 
         if (proxyResult.Applied == false)
-        {
-            return Problem(proxyResult.Logs != null && proxyResult.Logs.Any() ? $"Failed while creating the proxy. Logs: {string.Join(Environment.NewLine, proxyResult.Logs)}" : "Failed while creating the proxy. No logs");
-        }
+            return await RevertChanges("Something went wrong when creating the provider. The operation was not successful.", record.Id, container.ID);
 
         string? providerId = await _auth.GetProviderIdByExternalHost(request.Proxy.ExternalHost);
 
         if (providerId == null)
-            return Problem("Failed to find the created provider.");
+            return await RevertChanges("The created provider could not be found.", record.Id, container.ID);
 
         // idk how to validate this properly yet
         string? assignResult = await _auth.AssignToOutpost(request.Proxy.OutpostId, providerId);
         
         if (assignResult == null)
-            return Problem("Failed while assigning the provider to the outpost");
+            return await RevertChanges("Failed while assigning the provider to the outpost.", record.Id, container.ID, request.Proxy.ExternalHost);
         
         // Plesk
-        return _plesk.CreateSubdomain(request.Plesk.SubDomain, request.Plesk.RootDomain, request.Plesk.Email, request.Plesk.AuthentikHost);
+        if (!_plesk.CreateSubdomain(request.Plesk.SubDomain, request.Plesk.RootDomain, request.Plesk.Email, request.Plesk.AuthentikHost))
+            return await RevertChanges("Something went wrong when creating the subdomain in plesk.", record.Id, container.ID, request.Proxy.ExternalHost);
+
+        return Ok();
     }
 }

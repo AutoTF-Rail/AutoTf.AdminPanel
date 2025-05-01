@@ -88,7 +88,7 @@ public class CloudflareManager : IHostedService
 
     public bool DoesEntryExistByName(string name)
     {
-        return Records.Any(x => x.Name == name);
+        return Records.Any(x => x.Name == name.ToLower());
     }
 
     public bool DoesEntryExist(string id)
@@ -96,9 +96,9 @@ public class CloudflareManager : IHostedService
         return Records.Any(x => x.Id == id);
     }
 
-    public DnsRecord? GetRecordByName(string name)
+    public DnsRecord? GetRecordByName(string name, string type)
     {
-        return Records.FirstOrDefault(x => x.Name == name);
+        return Records.FirstOrDefault(x => x.Name == name.ToLower() && x.Type == type);
     }
 
     public DnsRecord? GetRecord(string id)
