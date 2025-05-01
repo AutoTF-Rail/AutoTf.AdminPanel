@@ -3,6 +3,7 @@ using AutoTf.AdminPanel.Statics;
 using Docker.DotNet;
 using Docker.DotNet.Models;
 using MemoryStats = AutoTf.AdminPanel.Models.Requests.MemoryStats;
+using NetworkStats = Docker.DotNet.Models.NetworkStats;
 
 namespace AutoTf.AdminPanel.Managers;
 
@@ -66,6 +67,50 @@ public class DockerManager
         };
 
         return stats;
+    }
+
+    public async Task<double?> GetCpuUsage(string id)
+    {
+        ContainerStatsResponse? response = await GetContainerStats(id);
+
+        if (response == null)
+            return null;
+        
+        ulong cpuDelta = response.CPUStats.CPUUsage.TotalUsage - response.PreCPUStats.CPUUsage.TotalUsage;
+        ulong systemDelta = response.CPUStats.SystemUsage - response.PreCPUStats.SystemUsage;
+        uint cpuCount = response.CPUStats.OnlineCPUs;
+
+        double cpuPercent = 0;
+        
+        if (systemDelta > 0 && cpuDelta > 0)
+        {
+            cpuPercent = ((double)cpuDelta / systemDelta) * cpuCount * 100;
+        }
+
+        return cpuPercent;
+    }
+
+    public async Task<AutoTf.AdminPanel.Models.Requests.NetworkStats?> GetNetworkStats(string id)
+    {
+        ContainerStatsResponse? response = await GetContainerStats(id);
+
+        if (response == null)
+            return null;
+        
+        ulong totalRx = 0;
+        ulong totalTx = 0;
+
+        foreach (NetworkStats? net in response.Networks.Values)
+        {
+            totalRx += net.RxBytes;
+            totalTx += net.TxBytes;
+        }
+
+        return new Models.Requests.NetworkStats()
+        {
+            TotalReceived = totalRx,
+            TotalSend = totalTx
+        };
     }
 
     public async Task<ContainerStatsResponse?> GetContainerStats(string id)

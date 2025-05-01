@@ -26,37 +26,6 @@ public class ManageController : ControllerBase
         _plesk = plesk;
         _docker = docker;
     }
-
-    [HttpGet("stats/memory")]
-    public async Task<ActionResult<MemoryStats>> StatsMemory()
-    {
-        List<ContainerListResponse> containers = await _docker.GetContainers();
-
-        ConcurrentBag<MemoryStats> statsBag = new ConcurrentBag<MemoryStats>();
-        
-        await Parallel.ForEachAsync(containers, async (container, token) =>
-        {
-            statsBag.Add((await _docker.GetMemoryStats(container.ID))!);
-        });
-
-        float memoryUsageMb = 0.0f;
-        float memoryPercentage = 0.0f;
-        float memoryLimitMb = statsBag.Any() ? statsBag.First().MemoryLimitMb : 0.0f;
-        
-        foreach (MemoryStats stat in statsBag)
-        {
-            memoryUsageMb += stat.MemoryUsageMb;
-            memoryPercentage += stat.MemoryPercentage;
-        }
-
-        return new MemoryStats()
-        {
-            MemoryPercentage = MathF.Round(memoryPercentage, 2),
-            MemoryLimitMb = MathF.Round(memoryLimitMb, 2),
-            MemoryUsageMb = MathF.Round(memoryUsageMb, 2)
-        };
-    }
-
     [HttpDelete]
     public async Task<ActionResult> Delete([FromBody, Required] DeletionRequest request)
     {
