@@ -183,8 +183,7 @@ fetchDocker();
 fetchPlesk();
 fetchAuthentik();
 fetchCloudflare();
-toggleSection('managedContainers');
-
+toggleSection('managedContent');
 
 // Stats
 
