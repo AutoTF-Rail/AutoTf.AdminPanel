@@ -102,6 +102,9 @@ public class DockerManager
 
         foreach (NetworkStats? net in response.Networks.Values)
         {
+            if (net == null)
+                continue;
+            
             totalRx += net.RxBytes;
             totalTx += net.TxBytes;
         }
