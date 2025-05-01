@@ -76,3 +76,20 @@ button:hover {
 .delete-btn:hover {
     background-color: #c82333;
 }
+
+.container-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    cursor: pointer;
+}
+
+.container-name {
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+.container-state {
+    font-size: 0.9em;
+    color: #555;
+}

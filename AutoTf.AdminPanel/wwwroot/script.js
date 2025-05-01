@@ -15,25 +15,48 @@ document.addEventListener('DOMContentLoaded', () => {
             const li = document.createElement('li');
             li.className = 'container-item';
 
-            const idSpan = document.createElement('span');
-            idSpan.className = 'container-id';
-            idSpan.textContent = container.ID;
+            const idInput = document.createElement('input');
+            idInput.type = 'hidden';
+            idInput.value = container.id;
 
-            idSpan.addEventListener('click', () => {
-                alert(`Container ID: ${container.ID}\nWarnings: ${container.Warnings?.join(', ') || 'None'}`);
+            const name = (container.names && container.names.length > 0)
+                ? container.names[0].replace(/^\//, '')
+                : '(no name)';
+
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'container-info';
+
+            const nameEl = document.createElement('div');
+            nameEl.className = 'container-name';
+            nameEl.textContent = name;
+
+            const stateEl = document.createElement('div');
+            stateEl.className = 'container-state';
+            stateEl.textContent = `State: ${container.state}`;
+
+            infoDiv.appendChild(nameEl);
+            infoDiv.appendChild(stateEl);
+
+            infoDiv.addEventListener('click', () => {
+                alert(`Name: ${name}
+                    ID: ${container.id}
+                    Image: ${container.image}
+                    Command: ${container.command}
+                    Status: ${container.status}`);
             });
 
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'delete-btn';
             deleteBtn.textContent = 'Delete';
             deleteBtn.onclick = async () => {
-                await fetch(`/api/docker/deleteContainer/${container.ID}`, {
+                await fetch(`/api/docker/deleteContainer/${container.id}`, {
                     method: 'DELETE',
                 });
                 fetchContainers();
             };
 
-            li.appendChild(idSpan);
+            li.appendChild(idInput);
+            li.appendChild(infoDiv);
             li.appendChild(deleteBtn);
             listEl.appendChild(li);
         });
@@ -48,6 +71,5 @@ document.addEventListener('DOMContentLoaded', () => {
         fetchContainers();
     });
 
-    // Initial fetch
     fetchContainers();
 });
