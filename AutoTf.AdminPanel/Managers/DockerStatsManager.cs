@@ -27,7 +27,10 @@ public class DockerStatsManager
         });
         
         NetworkStats network = new NetworkStats();
-        MemoryStats memory = new MemoryStats();
+        MemoryStats memory = new MemoryStats()
+        {
+            MemoryLimitMb = -1
+        }
         double cpuUsage = 0.1f;
 
         Parallel.ForEach(stats, stat =>
@@ -40,8 +43,10 @@ public class DockerStatsManager
             network.TotalSend += currNet.TotalSend;
 
             memory.MemoryPercentage += currMem.MemoryPercentage;
-            memory.MemoryLimitMb += currMem.MemoryLimitMb;
             memory.MemoryUsageMb += currMem.MemoryUsageMb;
+            
+            if(Math.Abs(memory.MemoryLimitMb - -1) < .01)
+                memory.MemoryLimitMb += currMem.MemoryLimitMb;
 
             cpuUsage += currCpu;
         });
