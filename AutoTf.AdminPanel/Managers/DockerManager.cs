@@ -100,11 +100,14 @@ public class DockerManager
         ulong totalRx = 0;
         ulong totalTx = 0;
 
+        if (response.Networks == null)
+            return new Models.Requests.NetworkStats();
+            
         foreach (NetworkStats? net in response.Networks.Values)
         {
             if (net == null)
                 continue;
-            
+
             totalRx += net.RxBytes;
             totalTx += net.TxBytes;
         }
