@@ -41,6 +41,7 @@ public class ManageController : ControllerBase
         
         List<Provider> providers = authResult.Results;
         
+        
         foreach (ContainerListResponse container in containers)
         {
             string name = container.Names.First().Replace("/autotf-", "");
@@ -48,6 +49,9 @@ public class ManageController : ControllerBase
                 continue;
             
             if (!providers.Any(x => x.Name.ToLower().Replace("managed provider for ", "").StartsWith(name)))
+                continue;
+            
+            if (_cloudflare.Records.Any(x => x.Name.StartsWith(name)))
                 continue;
             
             managedContainers.Add(container);
