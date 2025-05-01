@@ -209,8 +209,16 @@ async function fetchDockerStats() {
         data: {
             labels: ['Received', 'Sent'],
             datasets: [{
-                data: [netRecv, netSend],
-                backgroundColor: ['#17a2b8', '#ffc107']
+                data: [ netRecv, netSend ],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgb(255, 99, 132)',
+                    'rgb(255, 159, 64)'
+                ],
+                borderWidth: 1
             }]
         },
         options: {
