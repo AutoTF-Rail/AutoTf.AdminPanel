@@ -3,14 +3,51 @@ function toggleSection(id) {
     content.style.display = content.style.display === 'block' ? 'none' : 'block';
 }
 
+// ---- Managed ----
+async function fetchManaged() {
+    const res = await fetch('/api/manage/all');
+    const containers = await res.json();
+    const list = document.getElementById('managedContent');
+
+    list.innerHTML = '';
+
+    containers.sort((a, b) => (a.names?.[0] || '').localeCompare(b.names?.[0] || '')).forEach(container => {
+        const item = document.createElement('li');
+        item.className = 'container-item';
+
+        const name = container.names?.[0]?.replace(/^\//, '') || '(no name)';
+        const info = document.createElement('div');
+        info.className = 'container-info';
+        info.innerHTML = `<div class="container-name">${name}</div>
+                      <div class="container-state">State: ${container.state}</div>`;
+        info.onclick = () => alert(`ID: ${container.id}\nImage: ${container.image}\nCommand: ${container.command}`);
+
+        const hidden = document.createElement('input');
+        hidden.type = 'hidden';
+        hidden.value = container.id;
+
+        const del = document.createElement('button');
+        del.className = 'delete-btn';
+        del.textContent = 'Delete';
+        del.onclick = async () => {
+            await fetch(`/api/docker/deleteContainer/${container.id}`, { method: 'DELETE' });
+            fetchManaged();
+        };
+
+        item.append(hidden, info, del);
+        list.appendChild(item);
+    });
+}
+
+
 // ---- Docker ----
 async function fetchDocker() {
     const res = await fetch('/api/docker/getAllContainers');
     const containers = await res.json();
     const list = document.getElementById('dockerContent');
-    
+
     list.innerHTML = '';
-    
+
     containers.sort((a, b) => (a.names?.[0] || '').localeCompare(b.names?.[0] || '')).forEach(container => {
         const item = document.createElement('li');
         item.className = 'container-item';
@@ -141,10 +178,12 @@ async function fetchCloudflare() {
     });
 }
 
+fetchManaged();
 fetchDocker();
 fetchPlesk();
 fetchAuthentik();
 fetchCloudflare();
+toggleSection('managedContainers');
 
 
 // Stats

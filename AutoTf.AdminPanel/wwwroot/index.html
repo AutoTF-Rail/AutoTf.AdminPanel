@@ -44,7 +44,16 @@
                 </div>
             </div>
         </div>
+        
         <div class="container">
+
+            <div class="section" id="managedSection">
+                <div class="section-header" onclick="toggleSection('managedContainers')">
+                    <h2>Managed Containers</h2>
+                    <button onclick="event.stopPropagation(); fetchManaged()">Refresh</button>
+                </div>
+                <ul id="managedContent" class="section-content"></ul>
+            </div>
         
             <div class="section" id="dockerSection">
                 <div class="section-header" onclick="toggleSection('dockerContent')">
