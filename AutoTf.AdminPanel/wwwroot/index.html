@@ -100,81 +100,83 @@
 
         <div id="createDialog" class="dialog-overlay">
             <div class="dialog">
-                <h2>Create New</h2>
-                <div class="form-section">
-                    <label for="evuName">EVU Name</label>
-                    <input id="evuName" class="input" type="text" pattern="[a-zA-Z0-9]+" />
-                </div>
-
-                <div class="form-section">
-                    <label>Target</label>
-                    <div class="row">
-                        <input class="input" id="dnsContent" type="text" pattern="[\d\.]+" placeholder="Content" />
+                <div class="dialog-scroll">
+                    <h2>Create New</h2>
+                    <div class="form-section">
+                        <label for="evuName">EVU Name</label>
+                        <input id="evuName" class="input" type="text" pattern="[a-zA-Z0-9]+" />
                     </div>
-                    <label for="ttl">TTL</label>
-                    <input class="input" id="ttl" type="number" />
-                    <label for="dnsComment">Comment</label>
-                    <input class="input" id="dnsComment" type="text" />
-                </div>
-
-                <div class="form-section">
-                    <label for="defaultNetwork">Default Network</label>
-                    <select class="input" id="defaultNetwork">
-                        <option>Default Network</option>
-                    </select>
-
-                    <label for="additionalNetwork">Additional Network</label>
-                    <select class="input" id="additionalNetwork">
-                        <option>Additional Network</option>
-                    </select>
-
-                    <label for="imageField">Image</label>
-                    <input class="input" id="imageField" type="text" />
-                </div>
-
-                <div class="form-section collapsible-section">
-                    <div class="section-header" onclick="toggleCollapse('authContent')">
-                        <h3>Auth</h3>
+    
+                    <div class="form-section">
+                        <label>Target</label>
+                        <div class="row">
+                            <input class="input" id="dnsContent" type="text" pattern="[\d\.]+" placeholder="Content" />
+                        </div>
+                        <label for="ttl">TTL</label>
+                        <input class="input" id="ttl" type="number" />
+                        <label for="dnsComment">Comment</label>
+                        <input class="input" id="dnsComment" type="text" />
                     </div>
-                    <div id="authContent" class="section-content">
-                        <label for="authFlow">Authorization Flow</label>
-                        <select class="input" id="authFlow">
-                            <option>Authorization Flow</option>
+    
+                    <div class="form-section">
+                        <label for="defaultNetwork">Default Network</label>
+                        <select class="input" id="defaultNetwork">
+                            <option>Default Network</option>
                         </select>
-
-                        <label for="invalidationFlow">Invalidation Flow</label>
-                        <select class="input" id="invalidationFlow">
-                            <option>Invalidation Flow</option>
+    
+                        <label for="additionalNetwork">Additional Network</label>
+                        <select class="input" id="additionalNetwork">
+                            <option>Additional Network</option>
                         </select>
-
-                        <label for="allowedGroup">Group</label>
-                        <select class="input" id="allowedGroup">
-                            <option>Allowed Group</option>
-                        </select>
-
-                        <label for="outpost">Outpost ID</label>
-                        <select class="input" id="outpost">
-                            <option>Outpost</option>
-                        </select>
+    
+                        <label for="imageField">Image</label>
+                        <input class="input" id="imageField" type="text" />
                     </div>
-                </div>
-
-                <div class="form-section collapsible-section">
-                    <div class="section-header" onclick="toggleCollapse('pleskSectionContent')">
-                        <h3>Plesk</h3>
+    
+                    <div class="form-section collapsible-section">
+                        <div class="section-header" onclick="toggleCollapse('authContent')">
+                            <h3>Auth</h3>
+                        </div>
+                        <div id="authContent" class="section-content">
+                            <label for="authFlow">Authorization Flow</label>
+                            <select class="input" id="authFlow">
+                                <option>Authorization Flow</option>
+                            </select>
+    
+                            <label for="invalidationFlow">Invalidation Flow</label>
+                            <select class="input" id="invalidationFlow">
+                                <option>Invalidation Flow</option>
+                            </select>
+    
+                            <label for="allowedGroup">Group</label>
+                            <select class="input" id="allowedGroup">
+                                <option>Allowed Group</option>
+                            </select>
+    
+                            <label for="outpost">Outpost ID</label>
+                            <select class="input" id="outpost">
+                                <option>Outpost</option>
+                            </select>
+                        </div>
                     </div>
-                    <div id="pleskSectionContent" class="section-content">
-                        <label for="pleskEmail">Certificate Email</label>
-                        <input class="input" id="pleskEmail" type="email" />
-
-                        <label for="authentikHost">Authentik Host</label>
-                        <input class="input" id="authentikHost" type="text" />
+    
+                    <div class="form-section collapsible-section">
+                        <div class="section-header" onclick="toggleCollapse('pleskSectionContent')">
+                            <h3>Plesk</h3>
+                        </div>
+                        <div id="pleskSectionContent" class="section-content">
+                            <label for="pleskEmail">Certificate Email</label>
+                            <input class="input" id="pleskEmail" type="email" />
+    
+                            <label for="authentikHost">Authentik Host</label>
+                            <input class="input" id="authentikHost" type="text" />
+                        </div>
                     </div>
-                </div>
-
-                <div class="actions">
-                    <button onclick="document.getElementById('createDialog').classList.remove('open')">Close</button>
-                    <button>Create</button>
+    
+                    <div class="actions">
+                        <button onclick="document.getElementById('createDialog').classList.remove('open')">Close</button>
+                        <button>Create</button>
+                    </div>
                 </div>
             </div>
         </div>
