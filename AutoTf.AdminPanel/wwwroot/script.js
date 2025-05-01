@@ -221,9 +221,6 @@ async function fetchDockerStats() {
             }]
         },
         options: {
-            plugins: {
-                legend: { display: false }
-            },
             scales: {
                 y: {
                     beginAtZero: true,
