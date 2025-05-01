@@ -15,11 +15,11 @@ public class Program
         builder.Services.AddControllers();
 
         builder.Services.AddSingleton<DockerManager>();
-        builder.Services.AddSingleton<PleskManager>();
         builder.Services.AddSingleton<DockerStatsManager>();
         
         builder.Services.AddHostedSingleton<CloudflareManager>();
         builder.Services.AddHostedSingleton<AuthManager>();
+        builder.Services.AddHostedSingleton<PleskManager>();
         
         // stored in appsettings.Development.json or set manually in .env
         builder.Services.Configure<Credentials>(options =>
