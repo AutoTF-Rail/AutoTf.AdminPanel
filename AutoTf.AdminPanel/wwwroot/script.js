@@ -8,8 +8,10 @@ async function fetchDocker() {
     const res = await fetch('/api/docker/getAllContainers');
     const containers = await res.json();
     const list = document.getElementById('dockerContent');
+    
     list.innerHTML = '';
-    containers.forEach(container => {
+    
+    containers.sort((a, b) => (a.names?.[0] || '').localeCompare(b.names?.[0] || '')).forEach(container => {
         const item = document.createElement('li');
         item.className = 'container-item';
 
@@ -42,8 +44,10 @@ async function fetchPlesk() {
     const res = await fetch('/api/plesk/all');
     const domains = await res.json();
     const list = document.getElementById('pleskContent');
+    
     list.innerHTML = '';
-    domains.forEach(domain => {
+    
+    domains.sort((a, b) => a.localeCompare(b)).forEach(domain => {
         const item = document.createElement('li');
         item.className = 'container-item';
 
@@ -71,7 +75,12 @@ async function fetchAuthentik() {
     const data = await res.json();
     const list = document.getElementById('authentikContent');
     list.innerHTML = '';
-    data.results.forEach(provider => {
+    data.results.sort((a, b) => {
+        const nameA = a.name.replace(/^Managed provider for\s*/i, '');
+        const nameB = b.name.replace(/^Managed provider for\s*/i, '');
+        return nameA.localeCompare(nameB);
+    }).forEach(provider => {
+        
         const item = document.createElement('li');
         item.className = 'container-item';
 
@@ -104,7 +113,9 @@ async function fetchCloudflare() {
     const records = await res.json();
     const list = document.getElementById('cloudflareContent');
     list.innerHTML = '';
-    records.forEach(record => {
+    
+    records.sort((a, b) => a.name.localeCompare(b.name)).forEach(record => {
+        
         const item = document.createElement('li');
         item.className = 'container-item';
 
