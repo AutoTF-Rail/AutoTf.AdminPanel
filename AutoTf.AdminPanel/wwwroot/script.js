@@ -153,7 +153,7 @@ async function fetchDockerStats() {
     const res = await fetch('/api/docker/stats/');
     const stats = await res.json();
 
-    const cpu = +(stats.cpuUsage * 100).toFixed(2);
+    const cpu = +stats.cpuUsage.toFixed(2);
 
     const memoryUsed = stats.memory.memoryUsageMb / 1024;
     const memoryTotal = stats.memory.memoryLimitMb / 1024;
