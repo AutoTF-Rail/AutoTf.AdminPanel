@@ -20,4 +20,52 @@ public class DockerStatsController : ControllerBase
     {
         return await _docker.Memory();
     }
+    
+    #region Container
+
+    [HttpGet("{containerId}")]
+    public async Task<ActionResult<ContainerStats>> Stats(string containerId)
+    {
+        ContainerStats? stats = await _docker.Stats(containerId);
+
+        if (stats == null)
+            return NotFound("Could not find container.");
+
+        return stats;
+    }
+
+    [HttpGet("memory/{containerId}")]
+    public async Task<ActionResult<MemoryStats>> Memory(string containerId)
+    {
+        MemoryStats? stats = await _docker.Memory(containerId);
+
+        if (stats == null)
+            return NotFound("Could not find container.");
+
+        return stats;
+    }
+
+    [HttpGet("network/{containerId}")]
+    public async Task<ActionResult<NetworkStats>> Network(string containerId)
+    {
+        NetworkStats? stats = await _docker.Network(containerId);
+
+        if (stats == null)
+            return NotFound("Could not find container.");
+
+        return stats;
+    }
+
+    [HttpGet("cpu/{containerId}")]
+    public async Task<ActionResult<double>> Cpu(string containerId)
+    {
+        double? stats = await _docker.Cpu(containerId);
+
+        if (stats == null)
+            return NotFound("Could not find container.");
+
+        return stats;
+    }
+    
+    #endregion
 }
