@@ -98,7 +98,7 @@ public class CloudflareManager : IHostedService
 
     public DnsRecord? GetRecordByName(string name, string content)
     {
-        return Records.FirstOrDefault(x => x.Name == name.ToLower() && x.Content == content.ToLower());
+        return Records.FirstOrDefault(x => x.Name.StartsWith(name.ToLower()) && x.Content == content.ToLower());
     }
 
     public DnsRecord? GetRecord(string id)
