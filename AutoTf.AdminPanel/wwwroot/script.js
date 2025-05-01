@@ -1,3 +1,7 @@
+let cpuChartInstance = null;
+let memoryChartInstance = null;
+let networkChartInstance = null;
+
 function toggleSection(id) {
     const content = document.getElementById(id);
     content.style.display = content.style.display === 'block' ? 'none' : 'block';
@@ -195,8 +199,11 @@ async function fetchDockerStats() {
     const netSend = +(stats.network.totalSend / 1024).toFixed(2);
 
     document.getElementById('cpuPercent').innerText = `${cpu}%`;
+    if (cpuChartInstance) cpuChartInstance.destroy();
+    if (memoryChartInstance) memoryChartInstance.destroy();
+    if (networkChartInstance) networkChartInstance.destroy();
 
-    new Chart(document.getElementById('cpuChart'), {
+    cpuChartInstance = new Chart(document.getElementById('cpuChart'), {
         type: 'doughnut',
         data: {
             datasets: [{
@@ -217,7 +224,7 @@ async function fetchDockerStats() {
     document.getElementById('memoryPercent').innerText = `${memoryPercentage}%`;
     document.getElementById('memoryStatTotal').innerText = `${memoryUsed.toFixed(2)}/${memoryTotal.toFixed(2)} GB`;
 
-    new Chart(document.getElementById('memoryChart'), {
+    memoryChartInstance = new Chart(document.getElementById('memoryChart'), {
         type: 'doughnut',
         data: {
             datasets: [{
@@ -235,7 +242,7 @@ async function fetchDockerStats() {
         }
     });
 
-    new Chart(document.getElementById('networkChart'), {
+    networkChartInstance = new Chart(document.getElementById('networkChart'), {
         type: 'bar',
         data: {
             labels: ['Received', 'Transmitted'],
@@ -269,10 +276,15 @@ async function fetchDockerStats() {
 }
 
 toggleSection('managedContent');
-fetchManaged();
-fetchDocker();
-fetchPlesk();
-fetchAuthentik();
-fetchCloudflare();
+
+Promise.all([
+    fetchManaged(),
+    fetchDocker(),
+    fetchPlesk(),
+    fetchAuthentik(),
+    fetchCloudflare()
+]).then(() => {
+    console.log("Initialization complete");
+});
 
 setInterval(fetchDockerStats, 5000);
