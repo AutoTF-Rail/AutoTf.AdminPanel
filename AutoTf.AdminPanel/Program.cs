@@ -41,6 +41,12 @@ public class Program
         
         app.MapControllers();
         
+        app.UseDefaultFiles();
+        app.UseStaticFiles();
+        
+        #if DEBUG
+        app.Run("http://0.0.0.0:837");
+        #endif
         app.Run("http://172.17.0.1:837");
     }
 }
