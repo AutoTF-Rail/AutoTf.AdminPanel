@@ -122,6 +122,7 @@ button:hover {
 
 .stats-container {
     display: flex;
+    max-width: 800px;
     justify-content: space-around;
     align-items: center;
     margin: 30px auto;
