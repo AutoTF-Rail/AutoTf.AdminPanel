@@ -26,6 +26,32 @@ public class ManageController : ControllerBase
         _plesk = plesk;
         _docker = docker;
     }
+
+    [HttpGet("all")]
+    public async Task<ActionResult<object>> All()
+    {
+        List<ContainerListResponse> managedContainers = new List<ContainerListResponse>();
+        
+        List<ContainerListResponse> containers = await _docker.GetAll();
+        List<string> pleskDomains = _plesk.GetAll();
+
+        // Gets all containers, whichs name (without the autotf- at the start) is in the plesk domains list.
+        managedContainers = containers.Where(x => pleskDomains.Any(y => y.StartsWith(x.Names.First().Replace("autotf-", "")))).ToList();
+
+        ProviderPaginationResult? authResult = await _auth.GetProviders();
+        
+        if (authResult == null)
+            return Problem("Something went wrong when getting the authentik providers.");
+        
+        List<Provider> providers = authResult.Results;
+
+        managedContainers = managedContainers.Where(x => providers.Any(y => y.Name.ToLower() == x.Names.First().Replace("autotf-", ""))).ToList();
+        
+        
+
+        return managedContainers;
+    }
+    
     [HttpDelete]
     public async Task<ActionResult> Delete([FromBody, Required] DeletionRequest request)
     {

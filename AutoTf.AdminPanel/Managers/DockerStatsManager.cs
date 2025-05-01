@@ -17,7 +17,7 @@ public class DockerStatsManager
 
     public async Task<ContainerStats> Stats()
     {
-        List<ContainerListResponse> containers = await _docker.GetContainers();
+        List<ContainerListResponse> containers = await _docker.GetAll();
 
         ConcurrentBag<ContainerStatsResponse> stats = new ConcurrentBag<ContainerStatsResponse>();
         
@@ -62,7 +62,7 @@ public class DockerStatsManager
 
     public async Task<MemoryStats> Memory()
     {
-        List<ContainerListResponse> containers = await _docker.GetContainers();
+        List<ContainerListResponse> containers = await _docker.GetAll();
 
         ConcurrentBag<ContainerStatsResponse> stats = new ConcurrentBag<ContainerStatsResponse>();
         
@@ -76,7 +76,7 @@ public class DockerStatsManager
 
     public async Task<double> Cpu()
     {
-        List<ContainerListResponse> containers = await _docker.GetContainers();
+        List<ContainerListResponse> containers = await _docker.GetAll();
 
         ConcurrentBag<ContainerStatsResponse> stats = new ConcurrentBag<ContainerStatsResponse>();
         
@@ -90,7 +90,7 @@ public class DockerStatsManager
 
     public async Task<NetworkStats> Network()
     {
-        List<ContainerListResponse> containers = await _docker.GetContainers();
+        List<ContainerListResponse> containers = await _docker.GetAll();
 
         ConcurrentBag<ContainerStatsResponse> stats = new ConcurrentBag<ContainerStatsResponse>();
         

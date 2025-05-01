@@ -17,7 +17,7 @@ public class DockerManager
     }
 
     // TODO: Cache?
-    public async Task<List<ContainerListResponse>> GetContainers()
+    public async Task<List<ContainerListResponse>> GetAll()
     {
         IList<ContainerListResponse>? containers = await _dockerClient.Containers.ListContainersAsync(new ContainersListParameters()
         {
@@ -30,12 +30,12 @@ public class DockerManager
 
     public async Task<bool> ContainerExists(string id)
     {
-        return (await GetContainers()).Any(x => x.ID == id);
+        return (await GetAll()).Any(x => x.ID == id);
     }
 
     public async Task<ContainerListResponse?> GetContainerByName(string name)
     {
-        ContainerListResponse? containerListResponse = (await GetContainers()).FirstOrDefault(x => x.Names.Any(y => y.Contains(name.ToLower())));
+        ContainerListResponse? containerListResponse = (await GetAll()).FirstOrDefault(x => x.Names.Any(y => y.Contains(name.ToLower())));
 
         if (containerListResponse == null)
         {

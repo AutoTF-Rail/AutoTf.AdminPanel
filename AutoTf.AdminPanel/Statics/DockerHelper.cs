@@ -12,7 +12,7 @@ public static class DockerHelper
     {
         Dictionary<string, EndpointSettings> dict = new Dictionary<string, EndpointSettings>();
         NetworkResponse? defaultNetwork = await dockerManager.GetNetwork(parameters.DefaultNetwork);
-        IEnumerable<string> containersInNetwork = (await dockerManager.GetContainers()).Where(x => x.NetworkSettings.Networks.ContainsKey(parameters.DefaultNetwork)).Select(x => x.NetworkSettings.Networks[parameters.DefaultNetwork].IPAddress);
+        IEnumerable<string> containersInNetwork = (await dockerManager.GetAll()).Where(x => x.NetworkSettings.Networks.ContainsKey(parameters.DefaultNetwork)).Select(x => x.NetworkSettings.Networks[parameters.DefaultNetwork].IPAddress);
 
         if (defaultNetwork == null)
             throw new Exception("Could not find network.");
@@ -35,7 +35,7 @@ public static class DockerHelper
         NetworkResponse? additionalNetwork = await dockerManager.GetNetwork(parameters.AdditionalNetwork);
         if (additionalNetwork == null)
             throw new Exception("Could not find additional network.");
-        IEnumerable<string> containersInAdditionalNetwork = (await dockerManager.GetContainers()).Where(x => x.NetworkSettings.Networks.ContainsKey(parameters.AdditionalNetwork)).Select(x => x.NetworkSettings.Networks[parameters.AdditionalNetwork].IPAddress);
+        IEnumerable<string> containersInAdditionalNetwork = (await dockerManager.GetAll()).Where(x => x.NetworkSettings.Networks.ContainsKey(parameters.AdditionalNetwork)).Select(x => x.NetworkSettings.Networks[parameters.AdditionalNetwork].IPAddress);
 
         string additionalIp = GetFreeIp(additionalNetwork, containersInAdditionalNetwork);
         dict.Add(parameters.AdditionalNetwork, new EndpointSettings()

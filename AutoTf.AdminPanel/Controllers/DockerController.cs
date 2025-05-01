@@ -24,7 +24,7 @@ public class DockerController : ControllerBase
     [HttpGet("getAllContainers")]
     public async Task<ActionResult<List<ContainerListResponse>>> GetAllContainers()
     {
-        return await _docker.GetContainers();
+        return await _docker.GetAll();
     }
 
     [HttpPost("create")]
