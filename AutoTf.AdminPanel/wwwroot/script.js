@@ -214,16 +214,9 @@ async function fetchDockerStats() {
             }]
         },
         options: {
-            responsive: true,
-            plugins: {
-                legend: { display: false }
-            },
             scales: {
                 y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: val => `${val} GB`
-                    }
+                    beginAtZero: true
                 }
             }
         }
