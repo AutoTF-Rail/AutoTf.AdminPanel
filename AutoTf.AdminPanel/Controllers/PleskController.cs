@@ -48,7 +48,7 @@ public class PleskController : ControllerBase
     }
 
     [HttpPost("{rootDomain}/{subDomain}/updateAuthHost")]
-    public IActionResult UpdateAuthHost(string rootDomain, string subDomain, string newAuthHost)
+    public IActionResult UpdateAuthHost(string rootDomain, string subDomain, [FromBody, Required] string newAuthHost)
     {
         if (_plesk.UpdateAuthHost(rootDomain, subDomain, newAuthHost))
             return Ok();
