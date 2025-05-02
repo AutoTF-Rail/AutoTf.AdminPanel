@@ -32,7 +32,7 @@ public class ManageController : ControllerBase
         return Ok();
     }
 
-    [HttpPost("updateAuthHost")]
+    [HttpPost("updateAllAuthHost")]
     public async Task<ActionResult> UpdateAuthHost([FromBody, Required] string newHost)
     {
         List<string> allPlesk = await _manager.AllPlesk();
