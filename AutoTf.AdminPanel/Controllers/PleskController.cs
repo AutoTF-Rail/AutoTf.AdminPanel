@@ -51,7 +51,10 @@ public class PleskController : ControllerBase
     public IActionResult UpdateAuthHost(string rootDomain, string subDomain, [FromBody, Required] string newAuthHost)
     {
         if (_plesk.UpdateAuthHost(rootDomain, subDomain, newAuthHost))
+        {
+            _plesk.ReloadNginx();
             return Ok();
+        }
 
         return Problem($"Something went wrong when updating to the new auth host {newAuthHost}.");
     }
@@ -65,5 +68,16 @@ public class PleskController : ControllerBase
             return Problem("Could not read auth host because the subdomain does not exist, or it's invalid.");
 
         return authHost;
+    }
+
+    [HttpGet("{domain}/extract")]
+    public ActionResult<KeyValuePair<string, string>> ExtractDomains(string domain)
+    {
+        KeyValuePair<string, string>? domains = _plesk.ExtractDomains(domain);
+
+        if (domains == null)
+            return Problem("Could not extract the domains.");
+
+        return domains;
     }
 }

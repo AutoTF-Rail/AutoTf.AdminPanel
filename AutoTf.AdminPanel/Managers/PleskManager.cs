@@ -9,6 +9,7 @@ namespace AutoTf.AdminPanel.Managers;
 public class PleskManager : IHostedService
 {
     private const string _authHostPattern = "(?:http|https)://\\d{1,3}.\\d{1,3}.\\d{1,3}.\\d{1,3}(?::\\d{1,6})?";
+    private const string _domainsPattern = "(?:http|https)://((?:[a-z0-9-]+\\.)*)([a-z0-9-]+\\.[a-z]{2,})";
     
     private Timer _timer = new Timer(TimeSpan.FromMinutes(5));
 
@@ -24,6 +25,16 @@ public class PleskManager : IHostedService
     public bool ValidateAuthHost(string host)
     {
         return Regex.IsMatch(host, _authHostPattern);
+    }
+
+    public KeyValuePair<string, string>? ExtractDomains(string host)
+    {
+        MatchCollection matches = Regex.Matches(host, _domainsPattern);
+        
+        if (matches.Count != 3)
+            return null;
+
+        return new KeyValuePair<string, string>(matches[1].Value, matches[2].Value);
     }
 
     private void StartCacheTimer()
@@ -70,7 +81,7 @@ public class PleskManager : IHostedService
         if (!certResult.Contains("was successfully removed"))
             return false;
 
-        CommandExecuter.ExecuteCommand("systemctl reload nginx");
+        ReloadNginx();
         return true;
     }
 
@@ -105,6 +116,11 @@ public class PleskManager : IHostedService
             return null;
 
         return match.Value;
+    }
+
+    public void ReloadNginx()
+    {
+        CommandExecuter.ExecuteCommand("systemctl reload nginx");
     }
 
     private void PointToAuthentik(string subDomain, string rootDomain, string authentikHost)
