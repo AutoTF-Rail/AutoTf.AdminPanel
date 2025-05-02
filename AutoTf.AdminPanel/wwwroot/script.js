@@ -296,6 +296,7 @@ Promise.all([
     fetchAuthentik(),
     fetchCloudflare()
 ]).then(() => {
+    document.getElementById('loadingArea').classList.remove('open')
     console.log("Initialization complete");
 });
 
