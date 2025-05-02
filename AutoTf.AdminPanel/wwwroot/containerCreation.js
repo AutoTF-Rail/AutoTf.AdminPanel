@@ -75,11 +75,11 @@ function openCreateDialog() {
                 });
 
         })
+        .then(x => invokeLoadingScreen(false))
         .catch(error => {
             console.error('Failed to load default config:', error);
         });
     
-    invokeLoadingScreen(false);
 }
 
 function toggleCollapse(id) {
