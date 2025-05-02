@@ -91,19 +91,7 @@ public class PleskManager : IHostedService
 
     public bool UpdateAuthHost(string rootDomain, string subDomain, string newAuthHost)
     {
-        if (!ValidateAuthHost(newAuthHost))
-            return false;
-        
-        string file = $"/var/www/vhosts/system/{subDomain}.{rootDomain}/conf/vhost_nginx.conf";
-        
-        if (!File.Exists(file))
-            return false;
-
-        string fileContent = File.ReadAllText(file);
-        fileContent = Regex.Replace(fileContent, _authHostPattern, newAuthHost);
-        File.WriteAllText(file, fileContent);
-        
-        return true;
+        return UpdateAuthHost($"{subDomain}.{rootDomain}", newAuthHost);
     }
 
     public bool UpdateAuthHost(string domain, string newAuthHost)
@@ -125,18 +113,7 @@ public class PleskManager : IHostedService
 
     public string? GetAuthHost(string rootDomain, string subDomain)
     {
-        string file = $"/var/www/vhosts/system/{subDomain}.{rootDomain}/conf/vhost_nginx.conf";
-        
-        if (!File.Exists(file))
-            return null;
-        
-        string fileContent = File.ReadAllText(file);
-        Match match = Regex.Match(fileContent, _authHostPattern);
-
-        if (!match.Success)
-            return null;
-
-        return match.Value;
+        return GetAuthHost($"{subDomain}.{rootDomain}");
     }
 
     public string? GetAuthHost(string domain)

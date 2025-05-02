@@ -1,13 +1,8 @@
-using System.Collections.Concurrent;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using AutoTf.AdminPanel.Managers;
 using AutoTf.AdminPanel.Models.Manage;
 using AutoTf.AdminPanel.Models.Requests;
-using AutoTf.AdminPanel.Models.Requests.Authentik;
-using Docker.DotNet.Models;
 using Microsoft.AspNetCore.Mvc;
-using MemoryStats = AutoTf.AdminPanel.Models.Requests.MemoryStats;
 
 namespace AutoTf.AdminPanel.Controllers;
 
@@ -32,6 +27,19 @@ public class ManageController : ControllerBase
         foreach (string host in allWithHost)
         {
             _plesk.UpdateAuthHost(host, request.NewHost);
+        }
+
+        return Ok();
+    }
+
+    [HttpPost("updateAuthHost")]
+    public async Task<ActionResult> UpdateAuthHost([FromBody, Required] string newHost)
+    {
+        List<string> allPlesk = await _manager.AllPlesk();
+
+        foreach (string host in allPlesk)
+        {
+            _plesk.UpdateAuthHost(host, newHost);
         }
 
         return Ok();
