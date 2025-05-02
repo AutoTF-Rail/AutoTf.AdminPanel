@@ -9,7 +9,7 @@ namespace AutoTf.AdminPanel.Managers;
 public class PleskManager : IHostedService
 {
     private const string _authHostPattern = "(?:http|https)://\\d{1,3}.\\d{1,3}.\\d{1,3}.\\d{1,3}(?::\\d{1,6})?";
-    private const string _domainsPattern = "(?:https?:\\/\\/)?((?:[a-z0-9-]+\\.)*)([a-z0-9-]+\\.[a-z]{2,})";
+    private const string _domainsPattern = "((?:[a-z0-9-]+\\.)*)([a-z0-9-]+\\.[a-z]{2,})";
     
     private Timer _timer = new Timer(TimeSpan.FromMinutes(5));
 
@@ -31,10 +31,14 @@ public class PleskManager : IHostedService
     {
         MatchCollection matches = Regex.Matches(host, _domainsPattern);
         
-        if (matches.Count != 3)
+        if (matches.Count != 1)
             return null;
 
-        return new KeyValuePair<string, string>(matches[1].Value, matches[2].Value);
+        Console.WriteLine(matches[0].Groups.Count);
+        if (matches[0].Groups.Count != 3)
+            return null;
+
+        return new KeyValuePair<string, string>(matches[0].Groups[1].Value, matches[0].Groups[2].Value);
     }
 
     private void StartCacheTimer()
@@ -102,9 +106,42 @@ public class PleskManager : IHostedService
         return true;
     }
 
+    public bool UpdateAuthHost(string domain, string newAuthHost)
+    {
+        if (!ValidateAuthHost(newAuthHost))
+            return false;
+        
+        string file = $"/var/www/vhosts/system/{domain}/conf/vhost_nginx.conf";
+        
+        if (!File.Exists(file))
+            return false;
+
+        string fileContent = File.ReadAllText(file);
+        fileContent = Regex.Replace(fileContent, _authHostPattern, newAuthHost);
+        File.WriteAllText(file, fileContent);
+        
+        return true;
+    }
+
     public string? GetAuthHost(string rootDomain, string subDomain)
     {
         string file = $"/var/www/vhosts/system/{subDomain}.{rootDomain}/conf/vhost_nginx.conf";
+        
+        if (!File.Exists(file))
+            return null;
+        
+        string fileContent = File.ReadAllText(file);
+        Match match = Regex.Match(fileContent, _authHostPattern);
+
+        if (!match.Success)
+            return null;
+
+        return match.Value;
+    }
+
+    public string? GetAuthHost(string domain)
+    {
+        string file = $"/var/www/vhosts/system/{domain}/conf/vhost_nginx.conf";
         
         if (!File.Exists(file))
             return null;
