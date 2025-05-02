@@ -296,8 +296,16 @@ Promise.all([
     fetchAuthentik(),
     fetchCloudflare()
 ]).then(() => {
-    document.getElementById('loadingArea').classList.remove('open')
+    invokeLoadingScreen(false);
     console.log("Initialization complete");
 });
+
+function invokeLoadingScreen(visible)
+{
+    if(visible === true)
+        document.getElementById('loadingArea').classList.add('open');
+    else
+        document.getElementById('loadingArea').classList.remove('open');
+}
 
 setInterval(fetchDockerStats, 2500);
