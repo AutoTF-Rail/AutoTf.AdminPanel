@@ -46,6 +46,16 @@ public class PleskController : ControllerBase
     {
         return _plesk.ValidateAuthHost(newAuthHost);
     }
+
+    [HttpPost("{rootDomain}/{subDomain}/updateAuthHost")]
+    public IActionResult UpdateAuthHost(string rootDomain, string subDomain, string newAuthHost)
+    {
+        if (_plesk.UpdateAuthHost(rootDomain, subDomain, newAuthHost))
+            return Ok();
+
+        return Problem($"Something went wrong when updating to the new auth host {newAuthHost}.");
+    }
+
     [HttpGet("{rootDomain}/{subDomain}/authHost")]
     public ActionResult<string> GetAuthHost(string rootDomain, string subDomain)
     {

@@ -74,6 +74,23 @@ public class PleskManager : IHostedService
         return true;
     }
 
+    public bool UpdateAuthHost(string rootDomain, string subDomain, string newAuthHost)
+    {
+        if (!ValidateAuthHost(newAuthHost))
+            return false;
+        
+        string file = $"/var/www/vhosts/system/{subDomain}.{rootDomain}/conf/vhost_nginx.conf";
+        
+        if (!File.Exists(file))
+            return false;
+
+        string fileContent = File.ReadAllText(file);
+        fileContent = Regex.Replace(fileContent, _authHostPattern, newAuthHost);
+        File.WriteAllText(file, fileContent);
+        
+        return true;
+    }
+
     public string? GetAuthHost(string rootDomain, string subDomain)
     {
         string file = $"/var/www/vhosts/system/{subDomain}.{rootDomain}/conf/vhost_nginx.conf";
@@ -89,6 +106,7 @@ public class PleskManager : IHostedService
 
         return match.Value;
     }
+
     private void PointToAuthentik(string subDomain, string rootDomain, string authentikHost)
     {
         string dir = $"/var/www/vhosts/system/{subDomain}.{rootDomain}/conf";
