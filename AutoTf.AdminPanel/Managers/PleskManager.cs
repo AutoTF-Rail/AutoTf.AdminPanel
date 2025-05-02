@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Text.RegularExpressions;
 using AutoTf.AdminPanel.Statics;
 using Timer = System.Timers.Timer;
 
@@ -14,6 +15,11 @@ public class PleskManager : IHostedService
     {
         await Task.Run(UpdateCache, cancellationToken);
         StartCacheTimer();
+    }
+
+    public bool ValidateAuthHost(string host)
+    {
+        return Regex.IsMatch(host, @"(?:http|https)://\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}:\d{1,6}");
     }
 
     private void StartCacheTimer()

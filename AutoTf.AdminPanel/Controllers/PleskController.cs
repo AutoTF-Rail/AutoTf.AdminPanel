@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using AutoTf.AdminPanel.Managers;
 using AutoTf.AdminPanel.Models.Requests;
 using Microsoft.AspNetCore.Mvc;
@@ -38,5 +39,11 @@ public class PleskController : ControllerBase
     {
         _plesk.UpdateCache();
         return Ok();
+    }
+
+    [HttpPost("validateHost")]
+    public ActionResult<bool> ValidateHost([FromBody, Required] string newAuthHost)
+    {
+        return _plesk.ValidateAuthHost(newAuthHost);
     }
 }
