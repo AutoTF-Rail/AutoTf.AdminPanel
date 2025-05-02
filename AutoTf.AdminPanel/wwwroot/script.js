@@ -300,4 +300,4 @@ Promise.all([
     console.log("Initialization complete");
 });
 
-setInterval(fetchDockerStats, 5000);
+setInterval(fetchDockerStats, 2500);
