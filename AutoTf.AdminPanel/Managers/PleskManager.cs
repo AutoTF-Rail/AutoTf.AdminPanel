@@ -9,7 +9,7 @@ namespace AutoTf.AdminPanel.Managers;
 public class PleskManager : IHostedService
 {
     private const string _authHostPattern = "(?:http|https)://\\d{1,3}.\\d{1,3}.\\d{1,3}.\\d{1,3}(?::\\d{1,6})?";
-    private const string _domainsPattern = "(?:http|https)://((?:[a-z0-9-]+\\.)*)([a-z0-9-]+\\.[a-z]{2,})";
+    private const string _domainsPattern = "(?:https?:\\/\\/)?((?:[a-z0-9-]+\\.)*)([a-z0-9-]+\\.[a-z]{2,})";
     
     private Timer _timer = new Timer(TimeSpan.FromMinutes(5));
 
@@ -128,7 +128,6 @@ public class PleskManager : IHostedService
         string dir = $"/var/www/vhosts/system/{subDomain}.{rootDomain}/conf";
         Directory.CreateDirectory(dir);
         File.WriteAllText($"{dir}/vhost_nginx.conf", AssembleAuthentikConfig(authentikHost));
-        CommandExecuter.ExecuteCommand("systemctl reload nginx");
     }
 
     private bool IssueCertificate(string subDomain, string rootDomain, string email)
