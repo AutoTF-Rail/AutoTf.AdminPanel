@@ -1,4 +1,5 @@
 function openCreateDialog() {
+    invokeLoadingScreen(true);
     const dialog = document.getElementById('createDialog');
     dialog.classList.add('open');
 
@@ -77,6 +78,7 @@ function openCreateDialog() {
         .catch(error => {
             console.error('Failed to load default config:', error);
         });
+    invokeLoadingScreen(true);
 }
 
 function toggleCollapse(id) {
