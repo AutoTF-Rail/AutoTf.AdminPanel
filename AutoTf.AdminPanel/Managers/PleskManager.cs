@@ -19,7 +19,7 @@ public class PleskManager : IHostedService
 
     public bool ValidateAuthHost(string host)
     {
-        return Regex.IsMatch(host, @"(?:http|https)://\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}:\d{1,6}");
+        return Regex.IsMatch(host, @"(?:http|https)://\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}(?::\d{1,6})?");
     }
 
     private void StartCacheTimer()
