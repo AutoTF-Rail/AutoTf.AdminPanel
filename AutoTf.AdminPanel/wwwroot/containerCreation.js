@@ -78,7 +78,8 @@ function openCreateDialog() {
         .catch(error => {
             console.error('Failed to load default config:', error);
         });
-    invokeLoadingScreen(true);
+    
+    invokeLoadingScreen(false);
 }
 
 function toggleCollapse(id) {
