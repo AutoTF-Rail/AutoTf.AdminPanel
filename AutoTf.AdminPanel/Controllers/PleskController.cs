@@ -46,4 +46,14 @@ public class PleskController : ControllerBase
     {
         return _plesk.ValidateAuthHost(newAuthHost);
     }
+    [HttpGet("{rootDomain}/{subDomain}/authHost")]
+    public ActionResult<string> GetAuthHost(string rootDomain, string subDomain)
+    {
+        string? authHost = _plesk.GetAuthHost(rootDomain, subDomain);
+
+        if (authHost == null)
+            return Problem("Could not read auth host because the subdomain does not exist, or it's invalid.");
+
+        return authHost;
+    }
 }

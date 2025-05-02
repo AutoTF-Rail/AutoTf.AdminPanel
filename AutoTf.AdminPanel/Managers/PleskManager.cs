@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 using AutoTf.AdminPanel.Statics;
 using Timer = System.Timers.Timer;
@@ -7,9 +8,12 @@ namespace AutoTf.AdminPanel.Managers;
 
 public class PleskManager : IHostedService
 {
+    private const string _authHostPattern = "(?:http|https)://\\d{1,3}.\\d{1,3}.\\d{1,3}.\\d{1,3}(?::\\d{1,6})?";
+    
     private Timer _timer = new Timer(TimeSpan.FromMinutes(5));
 
     public List<string> Records { get; private set; } = [];
+
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
@@ -19,7 +23,7 @@ public class PleskManager : IHostedService
 
     public bool ValidateAuthHost(string host)
     {
-        return Regex.IsMatch(host, @"(?:http|https)://\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}(?::\d{1,6})?");
+        return Regex.IsMatch(host, _authHostPattern);
     }
 
     private void StartCacheTimer()
@@ -70,6 +74,21 @@ public class PleskManager : IHostedService
         return true;
     }
 
+    public string? GetAuthHost(string rootDomain, string subDomain)
+    {
+        string file = $"/var/www/vhosts/system/{subDomain}.{rootDomain}/conf/vhost_nginx.conf";
+        
+        if (!File.Exists(file))
+            return null;
+        
+        string fileContent = File.ReadAllText(file);
+        Match match = Regex.Match(fileContent, _authHostPattern);
+
+        if (!match.Success)
+            return null;
+
+        return match.Value;
+    }
     private void PointToAuthentik(string subDomain, string rootDomain, string authentikHost)
     {
         string dir = $"/var/www/vhosts/system/{subDomain}.{rootDomain}/conf";
