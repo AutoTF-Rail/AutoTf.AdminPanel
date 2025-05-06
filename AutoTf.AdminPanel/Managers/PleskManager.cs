@@ -9,7 +9,7 @@ namespace AutoTf.AdminPanel.Managers;
 public class PleskManager : IHostedService
 {
     private const string _authHostPattern = "(?:http|https)://\\d{1,3}.\\d{1,3}.\\d{1,3}.\\d{1,3}(?::\\d{1,6})?";
-    private const string _domainsPattern = "((?:[a-z0-9-]+\\.)*)([a-z0-9-]+\\.[a-z]{2,})";
+    private const string _domainsPattern = "((?:[a-z0-9-]+)(?:\\.[a-z0-9-]+)*)([a-z0-9-]+\\.[a-z]{2,})";
     
     private Timer _timer = new Timer(TimeSpan.FromMinutes(5));
 
