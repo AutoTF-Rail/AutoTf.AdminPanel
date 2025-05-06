@@ -180,7 +180,7 @@ public class ManageManager
         if (request.Container.ContainerName == "")
             request.Container.ContainerName = request.Container.EvuName;
 
-        if (request.Container.ContainerName.ToLower().StartsWith("autotf-"))
+        if (!request.Container.ContainerName.ToLower().StartsWith("autotf-"))
             request.Container.ContainerName = "autotf-" + request.Container.ContainerName.ToLower();
         
         if (await _docker.GetContainerByName(request.Container.ContainerName) != null)
