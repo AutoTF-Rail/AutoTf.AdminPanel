@@ -15,12 +15,12 @@ async function fetchManaged() {
 
     list.innerHTML = '';
 
-    containers.sort((a, b) => (a.externalHost || '').localeCompare(b.externalHost || '')).forEach(container => {
+    for (const container of containers.sort((a, b) => (a.externalHost || '').localeCompare(b.externalHost || ''))) {
         const item = document.createElement('li');
         item.className = 'container-item';
-        
-        const containerInfo = fetch(`/api/docker/getById/${container.containerId}`);
-        const containerBody = containerInfo.json();
+
+        const containerInfo = await fetch(`/api/docker/getById/${container.containerId}`);
+        const containerBody = await containerInfo.json();
 
         const name = container.externalHost.replace('autotf-', '') || '(no name)';
         const info = document.createElement('div');
@@ -43,7 +43,7 @@ async function fetchManaged() {
 
         item.append(hidden, info, del);
         list.appendChild(item);
-    });
+    }
 }
 
 
