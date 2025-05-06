@@ -1,7 +1,10 @@
+using System.Text;
+using System.Text.Json;
 using AutoTf.AdminPanel.Models.Manage;
 using AutoTf.AdminPanel.Models.Requests;
 using AutoTf.AdminPanel.Models.Requests.Authentik;
 using Docker.DotNet.Models;
+using Microsoft.Net.Http.Client;
 
 namespace AutoTf.AdminPanel.Managers;
 
@@ -73,17 +76,34 @@ public class ManageManager
 
             KeyValuePair<string,string>? domains = _plesk.ExtractDomains(pleskDomain);
 
-            managedContainers.Add(new ManageBody()
+            ManageBody body = new ManageBody()
             {
                 RecordId = cloudflareEntry.Id,
                 ContainerId = container.ID,
                 ExternalHost = authProvider.ExternalHost,
                 RootDomain = domains!.Value.Key,
                 SubDomain = domains.Value.Value,
-            });
+            };
+            body.Id = EncodeManagedDomain(body);
+            managedContainers.Add(body);
         }
 
         return managedContainers;
+    }
+    
+    string EncodeManagedDomain(ManageBody parts)
+    {
+        string combined = parts.RecordId + "|" + parts.ContainerId + "|" + parts.ExternalHost + "|" + parts.RootDomain + "|" +
+                          parts.SubDomain;
+        byte[] bytes = Encoding.UTF8.GetBytes(combined);
+        return Convert.ToBase64String(bytes);
+    }
+
+    ManageBody DecodeManagedDomain(string encoded)
+    {
+        byte[] bytes = Convert.FromBase64String(encoded);
+        string decoded = Encoding.UTF8.GetString(bytes);
+        return JsonSerializer.Deserialize<ManageBody>(decoded.Split('|').ToString()!)!;
     }
     
     public async Task<List<ContainerListResponse>> AllDocker()

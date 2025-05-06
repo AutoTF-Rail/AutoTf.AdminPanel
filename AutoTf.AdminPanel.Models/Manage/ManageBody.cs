@@ -18,4 +18,7 @@ public class ManageBody
     
     [JsonPropertyName("RootDomain")]
     public string? RootDomain { get; set; } = null;
+
+    [JsonPropertyName("id")] 
+    public string Id { get; set; } = null!;
 }
