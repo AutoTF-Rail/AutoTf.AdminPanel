@@ -43,6 +43,18 @@ public class DockerManager
         return containerListResponse;
     }
 
+    public async Task<ContainerListResponse?> GetContainerById(string id)
+    {
+        ContainerListResponse? containerListResponse = (await GetAll()).FirstOrDefault(x => x.ID == id);
+
+        if (containerListResponse == null)
+        {
+            return null;
+        }
+
+        return containerListResponse;
+    }
+
     public async Task<bool> ContainerRunning(string id)
     {
         ContainerInspectResponse container = await Client.Containers.InspectContainerAsync(id);
@@ -88,6 +100,10 @@ public class DockerManager
                 RestartPolicy = new RestartPolicy()
                 {
                     Name = RestartPolicyKind.UnlessStopped
+                },
+                Binds = new List<string>()
+                {
+                    $"/etc/AutoTf/CentralServer/{parameters.ContainerName}:/Data"
                 }
             },
             NetworkingConfig = new NetworkingConfig()
@@ -97,7 +113,7 @@ public class DockerManager
             Env = new List<string>()
             {
                 $"evuName={parameters.EvuName}"
-            }
+            },
         });
     }
     
@@ -130,15 +146,19 @@ public class DockerManager
         return true;
     }
 
-    public async Task DeleteContainer(string containerId)
+    public async Task<bool> DeleteContainer(string containerId)
     {
         if (!await ContainerExists(containerId))
-            return;
+            return false;
         
         if (!await ContainerRunning(containerId))
-            return;
-        
+            return false;
+
+        ContainerListResponse container = (await GetContainerById(containerId))!;
         await Client.Containers.RemoveContainerAsync(containerId, new ContainerRemoveParameters());
+        Directory.Delete($"/etc/AutoTf/CentralServer/{container.Names.First()}");
+
+        return true;
     }
 
     public async Task<NetworkResponse?> GetNetwork(string name)

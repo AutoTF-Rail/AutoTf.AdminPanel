@@ -66,8 +66,10 @@ public class DockerController : ControllerBase
     [HttpPost("delete")]
     public async Task<IActionResult> DeleteContainer([FromBody, Required] string id)
     {
-        await _docker.DeleteContainer(id);
-        return Ok();
+        if (await _docker.DeleteContainer(id))
+            return Ok();
+
+        return Problem("Could not delete container because it was either not found or is still running.");
     }
 
     [HttpGet("getByName")]
