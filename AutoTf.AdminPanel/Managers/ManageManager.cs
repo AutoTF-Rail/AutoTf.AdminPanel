@@ -93,8 +93,7 @@ public class ManageManager
     
     public string EncodeManagedDomain(ManageBody parts)
     {
-        string combined = parts.RecordId + "|" + parts.ContainerId + "|" + parts.ExternalHost + "|" + parts.RootDomain + "|" +
-                          parts.SubDomain;
+        string combined = JsonSerializer.Serialize(parts);
         byte[] bytes = Encoding.UTF8.GetBytes(combined);
         return Convert.ToBase64String(bytes);
     }
@@ -103,7 +102,7 @@ public class ManageManager
     {
         byte[] bytes = Convert.FromBase64String(encoded);
         string decoded = Encoding.UTF8.GetString(bytes);
-        return JsonSerializer.Deserialize<ManageBody>(decoded.Split('|').ToString()!)!;
+        return JsonSerializer.Deserialize<ManageBody>(decoded)!;
     }
     
     public async Task<List<ContainerListResponse>> AllDocker()
