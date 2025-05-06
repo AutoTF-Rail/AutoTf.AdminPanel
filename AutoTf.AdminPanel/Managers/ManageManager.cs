@@ -91,7 +91,7 @@ public class ManageManager
         return managedContainers;
     }
     
-    string EncodeManagedDomain(ManageBody parts)
+    public string EncodeManagedDomain(ManageBody parts)
     {
         string combined = parts.RecordId + "|" + parts.ContainerId + "|" + parts.ExternalHost + "|" + parts.RootDomain + "|" +
                           parts.SubDomain;
@@ -99,7 +99,7 @@ public class ManageManager
         return Convert.ToBase64String(bytes);
     }
 
-    ManageBody DecodeManagedDomain(string encoded)
+    public ManageBody DecodeManagedDomain(string encoded)
     {
         byte[] bytes = Convert.FromBase64String(encoded);
         string decoded = Encoding.UTF8.GetString(bytes);
@@ -246,6 +246,13 @@ public class ManageManager
             return await AssembleProblem("Something went wrong when creating the subdomain in plesk.", record.Id, container.ID, request.Proxy.ExternalHost);
 
         return null;
+    }
+
+    public async Task<string> RevertChangesById(string error, string manageId)
+    {
+        ManageBody body = DecodeManagedDomain(manageId);
+
+        return await RevertChanges(error, body.RecordId, body.ContainerId, body.ExternalHost, body.SubDomain, body.RootDomain);
     }
 
     public async Task<string> RevertChanges(string error, string? recordId = null, string? containerId = null, string? externalHost = null, string? subDomain = null, string? rootDomain = null)

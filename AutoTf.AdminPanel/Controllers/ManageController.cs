@@ -51,10 +51,10 @@ public class ManageController : ControllerBase
         return await _manager.All();
     }
     
-    [HttpDelete]
-    public async Task<ActionResult> Delete([FromBody, Required] ManageBody request)
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> Delete(string id)
     {
-        return Ok(await _manager.RevertChanges(string.Empty, request.RecordId, request.ContainerId, request.ExternalHost, request.SubDomain, request.RootDomain));
+        return Ok(await _manager.RevertChangesById(string.Empty, id));
     }
 
     [HttpPost("create")]
