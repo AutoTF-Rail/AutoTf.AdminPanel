@@ -19,7 +19,7 @@ async function fetchManaged() {
         const item = document.createElement('li');
         item.className = 'container-item';
 
-        const name = container.names?.[0]?.replace(/^\//, '').replace('autotf-', '') || '(no name)';
+        const name = container.name.replace('autotf-', '') || '(no name)';
         const info = document.createElement('div');
         info.className = 'container-info';
         info.innerHTML = `<div class="container-name">${name}</div>
