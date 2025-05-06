@@ -38,7 +38,7 @@ public class PleskManager : IHostedService
         if (matches[0].Groups.Count != 3)
             return null;
 
-        return new KeyValuePair<string, string>(matches[0].Groups[1].Value, matches[0].Groups[2].Value.TrimEnd('.'));
+        return new KeyValuePair<string, string>(matches[0].Groups[1].Value.TrimEnd('.'), matches[0].Groups[2].Value);
     }
 
     private void StartCacheTimer()
