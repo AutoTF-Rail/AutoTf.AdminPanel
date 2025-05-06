@@ -48,11 +48,11 @@ public class ManageController : ControllerBase
     [HttpGet("all")]
     public async Task<ActionResult<object>> All()
     {
-        return await _manager.AllDocker();
+        return await _manager.All();
     }
     
     [HttpDelete]
-    public async Task<ActionResult> Delete([FromBody, Required] DeletionRequest request)
+    public async Task<ActionResult> Delete([FromBody, Required] ManageBody request)
     {
         return Ok(await _manager.RevertChanges(string.Empty, request.RecordId, request.ContainerId, request.ExternalHost, request.SubDomain, request.RootDomain));
     }

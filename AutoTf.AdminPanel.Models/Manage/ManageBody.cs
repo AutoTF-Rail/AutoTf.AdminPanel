@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace AutoTf.AdminPanel.Models.Manage;
 
-public class DeletionRequest
+public class ManageBody
 {
     [JsonPropertyName("recordId")] 
     public string? RecordId { get; set; } = null;

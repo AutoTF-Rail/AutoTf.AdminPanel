@@ -2,7 +2,6 @@ using AutoTf.AdminPanel.Models.Manage;
 using AutoTf.AdminPanel.Models.Requests;
 using AutoTf.AdminPanel.Models.Requests.Authentik;
 using Docker.DotNet.Models;
-using Microsoft.AspNetCore.Mvc;
 
 namespace AutoTf.AdminPanel.Managers;
 
@@ -37,6 +36,54 @@ public class ManageManager
         }
 
         return sameHost;
+    }
+    
+    public async Task<List<ManageBody>> All()
+    {
+        List<ManageBody> managedContainers = new List<ManageBody>();
+        
+        List<ContainerListResponse> containers = await _docker.GetAll();
+        List<string> pleskDomains = _plesk.Records;
+        
+        ProviderPaginationResult? authResult = await _auth.GetProviders();
+
+        if (authResult == null)
+            return new List<ManageBody>();
+        
+        List<Provider> providers = authResult.Results;
+        
+        
+        foreach (ContainerListResponse container in containers)
+        {
+            string name = container.Names.First().Replace("/autotf-", "");
+            string? pleskDomain = pleskDomains.FirstOrDefault(x => x.StartsWith(name));
+            
+            if (pleskDomain == null)
+                continue;
+            
+            Provider? authProvider = providers.FirstOrDefault(x => x.Name.ToLower().Replace("managed provider for ", "").StartsWith(name));
+
+            if (authProvider == null)
+                continue;
+
+            DnsRecord? cloudflareEntry = _cloudflare.Records.FirstOrDefault(x => x.Name.StartsWith(name));
+            
+            if (cloudflareEntry == null)
+                continue;
+
+            KeyValuePair<string,string>? domains = _plesk.ExtractDomains(pleskDomain);
+
+            managedContainers.Add(new ManageBody()
+            {
+                RecordId = cloudflareEntry.Id,
+                ContainerId = container.ID,
+                ExternalHost = authProvider.ExternalHost,
+                RootDomain = domains!.Value.Key,
+                SubDomain = domains.Value.Value,
+            });
+        }
+
+        return managedContainers;
     }
     
     public async Task<List<ContainerListResponse>> AllDocker()
