@@ -180,8 +180,8 @@ public class ManageManager
         if (request.Container.ContainerName == "")
             request.Container.ContainerName = request.Container.EvuName;
 
-        if (request.Container.ContainerName.StartsWith("AutoTF-"))
-            request.Container.ContainerName = "AutoTF-" + request.Container.ContainerName;
+        if (request.Container.ContainerName.ToLower().StartsWith("autotf-"))
+            request.Container.ContainerName = "autotf-" + request.Container.ContainerName.ToLower();
         
         if (await _docker.GetContainerByName(request.Container.ContainerName) != null)
             return await AssembleProblem("A container with this name already exists.");
