@@ -83,6 +83,17 @@ public class DockerController : ControllerBase
         return containerListResponse;
     }
 
+    [HttpGet("getById/{id}")]
+    public async Task<ActionResult<ContainerListResponse>> GetById(string id)
+    {
+        ContainerListResponse? containerListResponse = await _docker.GetContainerById(id);
+        
+        if (containerListResponse == null)
+            return Problem("Could not find container.");
+        
+        return containerListResponse;
+    }
+
     [HttpGet("networks")]
     public async Task<ActionResult<List<string>>> GetAllNetworks()
     {
