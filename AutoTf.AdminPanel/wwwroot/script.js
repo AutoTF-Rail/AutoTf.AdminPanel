@@ -15,16 +15,16 @@ async function fetchManaged() {
 
     list.innerHTML = '';
 
-    containers.sort((a, b) => (a.names?.[0] || '').localeCompare(b.names?.[0] || '')).forEach(container => {
+    containers.sort((a, b) => (a.externalHost || '').localeCompare(b.externalHost || '')).forEach(container => {
         const item = document.createElement('li');
         item.className = 'container-item';
 
-        const name = container.name.replace('autotf-', '') || '(no name)';
+        const name = container.externalHost.replace('autotf-', '') || '(no name)';
         const info = document.createElement('div');
         info.className = 'container-info';
         info.innerHTML = `<div class="container-name">${name}</div>
                       <div class="container-state">State: ${container.state}</div>`;
-        info.onclick = () => alert(`ID: ${container.id}\nImage: ${container.image}\nCommand: ${container.command}`);
+        info.onclick = () => alert(`ID: ${container.containerId}\n\nRecordId: ${container.recordId}`);
 
         const hidden = document.createElement('input');
         hidden.type = 'hidden';
