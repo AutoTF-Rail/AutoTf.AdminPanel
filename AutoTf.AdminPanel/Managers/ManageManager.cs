@@ -231,7 +231,6 @@ public class ManageManager
     public async Task<string> RevertChanges(string error, string? recordId = null, string? containerId = null, string? externalHost = null, string? subDomain = null, string? rootDomain = null)
     {
         bool entryDeletionSuccess = false;
-        bool containerKillSuccess = false;
         bool proxyDeletionSuccess = false;
         bool pleskDeletionSuccess = false;
         
@@ -244,7 +243,7 @@ public class ManageManager
 
         if (containerId != null)
         {
-            containerKillSuccess = await _docker.KillContainer(containerId);
+            bool containerKillSuccess = await _docker.KillContainer(containerId);
 
             if (containerKillSuccess)
             {
