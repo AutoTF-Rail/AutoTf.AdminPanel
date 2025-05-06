@@ -18,12 +18,15 @@ async function fetchManaged() {
     containers.sort((a, b) => (a.externalHost || '').localeCompare(b.externalHost || '')).forEach(container => {
         const item = document.createElement('li');
         item.className = 'container-item';
+        
+        const containerInfo = fetch(`/api/docker/getById/${container.containerId}`);
+        const containerBody = containerInfo.json();
 
         const name = container.externalHost.replace('autotf-', '') || '(no name)';
         const info = document.createElement('div');
         info.className = 'container-info';
         info.innerHTML = `<div class="container-name">${name}</div>
-                      <div class="container-state">State: ${container.state}</div>`;
+                      <div class="container-state">State: ${containerBody.state}</div>`;
         info.onclick = () => alert(`ID: ${container.containerId}\n\nRecordId: ${container.recordId}`);
 
         const hidden = document.createElement('input');
