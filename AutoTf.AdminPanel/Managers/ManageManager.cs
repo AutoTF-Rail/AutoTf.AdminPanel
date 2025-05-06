@@ -81,8 +81,8 @@ public class ManageManager
                 RecordId = cloudflareEntry.Id,
                 ContainerId = container.ID,
                 ExternalHost = authProvider.ExternalHost,
-                RootDomain = domains!.Value.Key,
-                SubDomain = domains.Value.Value,
+                RootDomain = domains!.Value.Value,
+                SubDomain = domains.Value.Key,
             };
             body.Id = EncodeManagedDomain(body);
             managedContainers.Add(body);
