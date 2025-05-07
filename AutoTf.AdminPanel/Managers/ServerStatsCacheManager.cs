@@ -55,7 +55,7 @@ public class ServerStatsCacheManager : IHostedService
         ProcessStartInfo startInfo = new ProcessStartInfo
         {
             FileName = "/bin/bash",
-            Arguments = "-c \"top -bn1 | grep '%Cpu' | sed 's/.*, *\\([0-9.]*\\)%* id.*/\\1/' | awk '{print 100 - $1}'\"",
+            Arguments = "-c \"mpstat 1 1 | awk '/^Average/ { print 100 - $NF }'\"",
             RedirectStandardOutput = true,
             UseShellExecute = false,
             CreateNoWindow = true
