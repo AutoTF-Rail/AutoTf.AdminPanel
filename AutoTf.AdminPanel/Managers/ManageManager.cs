@@ -241,6 +241,9 @@ public class ManageManager
             return await AssembleProblem("Failed while assigning the provider to the outpost.", record.Id, container.ID, request.Proxy.ExternalHost);
         
         // Plesk
+        if (!request.Plesk.SubDomain.EndsWith(".server"))
+            request.Plesk.SubDomain += ".server";
+        
         if (!_plesk.CreateSubdomain(request.Plesk.SubDomain, request.Plesk.RootDomain, request.Plesk.Email, request.Plesk.AuthentikHost))
             return await AssembleProblem("Something went wrong when creating the subdomain in plesk.", record.Id, container.ID, request.Proxy.ExternalHost);
 

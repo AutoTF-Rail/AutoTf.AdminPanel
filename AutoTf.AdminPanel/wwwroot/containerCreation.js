@@ -1,3 +1,5 @@
+let systemConfig = null;
+
 function openCreateDialog() {
     invokeLoadingScreen(true);
     const dialog = document.getElementById('createDialog');
@@ -6,6 +8,8 @@ function openCreateDialog() {
     fetch('/api/system/config')
         .then(response => response.json())
         .then(config => {
+            systemConfig = config;
+            
             document.getElementById('dnsContent').value = config.defaultTarget;
             document.getElementById('ttl').value = config.defaultTtl;
             document.getElementById('dnsComment').value = '';
@@ -80,6 +84,95 @@ function openCreateDialog() {
             console.error('Failed to load default config:', error);
         });
     
+}
+
+function submitContainerCreation() {
+    if (!systemConfig) {
+        alert('System config not loaded.');
+        return;
+    }
+    
+    invokeLoadingScreen(true);
+
+    const evuName = document.getElementById('evuName').value;
+    const launchSubdomain = document.getElementById('launchSubdomain').value;
+    const dnsComment = document.getElementById('dnsComment').value;
+
+    const defaultNetwork = document.getElementById('defaultNetwork').value;
+    const additionalNetwork = document.getElementById('additionalNetwork').value;
+    const image = document.getElementById('imageField').value;
+
+    const authFlow = document.getElementById('authFlow').value;
+    const invalidationFlow = document.getElementById('invalidationFlow').value;
+    const allowedGroup = document.getElementById('allowedGroup').value;
+    const outpost = document.getElementById('outpost').value;
+
+    const pleskEmail = document.getElementById('pleskEmail').value;
+    const authentikHost = document.getElementById('authentikHost').value;
+
+    const launchDomain = `https://${launchSubdomain}.autotf.de`;
+
+    const payload = {
+        DnsRecord: {
+            Type: systemConfig.defaultDnsType,
+            Name: launchSubdomain,
+            Content: systemConfig.defaultTarget,
+            Proxied: systemConfig.defaultProxySetting,
+            Ttl: systemConfig.defaultTtl,
+            Comment: dnsComment
+        },
+        Container: {
+            DefaultNetwork: defaultNetwork,
+            AdditionalNetwork: additionalNetwork,
+            Image: image,
+            EvuName: evuName,
+            ContainerName: evuName
+        },
+        Proxy: {
+            Name: evuName,
+            LaunchUrl: launchDomain,
+            AuthorizationFlow: authFlow,
+            InvalidationFlow: invalidationFlow,
+            ExternalHost: launchDomain,
+            PolicyBindings: [
+                {
+                    group: allowedGroup,
+                    negate: false,
+                    enabled: true,
+                    order: "0",
+                    timeout: "30",
+                    failure_result: false
+                }
+            ],
+            OutpostId: outpost
+        },
+        Plesk: {
+            subdomain: launchSubdomain,
+            RootDomain: "autotf.de",
+            Email: pleskEmail,
+            AuthentikHost: authentikHost
+        }
+    };
+
+    fetch('/api/manage/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+        .then(response => {
+            if (!response.ok) throw new Error('Request failed');
+            return response.json();
+        })
+        .then(result => {
+            console.log('Container created successfully:', result);
+        })
+        .catch(error => {
+            console.error('Error creating container:', error);
+        })
+        .then(x => {
+            fetchManaged();
+            invokeLoadingScreen(false);
+        })
 }
 
 function toggleCollapse(id) {
