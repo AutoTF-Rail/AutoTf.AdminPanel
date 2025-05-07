@@ -35,17 +35,15 @@ public class AuthManager : IHostedService
     {
         try
         {
-            string subdomain = RegexHelper.ExtractDomains(request.ExternalHost)!.Value.Key;
-            
             CreateAppWithProviderModel model = new CreateAppWithProviderModel();
-            model.App.Name = $"Managed application for {subdomain}";
+            model.App.Name = $"Managed application for {request.Name}";
             model.App.Slug = Regex.Replace(request.Name.ToLower(), "[^a-z]", "");
             model.App.OpenInNewTab = false;
             model.App.MetaLaunchUrl = request.LaunchUrl.ToLower();
             model.App.PolicyEngineMode = "any";
             model.App.Group = "AutoTF-Managed";
 
-            model.Provider.Name = $"Managed provider for {subdomain}";
+            model.Provider.Name = $"Managed provider for {request.Name}";
             model.Provider.AuthenticationFlow = null;
             model.Provider.AuthorizationFlow = request.AuthorizationFlow;
             model.Provider.InvalidationFlow = request.InvalidationFlow;

@@ -214,7 +214,7 @@ public class ManageManager
             return await AssembleProblem("Something went wrong during the network creation.", record.Id, container.ID);
 
         // Authentik
-        CreateProxyRequest proxy = request.Proxy.ConvertToRequest(endpoint.IPAddress);
+        CreateProxyRequest proxy = request.Proxy.ConvertToRequest(endpoint.IPAddress, request.Plesk.SubDomain);
 
         TransactionalCreationResponse? proxyResult = await _auth.CreateProxy(proxy);
         

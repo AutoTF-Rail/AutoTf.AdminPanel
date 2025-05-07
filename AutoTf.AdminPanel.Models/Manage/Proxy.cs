@@ -27,11 +27,11 @@ public class Proxy
     [JsonPropertyName("outpostId")]
     public string OutpostId { get; set; }
 
-    public CreateProxyRequest ConvertToRequest(string ipAddress)
+    public CreateProxyRequest ConvertToRequest(string ipAddress, string subDomain)
     {
         return new CreateProxyRequest()
         {
-            Name = Name,
+            Name = subDomain,
             LaunchUrl = LaunchUrl,
             AuthorizationFlow = AuthorizationFlow,
             ExternalHost = ExternalHost,
