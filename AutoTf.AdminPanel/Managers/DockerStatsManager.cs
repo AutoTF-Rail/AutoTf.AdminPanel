@@ -9,10 +9,12 @@ namespace AutoTf.AdminPanel.Managers;
 public class DockerStatsManager
 {
     private readonly DockerCacheManager _docker;
+    private readonly ServerStatsCacheManager _server;
 
-    public DockerStatsManager(DockerCacheManager docker)
+    public DockerStatsManager(DockerCacheManager docker, ServerStatsCacheManager server)
     {
         _docker = docker;
+        _server = server;
     }
 
     public async Task<ContainerStats> Stats()
@@ -57,7 +59,8 @@ public class DockerStatsManager
         {
             Network = network,
             Memory = memory,
-            CpuUsage = cpuUsage
+            CpuUsage = cpuUsage,
+            SystemStats = _server.GetLatestStats()
         };
     }
 
