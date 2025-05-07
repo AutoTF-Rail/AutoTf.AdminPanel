@@ -71,14 +71,7 @@ async function fetchDocker() {
         const hidden = document.createElement('input');
         hidden.type = 'hidden';
         hidden.value = container.id;
-
-        const del = document.createElement('button');
-        del.className = 'delete-btn';
-        del.textContent = 'Delete';
-        del.onclick = async () => {
-            await fetch(`/api/docker/deleteContainer/${container.id}`, { method: 'DELETE' });
-            fetchDocker();
-        };
+        
 
         item.append(hidden, info, del);
         list.appendChild(item);
@@ -100,14 +93,6 @@ async function fetchPlesk() {
         const info = document.createElement('div');
         info.className = 'container-info';
         info.innerHTML = `<div class="container-name">${domain}</div>`;
-
-        const del = document.createElement('button');
-        del.className = 'delete-btn';
-        del.textContent = 'Delete';
-        del.onclick = async () => {
-            await fetch(`/api/plesk/delete/${domain}`, { method: 'DELETE' });
-            fetchPlesk();
-        };
 
         item.appendChild(info);
         item.appendChild(del);
@@ -140,14 +125,6 @@ async function fetchAuthentik() {
         hidden.type = 'hidden';
         hidden.value = provider.pk;
 
-        const del = document.createElement('button');
-        del.className = 'delete-btn';
-        del.textContent = 'Delete';
-        del.onclick = async () => {
-            await fetch(`/api/authentik/delete/${provider.pk}`, { method: 'DELETE' });
-            fetchAuthentik();
-        };
-
         item.append(hidden, info, del);
         list.appendChild(item);
     });
@@ -174,14 +151,6 @@ async function fetchCloudflare() {
         hidden.type = 'hidden';
         hidden.value = record.id;
 
-        const del = document.createElement('button');
-        del.className = 'delete-btn';
-        del.textContent = 'Delete';
-        del.onclick = async () => {
-            await fetch(`/api/cloudflare/delete/${record.id}`, { method: 'DELETE' });
-            fetchCloudflare();
-        };
-
         item.append(hidden, info, del);
         list.appendChild(item);
     });
@@ -189,7 +158,6 @@ async function fetchCloudflare() {
 
 
 // Stats
-
 async function fetchDockerStats() {
     const res = await fetch('/api/docker/stats/');
     const stats = await res.json();
@@ -324,17 +292,21 @@ async function fetchDockerStats() {
     }
 }
 
-Promise.all([
-    fetchDockerStats(),
-    fetchManaged(),
-    fetchDocker(),
-    fetchPlesk(),
-    fetchAuthentik(),
-    fetchCloudflare()
-]).then(() => {
-    invokeLoadingScreen(false);
-    console.log("Initialization complete");
-});
+function LoadData() {
+    Promise.all([
+        fetchDockerStats(),
+        fetchManaged(),
+        fetchDocker(),
+        fetchPlesk(),
+        fetchAuthentik(),
+        fetchCloudflare()
+    ]).then(() => {
+        invokeLoadingScreen(false);
+        console.log("Loading complete");
+    });
+}
+
+LoadData();
 
 function invokeLoadingScreen(visible)
 {

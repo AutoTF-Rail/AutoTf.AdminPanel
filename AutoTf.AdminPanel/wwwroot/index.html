@@ -52,7 +52,7 @@
             <div class="section" id="managedSection">
                 <div class="section-header" onclick="toggleSection('managedContent')">
                     <h2>Managed Containers</h2>
-                    <button onclick="event.stopPropagation(); fetchManaged()">Refresh</button>
+                    <button onclick="event.stopPropagation(); LoadData()">Refresh</button>
                 </div>
                 <ul id="managedContent" class="section-content show"></ul>
             </div>
@@ -60,7 +60,6 @@
             <div class="section" id="dockerSection">
                 <div class="section-header" onclick="toggleSection('dockerContent')">
                     <h2>Docker Containers</h2>
-                    <button onclick="event.stopPropagation(); fetchDocker()">Refresh</button>
                 </div>
                 <ul id="dockerContent" class="section-content"></ul>
             </div>
@@ -68,7 +67,6 @@
             <div class="section" id="pleskSection">
                 <div class="section-header" onclick="toggleSection('pleskContent')">
                     <h2>Plesk Domains</h2>
-                    <button onclick="event.stopPropagation(); fetchPlesk()">Refresh</button>
                 </div>
                 <ul id="pleskContent" class="section-content"></ul>
             </div>
@@ -76,7 +74,6 @@
             <div class="section" id="authentikSection">
                 <div class="section-header" onclick="toggleSection('authentikContent')">
                     <h2>Authentik Providers</h2>
-                    <button onclick="event.stopPropagation(); fetchAuthentik()">Refresh</button>
                 </div>
                 <ul id="authentikContent" class="section-content"></ul>
             </div>
@@ -84,7 +81,6 @@
             <div class="section" id="cloudflareSection">
                 <div class="section-header" onclick="toggleSection('cloudflareContent')">
                     <h2>Cloudflare DNS</h2>
-                    <button onclick="event.stopPropagation(); fetchCloudflare()">Refresh</button>
                 </div>
                 <ul id="cloudflareContent" class="section-content"></ul>
             </div>
