@@ -273,8 +273,8 @@ public class ManageManager
 
             if (containerKillSuccess)
             {
-                await _docker.DeleteContainer(containerId);
-                error += containerKillSuccess ? " Deleted container." : "";
+                if(await _docker.DeleteContainer(containerId))
+                    error += containerKillSuccess ? " Deleted container." : "";
             }
         }
 

@@ -151,7 +151,7 @@ public class DockerManager
         if (!await ContainerExists(containerId))
             return false;
         
-        if (!await ContainerRunning(containerId))
+        if (await ContainerRunning(containerId))
             return false;
 
         ContainerListResponse container = (await GetContainerById(containerId))!;
