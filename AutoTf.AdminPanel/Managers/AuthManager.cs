@@ -35,6 +35,8 @@ public class AuthManager : IHostedService
     {
         try
         {
+            request.Name = request.Name.ToLower();
+            
             CreateAppWithProviderModel model = new CreateAppWithProviderModel();
             model.App.Name = $"Managed application for {request.Name}";
             model.App.Slug = Regex.Replace(request.Name.ToLower(), "[^a-z]", "");
