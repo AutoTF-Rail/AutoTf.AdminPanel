@@ -252,7 +252,7 @@ async function fetchDockerStats() {
     document.getElementById('memoryStatTotal').innerText = `${(dockerMemMb / 1024).toFixed(2)}/${(systemTotalMb / 1024).toFixed(2)} GB`;
 
     const memoryData = [otherMemMb, dockerMemMb, freeMemMb];
-    const memoryColors = ['#ffc107', '#28a745', '#e0e0e0'];
+    const memoryColors = ['#ffc107', '#007bff', '#e0e0e0'];
 
     if (!memoryChartInstance) {
         memoryChartInstance = new Chart(document.getElementById('memoryChart'), {
