@@ -13,12 +13,12 @@ public class Application
     [JsonPropertyName("slug")]
     public string Slug { get; set; }
 
-    [JsonPropertyName("launchUrl")]
+    [JsonPropertyName("launch_url")]
     public string? LaunchUrl { get; set; }
 
-    [JsonPropertyName("openInNewTab")]
+    [JsonPropertyName("open_in_new_tab")]
     public bool OpenInNewTab { get; set; }
 
-    [JsonPropertyName("metaLaunchUrl")]
-    public string MetaLaunchUrl { get; set; }
+    [JsonPropertyName("meta_launch_url")]
+    public string? MetaLaunchUrl { get; set; }
 }
