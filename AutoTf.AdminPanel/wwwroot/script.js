@@ -37,8 +37,10 @@ async function fetchManaged() {
         del.className = 'delete-btn';
         del.textContent = 'Delete';
         del.onclick = async () => {
-            await fetch(`/api/docker/deleteContainer/${container.id}`, { method: 'DELETE' });
-            fetchManaged();
+            invokeLoadingScreen(true);
+            await fetch(`/api/manage/delete/${container.id}`, { method: 'DELETE' });
+            await fetchManaged();
+            invokeLoadingScreen(true);
         };
 
         item.append(hidden, info, del);
