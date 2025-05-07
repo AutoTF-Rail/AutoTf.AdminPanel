@@ -40,7 +40,7 @@ async function fetchManaged() {
             invokeLoadingScreen(true);
             await fetch(`/api/manage/${container.id}`, { method: 'DELETE' });
             await fetchManaged();
-            invokeLoadingScreen(true);
+            invokeLoadingScreen(false);
         };
 
         item.append(hidden, info, del);
