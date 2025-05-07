@@ -72,8 +72,7 @@ async function fetchDocker() {
         hidden.type = 'hidden';
         hidden.value = container.id;
         
-
-        item.append(hidden, info, del);
+        
         list.appendChild(item);
     });
 }
@@ -95,7 +94,6 @@ async function fetchPlesk() {
         info.innerHTML = `<div class="container-name">${domain}</div>`;
 
         item.appendChild(info);
-        item.appendChild(del);
         list.appendChild(item);
     });
 }
@@ -125,7 +123,6 @@ async function fetchAuthentik() {
         hidden.type = 'hidden';
         hidden.value = provider.pk;
 
-        item.append(hidden, info, del);
         list.appendChild(item);
     });
 }
@@ -151,7 +148,6 @@ async function fetchCloudflare() {
         hidden.type = 'hidden';
         hidden.value = record.id;
 
-        item.append(hidden, info, del);
         list.appendChild(item);
     });
 }
