@@ -285,18 +285,15 @@ public class ManageManager
             string? providerId = await _auth.GetProviderIdByExternalHost(externalHost);
             string? applicationSlug = await _auth.GetApplicationSlugByLaunchUrl(externalHost);
 
-            if (providerId != null && applicationSlug != null)
-            {
+            if (providerId != null)
                 proxyDeletionSuccess = await _auth.DeleteProvider(providerId);
-                applicationDeletionSuccess = await _auth.DeleteApplication(applicationSlug);
-            }
             else
-            {
-                if(providerId == null)
-                    error += $" Could not find provider by external host {externalHost}.";
-                if(applicationSlug == null)
-                    error += $" Could not find application Slug by external host {externalHost}.";
-            }
+                error += $" Could not find provider by external host {externalHost}.";
+            
+            if(applicationSlug != null)
+                applicationDeletionSuccess = await _auth.DeleteApplication(applicationSlug);
+            else
+                error += $" Could not find application Slug by launch url {externalHost}.";
         }
         
         if (proxyDeletionSuccess)

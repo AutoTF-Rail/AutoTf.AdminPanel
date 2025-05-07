@@ -95,6 +95,17 @@ public class AuthentikController : ControllerBase
         return result;
     }
 
+    [HttpGet("applications")]
+    public async Task<ActionResult<ApplicationPaginationResult>> Applications()
+    {
+        ApplicationPaginationResult? result = await _auth.GetApplications();
+        
+        if (result == null)
+            return Problem("Failed to send the request to authentik.");
+
+        return result;
+    }
+
     [HttpGet("providerId")]
     public async Task<ActionResult<string>> ProviderByExternalHost([FromBody, Required] string externalHost)
     {
