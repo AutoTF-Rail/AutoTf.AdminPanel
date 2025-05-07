@@ -3,6 +3,7 @@ using System.Text.Json;
 using AutoTf.AdminPanel.Models.Manage;
 using AutoTf.AdminPanel.Models.Requests;
 using AutoTf.AdminPanel.Models.Requests.Authentik;
+using AutoTf.AdminPanel.Statics;
 using Docker.DotNet.Models;
 using Microsoft.Net.Http.Client;
 
@@ -74,7 +75,7 @@ public class ManageManager
             if (cloudflareEntry == null)
                 continue;
 
-            KeyValuePair<string,string>? domains = _plesk.ExtractDomains(pleskDomain);
+            KeyValuePair<string,string>? domains = RegexHelper.ExtractDomains(pleskDomain);
 
             ManageBody body = new ManageBody()
             {

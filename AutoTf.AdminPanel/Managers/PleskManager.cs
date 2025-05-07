@@ -8,8 +8,6 @@ namespace AutoTf.AdminPanel.Managers;
 
 public class PleskManager : IHostedService
 {
-    private const string _authHostPattern = "(?:http|https)://\\d{1,3}.\\d{1,3}.\\d{1,3}.\\d{1,3}(?::\\d{1,6})?";
-    private const string _domainsPattern = "((?:[a-z0-9-]+\\.)*)([a-z0-9-]+\\.[a-z]{2,})";
     
     private Timer _timer = new Timer(TimeSpan.FromMinutes(5));
 
@@ -20,24 +18,6 @@ public class PleskManager : IHostedService
     {
         await Task.Run(UpdateCache, cancellationToken);
         StartCacheTimer();
-    }
-
-    public bool ValidateAuthHost(string host)
-    {
-        return Regex.IsMatch(host, _authHostPattern);
-    }
-
-    public KeyValuePair<string, string>? ExtractDomains(string host)
-    {
-        MatchCollection matches = Regex.Matches(host, _domainsPattern);
-        
-        if (matches.Count != 1)
-            return null;
-
-        if (matches[0].Groups.Count != 3)
-            return null;
-
-        return new KeyValuePair<string, string>(matches[0].Groups[1].Value.TrimEnd('.'), matches[0].Groups[2].Value);
     }
 
     private void StartCacheTimer()
@@ -95,7 +75,7 @@ public class PleskManager : IHostedService
 
     public bool UpdateAuthHost(string domain, string newAuthHost)
     {
-        if (!ValidateAuthHost(newAuthHost))
+        if (!RegexHelper.ValidateAuthHost(newAuthHost))
             return false;
         
         string file = $"/var/www/vhosts/system/{domain}/conf/vhost_nginx.conf";
@@ -104,7 +84,7 @@ public class PleskManager : IHostedService
             return false;
 
         string fileContent = File.ReadAllText(file);
-        fileContent = Regex.Replace(fileContent, _authHostPattern, newAuthHost);
+        fileContent = Regex.Replace(fileContent, RegexHelper.AuthHostPattern, newAuthHost);
         File.WriteAllText(file, fileContent);
         
         return true;
@@ -123,7 +103,7 @@ public class PleskManager : IHostedService
             return null;
         
         string fileContent = File.ReadAllText(file);
-        Match match = Regex.Match(fileContent, _authHostPattern);
+        Match match = Regex.Match(fileContent, RegexHelper.AuthHostPattern);
 
         if (!match.Success)
             return null;

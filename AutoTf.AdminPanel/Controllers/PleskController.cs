@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using AutoTf.AdminPanel.Managers;
 using AutoTf.AdminPanel.Models.Requests;
+using AutoTf.AdminPanel.Statics;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AutoTf.AdminPanel.Controllers;
@@ -44,7 +45,7 @@ public class PleskController : ControllerBase
     [HttpPost("validateHost")]
     public ActionResult<bool> ValidateHost([FromBody, Required] string newAuthHost)
     {
-        return _plesk.ValidateAuthHost(newAuthHost);
+        return RegexHelper.ValidateAuthHost(newAuthHost);
     }
 
     [HttpPost("{rootDomain}/{subDomain}/updateAuthHost")]
@@ -73,7 +74,7 @@ public class PleskController : ControllerBase
     [HttpGet("{domain}/extract")]
     public ActionResult<KeyValuePair<string, string>> ExtractDomains(string domain)
     {
-        KeyValuePair<string, string>? domains = _plesk.ExtractDomains(domain);
+        KeyValuePair<string, string>? domains = RegexHelper.ExtractDomains(domain);
 
         if (domains == null)
             return Problem("Could not extract the domains.");
