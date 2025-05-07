@@ -38,7 +38,7 @@ async function fetchManaged() {
         del.textContent = 'Delete';
         del.onclick = async () => {
             invokeLoadingScreen(true);
-            await fetch(`/api/manage/delete/${container.id}`, { method: 'DELETE' });
+            await fetch(`/api/manage/${container.id}`, { method: 'DELETE' });
             await fetchManaged();
             invokeLoadingScreen(true);
         };
