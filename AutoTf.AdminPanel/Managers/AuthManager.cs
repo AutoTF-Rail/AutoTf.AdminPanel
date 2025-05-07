@@ -222,7 +222,7 @@ public class AuthManager : IHostedService
     {
         try
         {
-            ApplicationPaginationResult? result = await ApiHttpHelper.SendGet<ApplicationPaginationResult>($"{_credentials.AuthUrl}/api/v3/core/applications",
+            ApplicationPaginationResult? result = await ApiHttpHelper.SendGet<ApplicationPaginationResult>($"{_credentials.AuthUrl}/api/v3/core/applications/",
                 _apiKey, true);
             
             if (result == null)
