@@ -14,6 +14,9 @@ public class ApiHttpHelper
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
             
             HttpResponseMessage response = await client.DeleteAsync(endpoint);
+            
+            if (reThrow)
+                response.EnsureSuccessStatusCode();
 
             return response.IsSuccessStatusCode;
         }
