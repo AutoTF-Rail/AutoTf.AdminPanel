@@ -161,10 +161,8 @@ function submitContainerCreation() {
     })
         .then(response => {
             if (!response.ok) throw new Error('Request failed');
+            console.log('creation response: ', response);
             return response;
-        })
-        .then(result => {
-            console.log('Container created successfully:', result);
         })
         .catch(error => {
             console.error('Error creating container:', error);

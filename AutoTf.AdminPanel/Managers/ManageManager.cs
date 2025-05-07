@@ -290,6 +290,13 @@ public class ManageManager
                 proxyDeletionSuccess = await _auth.DeleteProvider(providerId);
                 applicationDeletionSuccess = await _auth.DeleteApplication(applicationSlug);
             }
+            else
+            {
+                if(providerId != null)
+                    error += $" Could not find provider by external host {externalHost}.";
+                if(applicationSlug != null)
+                    error += $" Could not find application Slug by external host {externalHost}.";
+            }
         }
         
         if (proxyDeletionSuccess)
