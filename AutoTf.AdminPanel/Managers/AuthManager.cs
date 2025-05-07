@@ -266,7 +266,7 @@ public class AuthManager : IHostedService
     {
         try
         {
-            return await ApiHttpHelper.SendDelete($"{_credentials.AuthUrl}/api/v3/applications/{slug}/", _apiKey, true);
+            return await ApiHttpHelper.SendDelete($"{_credentials.AuthUrl}/api/v3/core/applications/{slug}/", _apiKey, true);
         }
         catch (Exception e)
         {
