@@ -171,6 +171,7 @@ function submitContainerCreation() {
         })
         .then(x => {
             fetchManaged();
+            document.getElementById('createDialog').classList.remove('open')
             invokeLoadingScreen(false);
         })
 }
