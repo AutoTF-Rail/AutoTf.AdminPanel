@@ -299,7 +299,7 @@ public class AuthManager : IHostedService
         if (providers == null || !providers.Results.Any())
             return null;
 
-        Application? app = providers.Results.FirstOrDefault(x => x.LaunchUrl.ToLower() == launchUrl.ToLower());
+        Application? app = providers.Results.FirstOrDefault(x => x.LaunchUrl != null && x.LaunchUrl.ToLower() == launchUrl.ToLower());
        
         if (app == null)
             return null;

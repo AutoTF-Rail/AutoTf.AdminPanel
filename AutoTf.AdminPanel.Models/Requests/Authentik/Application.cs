@@ -14,7 +14,7 @@ public class Application
     public string Slug { get; set; }
 
     [JsonPropertyName("launchUrl")]
-    public string LaunchUrl { get; set; }
+    public string? LaunchUrl { get; set; }
 
     [JsonPropertyName("openInNewTab")]
     public bool OpenInNewTab { get; set; }
