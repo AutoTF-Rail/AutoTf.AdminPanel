@@ -197,7 +197,7 @@ public class AuthManager : IHostedService
     {
         try
         {
-            ProviderPaginationResult? providerPaginationResult = await ApiHttpHelper.SendGet<ProviderPaginationResult>($"{_credentials.AuthUrl}/api/v3/providers/proxy/?application__isnull=false&ordering=name&page=1&page_size=20&search=",
+            ProviderPaginationResult? providerPaginationResult = await ApiHttpHelper.SendGet<ProviderPaginationResult>($"{_credentials.AuthUrl}/api/v3/providers/proxy/?application__isnull=false&ordering=name&page=1&page_size=200&search=",
                 _apiKey, true);
             
             if (providerPaginationResult == null)
@@ -224,7 +224,7 @@ public class AuthManager : IHostedService
     {
         try
         {
-            ApplicationPaginationResult? result = await ApiHttpHelper.SendGet<ApplicationPaginationResult>($"{_credentials.AuthUrl}/api/v3/core/applications/",
+            ApplicationPaginationResult? result = await ApiHttpHelper.SendGet<ApplicationPaginationResult>($"{_credentials.AuthUrl}/api/v3/core/applications/?ordering=name&page=1&page_size=200&search=&superuser_full_list=true",
                 _apiKey, true);
             
             if (result == null)
