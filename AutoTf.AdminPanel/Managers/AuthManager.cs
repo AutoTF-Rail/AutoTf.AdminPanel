@@ -36,7 +36,7 @@ public class AuthManager : IHostedService
         try
         {
             CreateAppWithProviderModel model = new CreateAppWithProviderModel();
-            model.App.Name = request.Name;
+            model.App.Name = $"Managed application for {request.Name}";
             model.App.Slug = Regex.Replace(request.Name.ToLower(), "[^a-z]", "");
             model.App.OpenInNewTab = false;
             model.App.MetaLaunchUrl = request.LaunchUrl.ToLower();
@@ -218,7 +218,49 @@ public class AuthManager : IHostedService
         return null;
     }
 
+    public async Task<ApplicationPaginationResult?> GetApplications()
+    {
+        try
+        {
+            ApplicationPaginationResult? result = await ApiHttpHelper.SendGet<ApplicationPaginationResult>($"{_credentials.AuthUrl}/api/v3/core/applications",
+                _apiKey, true);
+            
+            if (result == null)
+                return null;
+
+            if (!result.Results.Any())
+                return result;
+
+            result.Results =
+                result.Results.Where(x => x.Name.Contains("Managed application for ")).ToList();
+
+            return result;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Something went wrong when getting all applications:");
+            Console.WriteLine(e.ToString());
+        }
+
+        return null;
+    }
+
     public async Task<bool> DeleteProvider(string id)
+    {
+        try
+        {
+            return await ApiHttpHelper.SendDelete($"{_credentials.AuthUrl}/api/v3/providers/proxy/{id}/", _apiKey, true);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Something went wrong when deleting provider {id}:");
+            Console.WriteLine(e.ToString());
+        }
+
+        return false;
+    }
+
+    public async Task<bool> DeleteApplication(string id)
     {
         try
         {
@@ -240,12 +282,27 @@ public class AuthManager : IHostedService
         if (providers == null || !providers.Results.Any())
             return null;
 
-        Provider? provider = providers.Results.FirstOrDefault(x => x.Name.Contains("Managed provider for") && x.ExternalHost.ToLower() == externalHost.ToLower());
+        Provider? provider = providers.Results.FirstOrDefault(x => x.ExternalHost.ToLower() == externalHost.ToLower());
        
         if (provider == null)
             return null;
         
         return provider.Pk;
+    }
+
+    public async Task<string?> GetApplicationIdByLaunchUrl(string launchUrl)
+    {
+        ApplicationPaginationResult? providers = await GetApplications();
+        
+        if (providers == null || !providers.Results.Any())
+            return null;
+
+        Application? app = providers.Results.FirstOrDefault(x => x.LaunchUrl.ToLower() == launchUrl.ToLower());
+       
+        if (app == null)
+            return null;
+        
+        return app.Pk;
     }
 
     public async Task<string?> AssignToOutpost(string outpostId, string providerPk)

@@ -258,13 +258,14 @@ public class ManageManager
     {
         bool entryDeletionSuccess = false;
         bool proxyDeletionSuccess = false;
+        bool applicationDeletionSuccess = false;
         bool pleskDeletionSuccess = false;
         
         if (recordId != null)
             entryDeletionSuccess = await _cloudflare.DeleteEntry(recordId);
 
         if (entryDeletionSuccess)
-            error += entryDeletionSuccess ? " Deleted Dns Entry." : "";
+            error += " Deleted Dns Entry.";
 
 
         if (containerId != null)
@@ -281,20 +282,24 @@ public class ManageManager
         if (externalHost != null)
         {
             string? providerId = await _auth.GetProviderIdByExternalHost(externalHost);
-            
-            if (providerId != null)
+            string? applicationId = await _auth.GetApplicationIdByLaunchUrl(externalHost);
+
+            if (providerId != null && applicationId != null)
+            {
                 proxyDeletionSuccess = await _auth.DeleteProvider(providerId);
+                applicationDeletionSuccess = await _auth.DeleteApplication(applicationId);
+            }
         }
         
-        if (proxyDeletionSuccess)
-            error += proxyDeletionSuccess ? " Deleted proxy." : "";
+        if (proxyDeletionSuccess && applicationDeletionSuccess)
+            error += " Deleted proxy and application.";
 
         
         if (subDomain != null && rootDomain != null)
             pleskDeletionSuccess = _plesk.DeleteSubDomain(rootDomain, subDomain);
         
         if (pleskDeletionSuccess)
-            error += pleskDeletionSuccess ? " Deleted plesk site." : "";
+            error += " Deleted plesk site.";
 
         return error;
     }
