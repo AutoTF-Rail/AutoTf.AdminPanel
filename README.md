@@ -5,7 +5,7 @@ Hosted at [admin.autotf.de](https://admin.autotf.de).
 
 
 ## UI
-<img width="1606" alt="image" src="https://github.com/user-attachments/assets/65eb6372-745e-414c-812b-6cd8edc48ba7" />
+<img width="1643" alt="image" src="https://github.com/user-attachments/assets/7c391130-a210-433d-8d5f-a6e32a67d38b" />
 
 
 ## Container creation
