@@ -260,15 +260,15 @@ public class AuthManager : IHostedService
         return false;
     }
 
-    public async Task<bool> DeleteApplication(string id)
+    public async Task<bool> DeleteApplication(string slug)
     {
         try
         {
-            return await ApiHttpHelper.SendDelete($"{_credentials.AuthUrl}/api/v3/providers/proxy/{id}/", _apiKey, true);
+            return await ApiHttpHelper.SendDelete($"{_credentials.AuthUrl}/api/v3/applications/{slug}/", _apiKey, true);
         }
         catch (Exception e)
         {
-            Console.WriteLine($"Something went wrong when deleting provider {id}:");
+            Console.WriteLine($"Something went wrong when deleting application {slug}:");
             Console.WriteLine(e.ToString());
         }
 
@@ -290,7 +290,7 @@ public class AuthManager : IHostedService
         return provider.Pk;
     }
 
-    public async Task<string?> GetApplicationIdByLaunchUrl(string launchUrl)
+    public async Task<string?> GetApplicationSlugByLaunchUrl(string launchUrl)
     {
         ApplicationPaginationResult? providers = await GetApplications();
         
@@ -302,7 +302,7 @@ public class AuthManager : IHostedService
         if (app == null)
             return null;
         
-        return app.Pk;
+        return app.Slug;
     }
 
     public async Task<string?> AssignToOutpost(string outpostId, string providerPk)

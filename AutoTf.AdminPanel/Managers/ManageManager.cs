@@ -282,17 +282,19 @@ public class ManageManager
         if (externalHost != null)
         {
             string? providerId = await _auth.GetProviderIdByExternalHost(externalHost);
-            string? applicationId = await _auth.GetApplicationIdByLaunchUrl(externalHost);
+            string? applicationSlug = await _auth.GetApplicationSlugByLaunchUrl(externalHost);
 
-            if (providerId != null && applicationId != null)
+            if (providerId != null && applicationSlug != null)
             {
                 proxyDeletionSuccess = await _auth.DeleteProvider(providerId);
-                applicationDeletionSuccess = await _auth.DeleteApplication(applicationId);
+                applicationDeletionSuccess = await _auth.DeleteApplication(applicationSlug);
             }
         }
         
-        if (proxyDeletionSuccess && applicationDeletionSuccess)
-            error += " Deleted proxy and application.";
+        if (proxyDeletionSuccess)
+            error += " Deleted proxy.";
+        if (applicationDeletionSuccess)
+            error += " Deleted Application.";
 
         
         if (subDomain != null && rootDomain != null)

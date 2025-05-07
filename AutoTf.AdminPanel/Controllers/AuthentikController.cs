@@ -113,11 +113,11 @@ public class AuthentikController : ControllerBase
         return await _auth.DeleteProvider(id);
     }
 
-    [HttpDelete("application/{id}")]
-    public async Task<ActionResult<bool>> DeleteApplication(string id)
+    [HttpDelete("application/{slug}")]
+    public async Task<ActionResult<bool>> DeleteApplication(string slug)
     {
         // TODO: Check for existance
-        return await _auth.DeleteApplication(id);
+        return await _auth.DeleteApplication(slug);
     }
 
     [HttpGet("flows/authorization")]
