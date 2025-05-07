@@ -54,8 +54,8 @@ public class ServerStatsCacheManager : IHostedService
     {
         ProcessStartInfo startInfo = new ProcessStartInfo
         {
-            FileName = "top",
-            Arguments = "-bn1 | grep '^%Cpu' | sed 's/.*, *\\([0-9.]*\\)%* id.*/\\1/' | awk '{print 100 - $1}'",
+            FileName = "/bin/bash",
+            Arguments = "-c \"top -bn1 | grep '%Cpu' | sed 's/.*, *\\([0-9.]*\\)%* id.*/\\1/' | awk '{print 100 - $1}'\"",
             RedirectStandardOutput = true,
             UseShellExecute = false,
             CreateNoWindow = true
