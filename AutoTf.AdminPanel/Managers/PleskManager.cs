@@ -34,7 +34,6 @@ public class PleskManager : IHostedService
         if (matches.Count != 1)
             return null;
 
-        Console.WriteLine(matches[0].Groups.Count);
         if (matches[0].Groups.Count != 3)
             return null;
 
