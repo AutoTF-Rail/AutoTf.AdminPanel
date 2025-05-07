@@ -292,9 +292,9 @@ public class ManageManager
             }
             else
             {
-                if(providerId != null)
+                if(providerId == null)
                     error += $" Could not find provider by external host {externalHost}.";
-                if(applicationSlug != null)
+                if(applicationSlug == null)
                     error += $" Could not find application Slug by external host {externalHost}.";
             }
         }
