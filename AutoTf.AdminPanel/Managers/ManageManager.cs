@@ -182,7 +182,7 @@ public class ManageManager
             request.Container.ContainerName = request.Container.EvuName;
 
         if (!request.Container.ContainerName.ToLower().StartsWith("autotf-"))
-            request.Container.ContainerName = "autotf-" + request.Container.ContainerName.ToLower();
+            request.Container.ContainerName = "autotf-" + request.Plesk.SubDomain.ToLower();
         
         if (await _docker.GetContainerByName(request.Container.ContainerName) != null)
             return await AssembleProblem("A container with this name already exists.");
