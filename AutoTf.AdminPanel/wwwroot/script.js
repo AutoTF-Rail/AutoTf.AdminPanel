@@ -88,9 +88,9 @@ async function fetchPlesk() {
     const res = await fetch('/api/plesk/all');
     const domains = await res.json();
     const list = document.getElementById('pleskContent');
-    
+
     list.innerHTML = '';
-    
+
     domains.sort((a, b) => a.localeCompare(b)).forEach(domain => {
         const item = document.createElement('li');
         item.className = 'container-item';
@@ -124,7 +124,7 @@ async function fetchAuthentik() {
         const nameB = b.name.replace(/^Managed provider for\s*/i, '');
         return nameA.localeCompare(nameB);
     }).forEach(provider => {
-        
+
         const item = document.createElement('li');
         item.className = 'container-item';
 
@@ -157,9 +157,9 @@ async function fetchCloudflare() {
     const records = await res.json();
     const list = document.getElementById('cloudflareContent');
     list.innerHTML = '';
-    
+
     records.sort((a, b) => a.name.localeCompare(b.name)).forEach(record => {
-        
+
         const item = document.createElement('li');
         item.className = 'container-item';
 
@@ -192,7 +192,13 @@ async function fetchDockerStats() {
     const res = await fetch('/api/docker/stats/');
     const stats = await res.json();
 
-    const cpu = +stats.cpuUsage.toFixed(2);
+    const cpuDocker = +(stats.cpuUsage.toFixed(2));
+    const cpuSystem = +(stats.systemStats.cpuUsagePercent.toFixed(2));
+    const cpuOther = Math.max(cpuSystem - cpuDocker, 0);
+    const cpuIdle = Math.max(100 - cpuSystem, 0);
+
+    const cpuData = [cpuOther, cpuDocker, cpuIdle];
+    const cpuColors = ['#ffc107', '#007bff', '#e0e0e0'];
 
     const memoryUsed = stats.memory.memoryUsageMb / 1024;
     const memoryTotal = stats.memory.memoryLimitMb / 1024;
@@ -201,55 +207,80 @@ async function fetchDockerStats() {
     const netRecv = +(stats.network.totalReceived / 1024).toFixed(2);
     const netSend = +(stats.network.totalSend / 1024).toFixed(2);
 
-    document.getElementById('cpuPercent').innerText = `${cpu}%`;
-    
+    document.getElementById('cpuPercent').innerText = `${cpuDocker}%`;
+
 
     if (!cpuChartInstance) {
         cpuChartInstance = new Chart(document.getElementById('cpuChart'), {
             type: 'doughnut',
             data: {
                 datasets: [{
-                    data: [cpu, 100 - cpu],
-                    backgroundColor: ['#007bff', '#e0e0e0'],
+                    data: cpuData,
+                    backgroundColor: cpuColors,
                     borderWidth: 0
                 }]
             },
             options: {
                 cutout: '70%',
                 plugins: {
-                    tooltip: { enabled: false },
+                    tooltip: {
+                        callbacks: {
+                            label: (ctx) => {
+                                const labelMap = ['Other System CPU %', 'Docker CPU %', 'Idle CPU %'];
+                                return `${labelMap[ctx.dataIndex]}: ${ctx.formattedValue}%`;
+                            }
+                        }
+                    },
                     legend: { display: false }
                 }
             }
         });
     } else {
-        cpuChartInstance.data.datasets[0].data = [cpu, 100 - cpu];
-        cpuChartInstance.update('none'); 
+        cpuChartInstance.data.datasets[0].data = cpuData;
+        cpuChartInstance.update('none');
     }
-    
-    document.getElementById('memoryPercent').innerText = `${memoryPercentage}%`;
-    document.getElementById('memoryStatTotal').innerText = `${memoryUsed.toFixed(2)}/${memoryTotal.toFixed(2)} GB`;
+
+    const dockerMemMb = stats.memory.memoryUsageMb;
+    const systemUsedMb = stats.systemStats.usedMemoryMb;
+    const systemTotalMb = stats.systemStats.totalMemoryMb;
+
+    const otherMemMb = Math.max(systemUsedMb - dockerMemMb, 0);
+    const freeMemMb = Math.max(systemTotalMb - systemUsedMb, 0);
+
+    const memPercent = +(stats.memory.memoryPercentage).toFixed(2);
+    document.getElementById('memoryPercent').innerText = `${memPercent}%`;
+    document.getElementById('memoryStatTotal').innerText = `${(dockerMemMb / 1024).toFixed(2)}/${(systemTotalMb / 1024).toFixed(2)} GB`;
+
+    const memoryData = [otherMemMb, dockerMemMb, freeMemMb];
+    const memoryColors = ['#ffc107', '#28a745', '#e0e0e0'];
 
     if (!memoryChartInstance) {
         memoryChartInstance = new Chart(document.getElementById('memoryChart'), {
             type: 'doughnut',
             data: {
                 datasets: [{
-                    data: [memoryPercentage, 100 - memoryPercentage],
-                    backgroundColor: ['#28a745', '#e0e0e0'],
+                    data: memoryData,
+                    backgroundColor: memoryColors,
                     borderWidth: 0
                 }]
             },
             options: {
                 cutout: '70%',
                 plugins: {
-                    tooltip: { enabled: false },
+                    tooltip: {
+                        callbacks: {
+                            label: (ctx) => {
+                                const labelMap = ['Other System Memory', 'Docker Memory', 'Free Memory'];
+                                return `${labelMap[ctx.dataIndex]}: ${(memoryData[ctx.dataIndex] / 1024).toFixed(2)} GB`;
+                            }
+                        }
+                    },
                     legend: { display: false }
                 }
             }
         });
     } else {
-        memoryChartInstance.data.datasets[0].data = [memoryPercentage, 100 - memoryPercentage];
+        memoryChartInstance.data.datasets[0].data = memoryData;
         memoryChartInstance.update('none');
     }
 
