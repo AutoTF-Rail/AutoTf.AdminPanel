@@ -15,7 +15,6 @@ function openCreateDialog() {
             systemConfig = config;
             
             document.getElementById('dnsContent').value = config.defaultTarget;
-            document.getElementById('ttl').value = config.defaultTtl;
             document.getElementById('dnsComment').value = '';
 
             document.getElementById('imageField').value = config.defaultImage;

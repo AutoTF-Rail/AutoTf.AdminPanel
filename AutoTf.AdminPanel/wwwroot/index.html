@@ -136,32 +136,33 @@
                         <div class="row">
                             <input class="input" id="dnsContent" type="text" pattern="[\d\.]+" placeholder="Content" />
                         </div>
-                        <label for="ttl">TTL</label>
-                        <input class="input" id="ttl" type="number" />
                         <label for="dnsComment">Comment</label>
                         <input class="input" id="dnsComment" type="text" />
-                    </div>
-    
-                    <div class="form-section">
-                        <label for="defaultNetwork">Default Network</label>
-                        <select class="input" id="defaultNetwork">
-                            <option>Default Network</option>
+                        <label for="allowedGroup">Group</label>
+                        <select class="input" id="allowedGroup">
+                            <option>Allowed Group</option>
                         </select>
-    
-                        <label for="additionalNetwork">Additional Network</label>
-                        <select class="input" id="additionalNetwork">
-                            <option>Additional Network</option>
-                        </select>
-    
-                        <label for="imageField">Image</label>
-                        <input class="input" id="imageField" type="text" />
                     </div>
-    
+
                     <div class="form-section collapsible-section">
-                        <div class="section-header" onclick="toggleCollapse('authContent')">
-                            <h3>Auth</h3>
+                        <div class="section-header" onclick="toggleCollapse('advancedSettingsContent')">
+                            <h3>Advanced Settings</h3>
                         </div>
-                        <div id="authContent" class="section-content">
+                        <div id="advancedSettingsContent" class="section-content">
+                            
+                            <label for="defaultNetwork">Default Network</label>
+                            <select class="input" id="defaultNetwork">
+                                <option>Default Network</option>
+                            </select>
+        
+                            <label for="additionalNetwork">Additional Network</label>
+                            <select class="input" id="additionalNetwork">
+                                <option>Additional Network</option>
+                            </select>
+        
+                            <label for="imageField">Image</label>
+                            <input class="input" id="imageField" type="text" />
+                            
                             <label for="authFlow">Authorization Flow</label>
                             <select class="input" id="authFlow">
                                 <option>Authorization Flow</option>
@@ -172,23 +173,11 @@
                                 <option>Invalidation Flow</option>
                             </select>
     
-                            <label for="allowedGroup">Group</label>
-                            <select class="input" id="allowedGroup">
-                                <option>Allowed Group</option>
-                            </select>
-    
                             <label for="outpost">Outpost ID</label>
                             <select class="input" id="outpost">
                                 <option>Outpost</option>
                             </select>
-                        </div>
-                    </div>
-    
-                    <div class="form-section collapsible-section">
-                        <div class="section-header" onclick="toggleCollapse('pleskSectionContent')">
-                            <h3>Plesk</h3>
-                        </div>
-                        <div id="pleskSectionContent" class="section-content">
+                            
                             <label for="pleskEmail">Certificate Email</label>
                             <input class="input" id="pleskEmail" type="email" />
     
