@@ -198,7 +198,10 @@ public class DockerManager
 
         ContainerListResponse container = (await GetContainerById(containerId))!;
         await Client.Containers.RemoveContainerAsync(containerId, new ContainerRemoveParameters());
-        Directory.Delete($"/etc/AutoTf/CentralServer/{container.Names.First()}");
+        
+        string dir = $"/etc/AutoTf/CentralServer/{container.Names.First()}";
+        if(Directory.Exists(dir))
+            Directory.Delete(dir);
 
         return true;
     }
