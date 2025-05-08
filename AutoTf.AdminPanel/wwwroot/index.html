@@ -6,6 +6,7 @@
         <title>Management Panel</title>
         <link rel="stylesheet" href="style.css" />
         <link rel="stylesheet" href="containerCreation.css" />
+        <link rel="stylesheet" href="statStyles.css" />
         <link rel="icon" type="image/x-icon" href="/favicon.png">
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     </head>
@@ -44,6 +45,21 @@
                 <div class="network-container">
                     <canvas id="networkChart" width="250" height="150"></canvas>
                 </div>
+            </div>
+        </div>
+        
+        <div class="quick-stats">
+            <div class="quick-stat-box">
+                <div class="quick-stat-title">Managed Containers</div>
+                <div class="quick-stat-value" id="numberOfContainers">0</div>
+            </div>
+            <div class="quick-stat-box">
+                <div class="quick-stat-title">Total Trains</div>
+                <div class="quick-stat-value">5</div>
+            </div>
+            <div class="quick-stat-box">
+                <div class="quick-stat-title">Total Memory Usage</div>
+                <div class="quick-stat-value" id="totalStorageUsage">0.0 GB</div>
             </div>
         </div>
         

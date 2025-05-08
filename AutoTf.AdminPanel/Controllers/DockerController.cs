@@ -94,6 +94,18 @@ public class DockerController : ControllerBase
         return containerListResponse;
     }
 
+    [HttpGet("{id}/size")]
+    public async Task<ActionResult<long>> GetSize(string id)
+    {
+        return await _docker.GetContainerSize(id);
+    }
+
+    [HttpGet("size")]
+    public async Task<ActionResult<double>> TotalSizeGb()
+    {
+        return await _docker.GetTotalSizeGb();
+    }
+
     [HttpGet("networks")]
     public async Task<ActionResult<List<string>>> GetAllNetworks()
     {

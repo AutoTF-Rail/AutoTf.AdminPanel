@@ -7,6 +7,12 @@ function toggleSection(id) {
     content.style.display = content.style.display === 'block' ? 'none' : 'block';
 }
 
+async function fetchOtherStats() {
+    const res = await fetch('/api/docker/size');
+    const size = await res.json();
+    document.getElementById('totalStorageUsage').innerHTML = `${size} GB`;
+}
+
 // ---- Managed ----
 async function fetchManaged() {
     const res = await fetch('/api/manage/all');
@@ -14,6 +20,8 @@ async function fetchManaged() {
     const list = document.getElementById('managedContent');
 
     list.innerHTML = '';
+    
+    document.getElementById('numberOfContainers').innerHTML = containers.length;
 
     for (const container of containers.sort((a, b) => (a.externalHost || '').localeCompare(b.externalHost || ''))) {
         const item = document.createElement('li');
@@ -27,7 +35,6 @@ async function fetchManaged() {
         info.className = 'container-info';
         info.innerHTML = `<div class="container-name">${name}</div>
                       <div class="container-state">State: ${containerBody.state}</div>`;
-        info.onclick = () => alert(`ID: ${container.containerId}\n\nRecordId: ${container.recordId}`);
 
         const hidden = document.createElement('input');
         hidden.type = 'hidden';
@@ -66,7 +73,6 @@ async function fetchDocker() {
         info.className = 'container-info';
         info.innerHTML = `<div class="container-name">${name}</div>
                       <div class="container-state">State: ${container.state}</div>`;
-        info.onclick = () => alert(`ID: ${container.id}\nImage: ${container.image}\nCommand: ${container.command}`);
 
         const hidden = document.createElement('input');
         hidden.type = 'hidden';
@@ -292,6 +298,7 @@ async function fetchDockerStats() {
 }
 
 Promise.all([
+    fetchOtherStats(),
     fetchDockerStats(),
     fetchManaged(),
     fetchDocker(),
