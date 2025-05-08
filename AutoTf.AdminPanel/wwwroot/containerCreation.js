@@ -4,6 +4,10 @@ function openCreateDialog() {
     invokeLoadingScreen(true);
     const dialog = document.getElementById('createDialog');
     dialog.classList.add('open');
+    
+    document.getElementById('evuName').value = '';
+    document.getElementById('launchSubdomain').value = '';
+    document.getElementById('dnsComment').value = '';
 
     fetch('/api/system/config')
         .then(response => response.json())
