@@ -63,6 +63,12 @@ public class ManageController : ControllerBase
         return await _manager.GetTotalSizeGb();
     }
 
+    [HttpGet("trainCount")]
+    public async Task<ActionResult<int>> TrainCount()
+    {
+        return await _manager.GetTotalTrainCount();
+    }
+
     [HttpPost("create")]
     public async Task<ActionResult> Create([FromBody, Required] TotalCreationRequest request)
     {

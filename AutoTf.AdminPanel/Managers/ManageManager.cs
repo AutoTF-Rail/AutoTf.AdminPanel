@@ -329,4 +329,17 @@ public class ManageManager
 
         return MathF.Round((float)(final / (1024.0 * 1024.0 * 1024.0)), 2);
     }
+
+    public async Task<ActionResult<int>> GetTotalTrainCount()
+    {
+        List<ManageBody> managedContainers = await All();
+        int final = 0;
+        
+        foreach (ManageBody container in managedContainers)
+        {
+            final += await _docker.GetTrainCount(container.ContainerId!);
+        }
+
+        return final;
+    }
 }

@@ -11,6 +11,10 @@ async function fetchOtherStats() {
     const res = await fetch('/api/manage/size');
     const size = await res.json();
     document.getElementById('totalStorageUsage').innerHTML = `${size} GB`;
+    
+    const trainCountRes = await fetch('/api/manage/trainCount');
+    const trainCount = await trainCountRes.json();
+    document.getElementById('totalTrainsCount').innerHTML = trainCount;
 }
 
 // ---- Managed ----
