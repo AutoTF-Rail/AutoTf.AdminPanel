@@ -64,6 +64,7 @@ public class PleskManager : IHostedService
         if (!certResult.Contains("was successfully removed"))
             return false;
 
+        Task.Run(UpdateCache);
         ReloadNginx();
         return true;
     }

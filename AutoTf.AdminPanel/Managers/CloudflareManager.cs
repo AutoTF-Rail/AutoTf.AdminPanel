@@ -73,8 +73,8 @@ public class CloudflareManager : IHostedService
         {
             if (!await ApiHttpHelper.SendDelete($"https://api.cloudflare.com/client/v4/zones/{_credentials.CloudflareZone}/dns_records/{id}", _credentials.CloudflareKey)) 
                 return false;
-            
-            Records.RemoveAll(x => x.Id == id);
+
+            await UpdateCache();
             
             return true;
         }
