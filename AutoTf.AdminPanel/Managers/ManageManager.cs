@@ -324,7 +324,7 @@ public class ManageManager
         
         foreach (ManageBody container in managedContainers)
         {
-            final += await _docker.GetContainerSize(container.Id);
+            final += await _docker.GetContainerSize(container.ContainerId!);
         }
 
         return MathF.Round((float)(final / (1024.0 * 1024.0 * 1024.0)), 2);
