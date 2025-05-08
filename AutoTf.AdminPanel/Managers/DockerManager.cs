@@ -33,15 +33,15 @@ public class DockerManager
         
         foreach (ContainerListResponse container in containers)
         {
-            final += await GetContainerSize(container);
+            final += GetContainerSize(container);
         }
 
-        return final / (1024.0 * 1024.0 * 1024.0);;
+        return MathF.Round((float)(final / (1024.0 * 1024.0 * 1024.0)), 2);
     }
 
-    public async Task<long> GetContainerSize(ContainerListResponse container)
+    public long GetContainerSize(ContainerListResponse container)
     {
-        return GetDirectorySize($"/etc/AutoTf/CentralServer/{container.Names.First()}");
+        return GetDirectorySize(Path.Combine("/etc/AutoTf/CentralServer/", container.Names.First().TrimStart('/')));
     }
 
     public async Task<long> GetContainerSize(string containerId)
@@ -49,15 +49,16 @@ public class DockerManager
         ContainerListResponse? container = await GetContainerById(containerId);
         
         if (container == null)
-            return 0;
+            return -0;
 
-        return await GetContainerSize(container);
+        return GetContainerSize(container);
     }
     
     private long GetDirectorySize(string path)
     {
+        Console.WriteLine(path);
         if (!Directory.Exists(path))
-            return 0;
+            return -0;
 
         long size = 0;
         foreach (string file in Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories))
