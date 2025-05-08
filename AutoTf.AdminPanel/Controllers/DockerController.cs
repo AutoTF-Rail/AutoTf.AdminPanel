@@ -101,7 +101,7 @@ public class DockerController : ControllerBase
     }
 
     [HttpGet("size")]
-    public async Task<ActionResult<double>> TotalSizeGb()
+    public async Task<ActionResult<float>> TotalSizeGb()
     {
         return await _docker.GetTotalSizeGb();
     }

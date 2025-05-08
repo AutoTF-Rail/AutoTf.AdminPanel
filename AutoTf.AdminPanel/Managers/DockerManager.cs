@@ -26,7 +26,7 @@ public class DockerManager
         return containers.Where(x => x.Labels.ContainsKey("app.id") && x.Labels["app.id"] == "central-server-app").ToList();
     }
 
-    public async Task<double> GetTotalSizeGb()
+    public async Task<float> GetTotalSizeGb()
     {
         List<ContainerListResponse> containers = await GetAll();
         long final = 0;
