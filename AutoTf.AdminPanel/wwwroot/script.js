@@ -8,7 +8,7 @@ function toggleSection(id) {
 }
 
 async function fetchOtherStats() {
-    const res = await fetch('/api/docker/size');
+    const res = await fetch('/api/manage/size');
     const size = await res.json();
     document.getElementById('totalStorageUsage').innerHTML = `${size} GB`;
 }

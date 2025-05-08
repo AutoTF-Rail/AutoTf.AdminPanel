@@ -57,6 +57,12 @@ public class ManageController : ControllerBase
         return Ok(await _manager.RevertChangesById(string.Empty, id));
     }
 
+    [HttpGet("size")]
+    public async Task<ActionResult<float>> TotalSizeGb()
+    {
+        return await _manager.GetTotalSizeGb();
+    }
+
     [HttpPost("create")]
     public async Task<ActionResult> Create([FromBody, Required] TotalCreationRequest request)
     {

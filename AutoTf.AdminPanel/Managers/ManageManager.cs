@@ -5,6 +5,7 @@ using AutoTf.AdminPanel.Models.Requests;
 using AutoTf.AdminPanel.Models.Requests.Authentik;
 using AutoTf.AdminPanel.Statics;
 using Docker.DotNet.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Client;
 
 namespace AutoTf.AdminPanel.Managers;
@@ -314,5 +315,18 @@ public class ManageManager
     private async Task<string> AssembleProblem(string error, string? recordId = null, string? containerId = null, string? externalHost = null)
     {
         return await RevertChanges(error, recordId, containerId, externalHost);
+    }
+
+    public async Task<float> GetTotalSizeGb()
+    {
+        List<ManageBody> managedContainers = await All();
+        long final = 0;
+        
+        foreach (ManageBody container in managedContainers)
+        {
+            final += await _docker.GetContainerSize(container.Id);
+        }
+
+        return MathF.Round((float)(final / (1024.0 * 1024.0 * 1024.0)), 2);
     }
 }

@@ -26,19 +26,6 @@ public class DockerManager
         return containers.Where(x => x.Labels.ContainsKey("app.id") && x.Labels["app.id"] == "central-server-app").ToList();
     }
 
-    public async Task<float> GetTotalSizeGb()
-    {
-        List<ContainerListResponse> containers = await GetAll();
-        long final = 0;
-        
-        foreach (ContainerListResponse container in containers)
-        {
-            final += GetContainerSize(container);
-        }
-
-        return MathF.Round((float)(final / (1024.0 * 1024.0 * 1024.0)), 2);
-    }
-
     public long GetContainerSize(ContainerListResponse container)
     {
         return GetDirectorySize(Path.Combine("/etc/AutoTf/CentralServer/", container.Names.First().TrimStart('/')));
