@@ -100,6 +100,12 @@ public class DockerController : ControllerBase
         return await _docker.GetContainerSize(id);
     }
 
+    [HttpGet("{id}/trainCount")]
+    public async Task<ActionResult<int>> TrainCount(string id)
+    {
+        return await _docker.GetTrainCount(id);
+    }
+
     [HttpGet("networks")]
     public async Task<ActionResult<List<string>>> GetAllNetworks()
     {

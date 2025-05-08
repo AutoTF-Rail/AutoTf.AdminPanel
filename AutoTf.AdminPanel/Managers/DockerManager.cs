@@ -2,6 +2,7 @@ using AutoTf.AdminPanel.Models.Requests;
 using AutoTf.AdminPanel.Statics;
 using Docker.DotNet;
 using Docker.DotNet.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace AutoTf.AdminPanel.Managers;
 
@@ -214,5 +215,20 @@ public class DockerManager
     public async Task<List<string>> GetNetworks()
     {
         return (await Client.Networks.ListNetworksAsync()).Select(x => x.Name).ToList();
+    }
+
+    public async Task<int> GetTrainCount(string id)
+    {
+        ContainerListResponse? container = await GetContainerById(id);
+        
+        if (container == null)
+            return 0;
+
+        KeyValuePair<string, EndpointSettings>? network = container.NetworkSettings.Networks.FirstOrDefault();
+
+        if (network == null)
+            return 0;
+
+        return await HttpHelper.SendGet<int>($"http://{network.Value.Value.IPAddress}:8080/sync/device/trainCount");
     }
 }
