@@ -36,7 +36,7 @@ public class DockerManager
         ContainerListResponse? container = await GetContainerById(containerId);
         
         if (container == null)
-            return -0;
+            return -1000;
 
         return GetContainerSize(container);
     }
@@ -45,7 +45,7 @@ public class DockerManager
     {
         Console.WriteLine(path);
         if (!Directory.Exists(path))
-            return -0;
+            return -2000;
 
         long size = 0;
         foreach (string file in Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories))
@@ -149,7 +149,8 @@ public class DockerManager
             },
             Env = new List<string>()
             {
-                $"evuName={parameters.EvuName}"
+                $"evuName={parameters.EvuName}",
+                $"containerName={parameters.ContainerName}"
             },
         });
     }
