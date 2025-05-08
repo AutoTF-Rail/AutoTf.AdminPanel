@@ -96,10 +96,6 @@
     position: relative;
 }
 
-.quick-stat-box:hover {
-    transform: scale(1.03);
-}
-
 .quick-stat-title {
     font-size: 15px;
     color: #6c757d;

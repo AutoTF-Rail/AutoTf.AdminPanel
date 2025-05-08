@@ -45,7 +45,7 @@ async function fetchManaged() {
         del.textContent = 'Delete';
         del.onclick = async () => {
             invokeLoadingScreen(true);
-            if (confirm(`Are you sure you want to delete "${container.name}"?`)) {
+            if (confirm(`Are you sure you want to delete "${container.externalHost.replace('autotf-', '') || '(no name)'}"?`)) {
                 await fetch(`/api/manage/${container.id}`, { method: 'DELETE' });
                 await fetchManaged();
             }
