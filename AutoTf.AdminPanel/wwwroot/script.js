@@ -72,15 +72,7 @@ async function fetchDocker() {
         hidden.type = 'hidden';
         hidden.value = container.id;
 
-        const del = document.createElement('button');
-        del.className = 'delete-btn';
-        del.textContent = 'Delete';
-        del.onclick = async () => {
-            await fetch(`/api/docker/deleteContainer/${container.id}`, { method: 'DELETE' });
-            fetchDocker();
-        };
-
-        item.append(hidden, info, del);
+        item.append(hidden, info);
         list.appendChild(item);
     });
 }
@@ -101,16 +93,7 @@ async function fetchPlesk() {
         info.className = 'container-info';
         info.innerHTML = `<div class="container-name">${domain}</div>`;
 
-        const del = document.createElement('button');
-        del.className = 'delete-btn';
-        del.textContent = 'Delete';
-        del.onclick = async () => {
-            await fetch(`/api/plesk/delete/${domain}`, { method: 'DELETE' });
-            fetchPlesk();
-        };
-
         item.appendChild(info);
-        item.appendChild(del);
         list.appendChild(item);
     });
 }
@@ -140,15 +123,7 @@ async function fetchAuthentik() {
         hidden.type = 'hidden';
         hidden.value = provider.pk;
 
-        const del = document.createElement('button');
-        del.className = 'delete-btn';
-        del.textContent = 'Delete';
-        del.onclick = async () => {
-            await fetch(`/api/authentik/delete/${provider.pk}`, { method: 'DELETE' });
-            fetchAuthentik();
-        };
-
-        item.append(hidden, info, del);
+        item.append(hidden, info);
         list.appendChild(item);
     });
 }
@@ -174,15 +149,7 @@ async function fetchCloudflare() {
         hidden.type = 'hidden';
         hidden.value = record.id;
 
-        const del = document.createElement('button');
-        del.className = 'delete-btn';
-        del.textContent = 'Delete';
-        del.onclick = async () => {
-            await fetch(`/api/cloudflare/delete/${record.id}`, { method: 'DELETE' });
-            fetchCloudflare();
-        };
-
-        item.append(hidden, info, del);
+        item.append(hidden, info);
         list.appendChild(item);
     });
 }
