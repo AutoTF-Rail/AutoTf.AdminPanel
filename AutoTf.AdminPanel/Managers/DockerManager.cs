@@ -26,6 +26,55 @@ public class DockerManager
         return containers.Where(x => x.Labels.ContainsKey("app.id") && x.Labels["app.id"] == "central-server-app").ToList();
     }
 
+    public async Task<double> GetTotalSizeGb()
+    {
+        List<ContainerListResponse> containers = await GetAll();
+        long final = 0;
+        
+        foreach (ContainerListResponse container in containers)
+        {
+            final += await GetContainerSize(container);
+        }
+
+        return final / (1024.0 * 1024.0 * 1024.0);;
+    }
+
+    public async Task<long> GetContainerSize(ContainerListResponse container)
+    {
+        return GetDirectorySize($"/etc/AutoTf/CentralServer/{container.Names.First()}");
+    }
+
+    public async Task<long> GetContainerSize(string containerId)
+    {
+        ContainerListResponse? container = await GetContainerById(containerId);
+        
+        if (container == null)
+            return 0;
+
+        return await GetContainerSize(container);
+    }
+    
+    private long GetDirectorySize(string path)
+    {
+        if (!Directory.Exists(path))
+            return 0;
+
+        long size = 0;
+        foreach (string file in Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories))
+        {
+            try
+            {
+                size += new FileInfo(file).Length;
+            }
+            catch
+            {
+                // ignored
+            }
+        }
+        
+        return size;
+    }
+
     public async Task<bool> ContainerExists(string id)
     {
         return (await GetAll()).Any(x => x.ID == id);
