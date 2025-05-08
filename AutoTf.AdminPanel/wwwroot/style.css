@@ -148,3 +148,23 @@ button:hover {
     font-size: 13px;
     color: #777;
 }
+
+.header-bar-centered {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.header-bar-centered h1 {
+    margin: 0;
+    display: flex;
+    align-items: center; 
+}
+
+.logo-inline {
+    height: 40px;
+    vertical-align: middle;
+}
