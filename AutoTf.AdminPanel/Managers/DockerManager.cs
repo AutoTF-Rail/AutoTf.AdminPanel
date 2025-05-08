@@ -11,12 +11,17 @@ public class DockerManager
 
     public DockerManager()
     {
+#if RELEASE
         Client = new DockerClientConfiguration(new Uri("unix:///var/run/docker.sock")).CreateClient();
+#endif
     }
 
     // TODO: Cache?
     public async Task<List<ContainerListResponse>> GetAll()
     {
+        #if DEBUG
+        return new List<ContainerListResponse>();
+        #endif
         IList<ContainerListResponse>? containers = await Client.Containers.ListContainersAsync(new ContainersListParameters()
         {
             All = true
@@ -43,7 +48,6 @@ public class DockerManager
     
     private long GetDirectorySize(string path)
     {
-        Console.WriteLine(path);
         if (!Directory.Exists(path))
             return -2000;
 
