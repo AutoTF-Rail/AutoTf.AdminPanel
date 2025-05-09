@@ -2,6 +2,8 @@ let cpuChartInstance = null;
 let memoryChartInstance = null;
 let networkChartInstance = null;
 
+let containers = null;
+
 function toggleSection(id) {
     const content = document.getElementById(id);
     content.style.display = content.style.display === 'block' ? 'none' : 'block';
@@ -23,7 +25,7 @@ async function fetchOtherStats() {
 // ---- Managed ----
 async function fetchManaged() {
     const res = await fetch('/api/manage/all');
-    const containers = await res.json();
+    containers = await res.json();
     const list = document.getElementById('managedContent');
 
     list.innerHTML = '';
