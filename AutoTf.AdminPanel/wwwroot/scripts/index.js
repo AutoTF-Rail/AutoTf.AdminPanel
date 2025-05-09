@@ -37,10 +37,16 @@ async function fetchManaged() {
         const containerInfo = await fetch(`/api/docker/getById/${container.containerId}`);
         const containerBody = await containerInfo.json();
 
+        const trainCountRes = await fetch(`/api/docker/${container.containerId}/trainCount`);
+        const trainCount = await trainCountRes.json();
+
+        const allowedTrainsCountRes = await fetch(`/api/docker/${container.containerId}/allowedTrainsCount`);
+        const allowedTrainsCount = await allowedTrainsCountRes.json();
+
         const name = container.externalHost.replace('autotf-', '') || '(no name)';
         const info = document.createElement('div');
         info.className = 'container-info';
-        info.innerHTML = `<div class="container-name">${name}</div>
+        info.innerHTML = `<div class="container-name">[${trainCount}/${allowedTrainsCount}]${name}</div>
                       <div class="container-state">State: ${containerBody.state}</div>`;
 
         const hidden = document.createElement('input');
