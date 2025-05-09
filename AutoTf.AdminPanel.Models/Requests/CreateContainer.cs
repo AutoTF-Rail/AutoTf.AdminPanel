@@ -28,4 +28,7 @@ public class CreateContainer
 
     [JsonPropertyName("containerName")]
     public string ContainerName { get; set; } = string.Empty;
+
+    [JsonPropertyName("allowedTrainsCount")]
+    public int AllowedTrainsCount { get; set; } = 0;
 }

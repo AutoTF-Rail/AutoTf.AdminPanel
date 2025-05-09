@@ -163,7 +163,8 @@ public class DockerManager
             Env = new List<string>()
             {
                 $"evuName={parameters.EvuName}",
-                $"containerName={parameters.ContainerName}"
+                $"containerName={parameters.ContainerName}",
+                $"allowedTrainsCount={parameters.AllowedTrainsCount}"
             },
         });
     }

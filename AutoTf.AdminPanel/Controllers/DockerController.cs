@@ -1,12 +1,8 @@
-using System.Collections.Concurrent;
 using System.ComponentModel.DataAnnotations;
 using AutoTf.AdminPanel.Managers;
 using AutoTf.AdminPanel.Models.Requests;
-using AutoTf.AdminPanel.Statics;
 using Docker.DotNet.Models;
 using Microsoft.AspNetCore.Mvc;
-using MemoryStats = AutoTf.AdminPanel.Models.Requests.MemoryStats;
-using NetworkStats = AutoTf.AdminPanel.Models.Requests.NetworkStats;
 
 namespace AutoTf.AdminPanel.Controllers;
 

@@ -8,6 +8,7 @@ function openCreateDialog() {
     document.getElementById('evuName').value = '';
     document.getElementById('launchSubdomain').value = '';
     document.getElementById('dnsComment').value = '';
+    document.getElementById('createAllowedTrains').value = '';
 
     fetch('/api/system/config')
         .then(response => response.json())
@@ -15,7 +16,6 @@ function openCreateDialog() {
             systemConfig = config;
             
             document.getElementById('dnsContent').value = config.defaultTarget;
-            document.getElementById('dnsComment').value = '';
 
             document.getElementById('imageField').value = config.defaultImage;
             document.getElementById('pleskEmail').value = config.defaultCertificateEmail;
@@ -100,6 +100,7 @@ function submitContainerCreation() {
     const evuName = document.getElementById('evuName').value;
     const launchSubdomain = document.getElementById('launchSubdomain').value;
     const dnsComment = document.getElementById('dnsComment').value;
+    const allowedTrainsCount = document.getElementById('createAllowedTrains').value;
 
     const defaultNetwork = document.getElementById('defaultNetwork').value;
     const additionalNetwork = document.getElementById('additionalNetwork').value;
@@ -129,7 +130,8 @@ function submitContainerCreation() {
             AdditionalNetwork: additionalNetwork,
             Image: image,
             EvuName: evuName,
-            ContainerName: evuName
+            ContainerName: evuName,
+            AllowedTrainsCount: allowedTrainsCount
         },
         Proxy: {
             Name: evuName,
