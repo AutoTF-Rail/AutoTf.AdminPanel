@@ -1,42 +1,35 @@
-let _containerId = null
+let _container = null
 
 let startButton = null;
 let stopButton = null;
 
-async function openManageDialog(containerId) {
+async function openManageDialog(container) {
     invokeLoadingScreen(true);
     console.log("Opening manage dialog for: ", containerId);
     
-    _containerId = containerId;
-    const container = containers.find(c => c.containerId === containerId);
-    if (!container) {
-        invokeLoadingScreen(false);
-        console.log("Could not find container by the given ID.")
-        return;
-    }
+    _container = container;
 
+    document.getElementById('statEvu').innerHTML = _container.evuName;
+    document.getElementById('statUrl').innerHTML = _container.subDomain;
 
-    document.getElementById('statEvu').innerHTML = container.evuName;
-    document.getElementById('statUrl').innerHTML = container.subDomain;
-
-    const allowedTrainsCountRes = await fetch(`/api/docker/${container.containerId}/allowedTrainsCount`);
+    const allowedTrainsCountRes = await fetch(`/api/docker/${_container.containerId}/allowedTrainsCount`);
     const allowedTrainsCount = await allowedTrainsCountRes.json();
 
     document.getElementById('manageAllowedTrains').value = allowedTrainsCount;
 
-    const trainCountRes = await fetch(`/api/docker/${container.containerId}/trainCount`);
+    const trainCountRes = await fetch(`/api/docker/${_container.containerId}/trainCount`);
     const trainCount = await trainCountRes.json();
 
     document.getElementById('statTrains').innerHTML = trainCount;
 
 
-    const sizeRes = await fetch(`/api/docker/${container.containerId}/size`);
+    const sizeRes = await fetch(`/api/docker/${_container.containerId}/size`);
     const size = await sizeRes.json();
 
     document.getElementById('statStorage').innerHTML = `${size} GB`;
     
 
-    const containerInfo = await fetch(`/api/docker/getById/${container.containerId}`);
+    const containerInfo = await fetch(`/api/docker/getById/${_container.containerId}`);
     const containerBody = await containerInfo.json();
     
     const state = containerBody.state;
@@ -83,7 +76,7 @@ function updateContainer() { alert("Updating..."); }
 async function deleteContainer() {
     invokeLoadingScreen(true);
     if (confirm(`Are you sure you want to delete this container?`)) {
-        await fetch(`/api/manage/${_containerId}`, { method: 'DELETE' });
+        await fetch(`/api/manage/${_container.id}`, { method: 'DELETE' });
         await fetchManaged();
         closeManageDialog();
     }

@@ -59,7 +59,7 @@ async function fetchManaged() {
         hidden.value = container.id;
         
         item.onclick = async () => {
-            await openManageDialog(container.containerId);
+            await openManageDialog(container);
         };
 
         item.append(hidden, info);
