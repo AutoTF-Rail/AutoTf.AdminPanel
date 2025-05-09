@@ -46,7 +46,7 @@ async function fetchManaged() {
         const name = container.externalHost.replace('autotf-', '') || '(no name)';
         const info = document.createElement('div');
         info.className = 'container-info';
-        info.innerHTML = `<div class="container-name">[${trainCount}/${allowedTrainsCount}]${name}</div>
+        info.innerHTML = `<div class="container-name">[${trainCount}/${allowedTrainsCount}] ${name}</div>
                       <div class="container-state">State: ${containerBody.state}</div>`;
 
         const hidden = document.createElement('input');
