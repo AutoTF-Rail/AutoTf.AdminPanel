@@ -21,7 +21,7 @@ function changeTrainLimit(delta) {
     input.value = Math.max(0, parseInt(input.value || '0') + delta);
 }
 
-// Placeholder actions — hook these to your backend/API
+// Placeholder actions 
 function startContainer() { alert("Starting..."); }
 function stopContainer() { alert("Stopping..."); }
 function restartContainer() { alert("Restarting..."); }
