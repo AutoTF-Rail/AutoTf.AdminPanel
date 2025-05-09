@@ -42,12 +42,12 @@ async function openManageDialog(container) {
 
     if (state === "running") {
         stopButton.style.visibility = "visible";
-        startButton.style.visibility = "collapsed";
+        startButton.style.visibility = "collapse";
     }
     else
     {
         stopButton.style.visibility = "hidden";
-        startButton.style.visibility = "collapsed";
+        startButton.style.visibility = "collapse";
     }
         // manageBtn.onclick = async () => {
         //     invokeLoadingScreen(true);
