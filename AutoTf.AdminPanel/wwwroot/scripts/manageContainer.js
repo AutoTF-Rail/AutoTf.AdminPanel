@@ -5,7 +5,7 @@ let stopButton = null;
 
 async function openManageDialog(container) {
     invokeLoadingScreen(true);
-    console.log("Opening manage dialog for: ", containerId);
+    console.log("Opening manage dialog for: ", container.containerId);
     
     _container = container;
 
