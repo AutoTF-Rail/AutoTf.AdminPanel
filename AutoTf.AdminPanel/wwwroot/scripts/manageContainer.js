@@ -16,8 +16,8 @@ async function openManageDialog(containerId) {
     }
 
 
-    document.getElementById('statEvu').innerHTML = container.evuName;
-    document.getElementById('statUrl').innerHTML = container.subDomain;
+    document.getElementById('statEvu').innerHTML = container.EvuName;
+    document.getElementById('statUrl').innerHTML = container.SubDomain;
 
     const allowedTrainsCountRes = await fetch(`/api/docker/${container.containerId}/allowedTrainsCount`);
     const allowedTrainsCount = await allowedTrainsCountRes.json();
@@ -33,16 +33,21 @@ async function openManageDialog(containerId) {
     const sizeRes = await fetch(`/api/docker/${container.containerId}/size`);
     const size = await sizeRes.json();
 
-    document.getElementById('statStorage').innerHTML = size;
-
+    document.getElementById('statStorage').innerHTML = `${size} GB`;
     
-    document.getElementById('statStatus').innerHTML = container.state;
+
+    const containerInfo = await fetch(`/api/docker/getById/${container.containerId}`);
+    const containerBody = await containerInfo.json();
+    
+    const state = containerBody.state;
+    
+    document.getElementById('statStatus').innerHTML = state;
 
 
     startButton = document.getElementById('startContainerButton');
     stopButton = document.getElementById('stopContainerButton');
 
-    if (container.state === "running") {
+    if (state === "running") {
         stopButton.style.visibility = "visible";
         startButton.style.visibility = "hidden";
     }
