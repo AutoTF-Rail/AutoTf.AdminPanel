@@ -342,4 +342,17 @@ public class ManageManager
 
         return final;
     }
+
+    public async Task<ActionResult<int>> GetAllowedTrainsCount()
+    {
+        List<ManageBody> managedContainers = await All();
+        int final = 0;
+        
+        foreach (ManageBody container in managedContainers)
+        {
+            final += await _docker.GetAllowedTrainsCount(container.ContainerId!);
+        }
+
+        return final;
+    }
 }

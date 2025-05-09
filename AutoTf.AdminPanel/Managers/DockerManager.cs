@@ -231,4 +231,19 @@ public class DockerManager
 
         return await HttpHelper.SendGet<int>($"http://{network.Value.Value.IPAddress}:8080/sync/device/trainCount");
     }
+
+    public async Task<int> GetAllowedTrainsCount(string id)
+    {
+        ContainerListResponse? container = await GetContainerById(id);
+        
+        if (container == null)
+            return 0;
+
+        KeyValuePair<string, EndpointSettings>? network = container.NetworkSettings.Networks.FirstOrDefault();
+
+        if (network == null)
+            return 0;
+
+        return await HttpHelper.SendGet<int>($"http://{network.Value.Value.IPAddress}:8080/sync/device/allowedTrainsCount");
+    }
 }
