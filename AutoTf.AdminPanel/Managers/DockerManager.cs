@@ -37,7 +37,7 @@ public class DockerManager
         return GetDirectorySize(Path.Combine("/etc/AutoTf/CentralServer/", container.Names.First().TrimStart('/')));
     }
 
-    public async Task<long> GetContainerSize(string containerId)
+    public async Task<float> GetContainerSize(string containerId)
     {
         ContainerListResponse? container = await GetContainerById(containerId);
         

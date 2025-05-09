@@ -95,9 +95,9 @@ public class DockerController : ControllerBase
     }
 
     [HttpGet("{id}/size")]
-    public async Task<ActionResult<long>> GetSize(string id)
+    public async Task<ActionResult<float>> GetSize(string id)
     {
-        return await _docker.GetContainerSize(id);
+        return MathF.Round((float)(await _docker.GetContainerSize(id) / (1024.0 * 1024.0 * 1024.0)), 2);
     }
 
     [HttpGet("{id}/trainCount")]

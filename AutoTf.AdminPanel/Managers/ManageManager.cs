@@ -320,7 +320,7 @@ public class ManageManager
     public async Task<float> GetTotalSizeGb()
     {
         List<ManageBody> managedContainers = await All();
-        long final = 0;
+        float final = 0;
         
         foreach (ManageBody container in managedContainers)
         {
