@@ -196,38 +196,39 @@
         </div>
 
         <div id="manageDialog" class="dialog-overlay">
-            <div class="dialog large-dialog">
+            <div class="dialog">
                 <div class="dialog-scroll">
-                    <h2>Manage Container: <span id="manageContainerName">ContainerName</span></h2>
+                    <h2>Manage Container</h2>
 
                     <div class="form-section">
-                        <label for="manageId">ID</label>
-                        <input id="manageId" class="input" type="text" readonly />
+                        <label>EVU Name</label>
+                        <div class="readonly-field" id="statEvu">Loading...</div>
 
-                        <label for="manageStatus">Status</label>
-                        <input id="manageStatus" class="input" type="text" readonly />
+                        <label>Subdomain</label>
+                        <div class="readonly-field" id="statUrl">Loading...</div>
+                        
+                        <label>Status</label>
+                        <div class="readonly-field" id="statStatus">Loading...</div>
 
-                        <label for="manageNetwork">Network</label>
-                        <input id="manageNetwork" class="input" type="text" />
+                        <label>Total Trains</label>
+                        <div class="readonly-field" id="statTrains">Loading...</div>
 
-                        <label for="manageImage">Image</label>
-                        <input id="manageImage" class="input" type="text" />
-
-                        <label for="manageTrains">Trains Allowed</label>
+                        <label for="manageAllowedTrains">Allowed Trains</label>
                         <div class="row">
-                            <input id="manageTrains" class="input" type="number" />
-                            <button onclick="changeTrainLimit(-1)">-</button>
-                            <button onclick="changeTrainLimit(1)">+</button>
+                            <input class="input" id="manageAllowedTrains" type="number" min="0" />
+                            <button onclick="">Save</button>
                         </div>
 
+                        <label>Storage Used</label>
+                        <div class="readonly-field" id="statStorage">Loading...</div>
                     </div>
 
                     <div class="actions">
-                        <button onclick="startContainer()">Start</button>
-                        <button onclick="stopContainer()">Stop</button>
+                        <button id="startContainerButton" onclick="startContainer()">Start</button>
+                        <button id="stopContainerButton" onclick="stopContainer()">Stop</button>
                         <button onclick="restartContainer()">Restart</button>
                         <button onclick="updateContainer()">Update</button>
-                        <button onclick="confirmDeleteContainer()">Delete</button>
+                        <button onclick="deleteContainer()">Delete</button>
                         <button onclick="closeManageDialog()">Close</button>
                     </div>
                 </div>

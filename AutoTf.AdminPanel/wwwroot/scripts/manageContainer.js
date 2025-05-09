@@ -1,14 +1,59 @@
-function openManageDialog(containerId) {
+let _containerId = null
+
+let startButton = null;
+let stopButton = null;
+
+async function openManageDialog(containerId) {
+    _containerId = containerId;
     const container = containers.find(c => c.id === containerId);
     if (!container) return;
 
-    document.getElementById('manageContainerName').textContent = container.name || containerId;
-    document.getElementById('manageId').value = container.id;
-    document.getElementById('manageStatus').value = container.status;
-    document.getElementById('manageNetwork').value = container.network;
-    document.getElementById('manageImage').value = container.image;
-    document.getElementById('manageTrains').value = container.allowedTrains;
 
+    document.getElementById('statEvu').value = container.evuName;
+    document.getElementById('statUrl').value = container.subDomain;
+
+    const allowedTrainsCountRes = await fetch(`/api/docker/${container.containerId}/allowedTrainsCount`);
+    const allowedTrainsCount = await allowedTrainsCountRes.json();
+
+    document.getElementById('manageAllowedTrains').value = allowedTrainsCount;
+
+    const trainCountRes = await fetch(`/api/docker/${container.containerId}/trainCount`);
+    const trainCount = await trainCountRes.json();
+
+    document.getElementById('statTrains').value = trainCount
+
+
+    const sizeRes = await fetch(`/api/docker/${container.containerId}/size`);
+    const size = await sizeRes.json();
+
+    document.getElementById('statStorage').value = size
+
+    
+    document.getElementById('statStatus').value = container.state
+
+
+    startButton = document.getElementById('startContainerButton');
+    stopButton = document.getElementById('stopContainerButton');
+
+    if (container.state === "running") {
+        stopButton.style.visibility = "visible";
+        startButton.style.visibility = "hidden";
+    }
+    else
+    {
+        stopButton.style.visibility = "hidden";
+        startButton.style.visibility = "visible";
+    }
+        // manageBtn.onclick = async () => {
+        //     invokeLoadingScreen(true);
+        //     // if (confirm(`Are you sure you want to delete "${container.externalHost.replace('autotf-', '') || '(no name)'}"?`)) {
+        //     //     await fetch(`/api/manage/${container.id}`, { method: 'DELETE' });
+        //     //     await fetchManaged();
+        //     // }
+        //     openManageDialog();
+        //     invokeLoadingScreen(false);
+        // };
+    
     document.getElementById('manageDialog').classList.add('open');
 }
 

@@ -1,4 +1,31 @@
-.large-dialog {
-    width: 600px;
-    max-height: 90vh;
+.manage-dialog {
+    width: 700px;
+    max-height: 95vh;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 20px;
+    margin-bottom: 20px;
+}
+
+.readonly-field {
+    background-color: #f5f5f5;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+#manageDialog .dialog {
+    width: 650px;
+    max-height: 95vh;
+}
+
+#manageDialog .form-section label {
+    margin-top: 10px;
+    display: block;
+    font-weight: 500;
 }

@@ -131,6 +131,7 @@ button {
     background-color: #007bff;
     color: white;
     transition: background 0.3s;
+    height: 40px;
 }
 
 button:hover {

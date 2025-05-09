@@ -46,7 +46,7 @@ public class ManageController : ControllerBase
     }
 
     [HttpGet("all")]
-    public async Task<ActionResult<object>> All()
+    public async Task<ActionResult<List<ManageBody>>> All()
     {
         return await _manager.All();
     }
