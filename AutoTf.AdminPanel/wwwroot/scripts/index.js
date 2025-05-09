@@ -50,25 +50,26 @@ async function fetchManaged() {
         const info = document.createElement('div');
         info.className = 'container-info';
         info.innerHTML = `<div class="container-name">[${trainCount}/${allowedTrainsCount}] ${name}</div>
-                      <div class="container-state">State: ${containerBody.state} Size: ${size} GB</div>`;
+                      <div class="container-state">State: ${containerBody.state} -  Size: ${size} GB</div>`;
 
         const hidden = document.createElement('input');
         hidden.type = 'hidden';
         hidden.value = container.id;
 
-        const del = document.createElement('button');
-        del.className = 'delete-btn';
-        del.textContent = 'Delete';
-        del.onclick = async () => {
+        const manageBtn = document.createElement('button');
+        manageBtn.className = 'manage-btn';
+        manageBtn.textContent = 'Manage';
+        manageBtn.onclick = async () => {
             invokeLoadingScreen(true);
-            if (confirm(`Are you sure you want to delete "${container.externalHost.replace('autotf-', '') || '(no name)'}"?`)) {
-                await fetch(`/api/manage/${container.id}`, { method: 'DELETE' });
-                await fetchManaged();
-            }
+            // if (confirm(`Are you sure you want to delete "${container.externalHost.replace('autotf-', '') || '(no name)'}"?`)) {
+            //     await fetch(`/api/manage/${container.id}`, { method: 'DELETE' });
+            //     await fetchManaged();
+            // }
+            openManageDialog();
             invokeLoadingScreen(false);
         };
 
-        item.append(hidden, info, del);
+        item.append(hidden, info, manageBtn);
         list.appendChild(item);
     }
 }
