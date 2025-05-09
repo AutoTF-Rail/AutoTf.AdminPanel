@@ -49,12 +49,12 @@ async function openManageDialog(containerId) {
 
     if (state === "running") {
         stopButton.style.visibility = "visible";
-        startButton.style.visibility = "hidden";
+        startButton.style.visibility = "collapsed";
     }
     else
     {
         stopButton.style.visibility = "hidden";
-        startButton.style.visibility = "visible";
+        startButton.style.visibility = "collapsed";
     }
         // manageBtn.onclick = async () => {
         //     invokeLoadingScreen(true);
@@ -79,8 +79,13 @@ function startContainer() { alert("Starting..."); }
 function stopContainer() { alert("Stopping..."); }
 function restartContainer() { alert("Restarting..."); }
 function updateContainer() { alert("Updating..."); }
-function confirmDeleteContainer() {
-    if (confirm("Are you sure you want to delete this container?")) {
-        alert("Deleted.");
+
+async function deleteContainer() {
+    invokeLoadingScreen(true);
+    if (confirm(`Are you sure you want to delete "${container.externalHost.replace('autotf-', '') || '(no name)'}"?`)) {
+        await fetch(`/api/manage/${container.id}`, { method: 'DELETE' });
+        await fetchManaged();
+        closeManageDialog();
     }
+    invokeLoadingScreen(false);
 }
