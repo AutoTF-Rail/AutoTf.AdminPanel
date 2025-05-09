@@ -82,8 +82,8 @@ function updateContainer() { alert("Updating..."); }
 
 async function deleteContainer() {
     invokeLoadingScreen(true);
-    if (confirm(`Are you sure you want to delete "${container.externalHost.replace('autotf-', '') || '(no name)'}"?`)) {
-        await fetch(`/api/manage/${container.id}`, { method: 'DELETE' });
+    if (confirm(`Are you sure you want to delete this container?`)) {
+        await fetch(`/api/manage/${_containerId}`, { method: 'DELETE' });
         await fetchManaged();
         closeManageDialog();
     }
