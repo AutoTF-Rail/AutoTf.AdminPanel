@@ -67,7 +67,7 @@ async function fetchManaged() {
             //     await fetch(`/api/manage/${container.id}`, { method: 'DELETE' });
             //     await fetchManaged();
             // }
-            openManageDialog();
+            await openManageDialog(container.containerId);
             invokeLoadingScreen(false);
         };
 
