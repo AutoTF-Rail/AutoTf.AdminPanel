@@ -8,8 +8,12 @@ async function openManageDialog(containerId) {
     console.log("Opening manage dialog for: ", containerId);
     
     _containerId = containerId;
-    const container = containers.find(c => c.id === containerId);
-    if (!container) return;
+    const container = containers.find(c => c.containerId === containerId);
+    if (!container) {
+        invokeLoadingScreen(false);
+        console.log("Could not find container by the given ID.")
+        return;
+    }
 
 
     document.getElementById('statEvu').value = container.evuName;
