@@ -57,19 +57,12 @@ async function fetchManaged() {
         const hidden = document.createElement('input');
         hidden.type = 'hidden';
         hidden.value = container.id;
-
-        const manageBtn = document.createElement('button');
-        manageBtn.className = 'manage-btn';
-        manageBtn.textContent = 'Manage';
-        manageBtn.onclick = async () => {
-            // if (confirm(`Are you sure you want to delete "${container.externalHost.replace('autotf-', '') || '(no name)'}"?`)) {
-            //     await fetch(`/api/manage/${container.id}`, { method: 'DELETE' });
-            //     await fetchManaged();
-            // }
+        
+        item.onclick = async () => {
             await openManageDialog(container.containerId);
         };
 
-        item.append(hidden, info, manageBtn);
+        item.append(hidden, info);
         list.appendChild(item);
     }
 }
