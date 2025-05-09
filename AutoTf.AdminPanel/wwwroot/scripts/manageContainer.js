@@ -16,27 +16,27 @@ async function openManageDialog(containerId) {
     }
 
 
-    document.getElementById('statEvu').value = container.evuName;
-    document.getElementById('statUrl').value = container.subDomain;
+    document.getElementById('statEvu').innerHTML = container.evuName;
+    document.getElementById('statUrl').innerHTML = container.subDomain;
 
     const allowedTrainsCountRes = await fetch(`/api/docker/${container.containerId}/allowedTrainsCount`);
     const allowedTrainsCount = await allowedTrainsCountRes.json();
 
-    document.getElementById('manageAllowedTrains').value = allowedTrainsCount;
+    document.getElementById('manageAllowedTrains').innerHTML = allowedTrainsCount;
 
     const trainCountRes = await fetch(`/api/docker/${container.containerId}/trainCount`);
     const trainCount = await trainCountRes.json();
 
-    document.getElementById('statTrains').value = trainCount
+    document.getElementById('statTrains').innerHTML = trainCount;
 
 
     const sizeRes = await fetch(`/api/docker/${container.containerId}/size`);
     const size = await sizeRes.json();
 
-    document.getElementById('statStorage').value = size
+    document.getElementById('statStorage').innerHTML = size;
 
     
-    document.getElementById('statStatus').value = container.state
+    document.getElementById('statStatus').innerHTML = container.state;
 
 
     startButton = document.getElementById('startContainerButton');
@@ -67,11 +67,6 @@ async function openManageDialog(containerId) {
 
 function closeManageDialog() {
     document.getElementById('manageDialog').classList.remove('open');
-}
-
-function changeTrainLimit(delta) {
-    const input = document.getElementById('manageTrains');
-    input.value = Math.max(0, parseInt(input.value || '0') + delta);
 }
 
 // Placeholder actions 
