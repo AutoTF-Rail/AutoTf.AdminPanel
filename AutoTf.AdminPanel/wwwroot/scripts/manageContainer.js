@@ -4,6 +4,9 @@ let startButton = null;
 let stopButton = null;
 
 async function openManageDialog(containerId) {
+    invokeLoadingScreen(true);
+    console.log("Opening manage dialog for: ", containerId);
+    
     _containerId = containerId;
     const container = containers.find(c => c.id === containerId);
     if (!container) return;
@@ -55,6 +58,7 @@ async function openManageDialog(containerId) {
         // };
     
     document.getElementById('manageDialog').classList.add('open');
+    invokeLoadingScreen(false);
 }
 
 function closeManageDialog() {

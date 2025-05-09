@@ -62,13 +62,11 @@ async function fetchManaged() {
         manageBtn.className = 'manage-btn';
         manageBtn.textContent = 'Manage';
         manageBtn.onclick = async () => {
-            invokeLoadingScreen(true);
             // if (confirm(`Are you sure you want to delete "${container.externalHost.replace('autotf-', '') || '(no name)'}"?`)) {
             //     await fetch(`/api/manage/${container.id}`, { method: 'DELETE' });
             //     await fetchManaged();
             // }
             await openManageDialog(container.containerId);
-            invokeLoadingScreen(false);
         };
 
         item.append(hidden, info, manageBtn);
