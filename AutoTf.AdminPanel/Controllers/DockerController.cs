@@ -94,6 +94,17 @@ public class DockerController : ControllerBase
         return containerListResponse;
     }
 
+    [HttpGet("{id}/inspect")]
+    public async Task<ActionResult<ContainerInspectResponse>> Inspect(string id)
+    {
+        ContainerInspectResponse? response = await _docker.InspectContainerById(id);
+        
+        if (response == null)
+            return Problem("Could not find container.");
+        
+        return response;
+    }
+
     [HttpGet("{id}/size")]
     public async Task<ActionResult<float>> GetSize(string id)
     {

@@ -61,6 +61,18 @@ public class ManageManager
         foreach (ContainerListResponse container in containers)
         {
             string name = container.Names.First().Replace("/autotf-", "");
+            
+            ContainerInspectResponse? inspectedContainer = await _docker.InspectContainerById(container.ID);
+            if (inspectedContainer == null)
+                continue;
+
+            string? evuName = inspectedContainer.Config.Env.FirstOrDefault(x => x.StartsWith("evuName="));
+            
+            if (evuName == null)
+                continue;
+
+            evuName = evuName.Replace("evuName=", "");
+            
             string? pleskDomain = pleskDomains.FirstOrDefault(x => x.StartsWith(name));
             
             if (pleskDomain == null)
@@ -85,6 +97,7 @@ public class ManageManager
                 ExternalHost = authProvider.ExternalHost,
                 RootDomain = domains!.Value.Value,
                 SubDomain = domains.Value.Key,
+                EvuName = evuName
             };
             body.Id = EncodeManagedDomain(body);
             managedContainers.Add(body);

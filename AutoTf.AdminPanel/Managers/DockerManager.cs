@@ -97,6 +97,14 @@ public class DockerManager
         return containerListResponse;
     }
 
+    public async Task<ContainerInspectResponse?> InspectContainerById(string id)
+    {
+        if (!await ContainerExists(id))
+            return null;
+
+        return await Client.Containers.InspectContainerAsync(id);
+    }
+
     public async Task<bool> ContainerRunning(string id)
     {
         ContainerInspectResponse container = await Client.Containers.InspectContainerAsync(id);
