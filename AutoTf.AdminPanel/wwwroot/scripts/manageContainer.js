@@ -16,13 +16,13 @@ async function openManageDialog(containerId) {
     }
 
 
-    document.getElementById('statEvu').innerHTML = container.EvuName;
-    document.getElementById('statUrl').innerHTML = container.SubDomain;
+    document.getElementById('statEvu').innerHTML = container.evuName;
+    document.getElementById('statUrl').innerHTML = container.subDomain;
 
     const allowedTrainsCountRes = await fetch(`/api/docker/${container.containerId}/allowedTrainsCount`);
     const allowedTrainsCount = await allowedTrainsCountRes.json();
 
-    document.getElementById('manageAllowedTrains').innerHTML = allowedTrainsCount;
+    document.getElementById('manageAllowedTrains').value = allowedTrainsCount;
 
     const trainCountRes = await fetch(`/api/docker/${container.containerId}/trainCount`);
     const trainCount = await trainCountRes.json();

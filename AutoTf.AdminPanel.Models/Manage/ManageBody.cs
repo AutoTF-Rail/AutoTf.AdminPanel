@@ -16,10 +16,10 @@ public class ManageBody
     [JsonPropertyName("subDomain")]
     public string? SubDomain { get; set; } = null;
     
-    [JsonPropertyName("RootDomain")]
+    [JsonPropertyName("rootDomain")]
     public string? RootDomain { get; set; } = null;
     
-    [JsonPropertyName("EvuName")]
+    [JsonPropertyName("evuName")]
     public string? EvuName { get; set; } = null;
 
     [JsonPropertyName("id")] 
