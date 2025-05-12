@@ -3,6 +3,35 @@ let _container = null
 let startButton = null;
 let stopButton = null;
 
+
+async function saveAllowedTrains() {
+    const newLimit = parseInt(document.getElementById("allowedTrainsInput").value, 10);
+    
+    if (isNaN(newLimit)) {
+        alert("Please enter a valid number.");
+        return;
+    }
+
+    try {
+        const response = await fetch(`https://admin.autotf.de/api/docker/${_container.containerId}/updateAllowedTrains`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "text/plain"
+            },
+            body: newLimit.toString()
+        });
+
+        if (!response.ok) {
+            throw new Error("Failed to update allowed trains");
+        }
+        
+        console.log("Successfully updated the train count.")
+    } catch (error) {
+        console.error(error);
+        alert("An error occurred while updating allowed trains.");
+    }
+}
+
 async function openManageDialog(container) {
     invokeLoadingScreen(true);
     console.log("Opening manage dialog for: ", container.containerId);
