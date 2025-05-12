@@ -26,9 +26,11 @@ async function saveAllowedTrains() {
         }
         
         console.log("Successfully updated the train count.")
+        document.getElementById("manageInfoField").innerHTML = 'Successfully updated the train count.';
     } catch (error) {
         console.error(error);
         alert("An error occurred while updating allowed trains.");
+        document.getElementById("manageInfoField").innerHTML = 'Failed to update the train count.';
     }
 }
 
@@ -38,6 +40,9 @@ async function openManageDialog(container) {
     
     _container = container;
 
+    document.getElementById("manageInfoField").innerHTML = '';
+    
+    
     document.getElementById('statEvu').innerHTML = _container.evuName;
     document.getElementById('statUrl').innerHTML = _container.subDomain;
 
