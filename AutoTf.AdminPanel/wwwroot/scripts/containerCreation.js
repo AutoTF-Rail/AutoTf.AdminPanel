@@ -8,7 +8,7 @@ function openCreateDialog() {
     document.getElementById('evuName').value = '';
     document.getElementById('launchSubdomain').value = '';
     document.getElementById('dnsComment').value = '';
-    document.getElementById('createAllowedTrains').value = '';
+    document.getElementById('createAllowedTrains').value = '0';
 
     fetch('/api/system/config')
         .then(response => response.json())
