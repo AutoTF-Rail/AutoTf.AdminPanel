@@ -29,7 +29,6 @@ async function saveAllowedTrains() {
         document.getElementById("manageInfoField").innerHTML = 'Successfully updated the train count.';
     } catch (error) {
         console.error(error);
-        alert("An error occurred while updating allowed trains.");
         document.getElementById("manageInfoField").innerHTML = 'Failed to update the train count.';
     }
 }
@@ -83,15 +82,6 @@ async function openManageDialog(container) {
         stopButton.style.visibility = "hidden";
         startButton.style.visibility = "collapse";
     }
-        // manageBtn.onclick = async () => {
-        //     invokeLoadingScreen(true);
-        //     // if (confirm(`Are you sure you want to delete "${container.externalHost.replace('autotf-', '') || '(no name)'}"?`)) {
-        //     //     await fetch(`/api/manage/${container.id}`, { method: 'DELETE' });
-        //     //     await fetchManaged();
-        //     // }
-        //     openManageDialog();
-        //     invokeLoadingScreen(false);
-        // };
     
     document.getElementById('manageDialog').classList.add('open');
     invokeLoadingScreen(false);
@@ -115,7 +105,7 @@ async function deleteContainer() {
     if (confirm(`Are you sure you want to delete this container?`)) {
         await fetch(`/api/manage/${_container.id}`, { method: 'DELETE' });
         await fetchManaged();
-        closeManageDialog();
+        await closeManageDialog();
     }
     invokeLoadingScreen(false);
 }

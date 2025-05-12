@@ -85,6 +85,7 @@ function openCreateDialog() {
         .then(x => invokeLoadingScreen(false))
         .catch(error => {
             console.error('Failed to load default config:', error);
+            document.getElementById('createDialog').classList.remove('open')
         });
     
 }
