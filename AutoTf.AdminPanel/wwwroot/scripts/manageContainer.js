@@ -5,7 +5,7 @@ let stopButton = null;
 
 
 async function saveAllowedTrains() {
-    const newLimit = parseInt(document.getElementById("allowedTrainsInput").value, 10);
+    const newLimit = parseInt(document.getElementById("manageAllowedTrains").value, 10);
     
     if (isNaN(newLimit)) {
         alert("Please enter a valid number.");
