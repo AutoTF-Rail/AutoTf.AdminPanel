@@ -256,4 +256,19 @@ public class DockerManager
 
         return await HttpHelper.SendGet<int>($"http://{network.Value.Value.IPAddress}:8080/sync/device/allowedTrainsCount");
     }
+
+    public async Task<ActionResult> UpdateAllowedTrains(string id, int allowedTrains)
+    {
+        if (!await ContainerExists(id))
+            return new NotFoundResult();
+        
+        ContainerListResponse container = (await GetContainerById(id))!;
+        
+        string dir = $"/etc/AutoTf/CentralServer/{container.Names.First()}";
+
+        Directory.CreateDirectory(dir);
+        await File.WriteAllTextAsync(Path.Combine(dir, "allowedTrainsCount"), allowedTrains.ToString());
+
+        return new OkResult();
+    }
 }
