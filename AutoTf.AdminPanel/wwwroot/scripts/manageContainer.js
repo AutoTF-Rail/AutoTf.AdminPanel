@@ -97,8 +97,11 @@ async function openManageDialog(container) {
     invokeLoadingScreen(false);
 }
 
-function closeManageDialog() {
+async function closeManageDialog() {
     document.getElementById('manageDialog').classList.remove('open');
+    await fetchManaged();
+    await fetchOtherStats();
+    
 }
 
 // Placeholder actions 
