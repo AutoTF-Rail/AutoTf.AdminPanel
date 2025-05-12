@@ -16,9 +16,9 @@ async function saveAllowedTrains() {
         const response = await fetch(`https://admin.autotf.de/api/docker/${_container.containerId}/updateAllowedTrains`, {
             method: "POST",
             headers: {
-                "Content-Type": "text/plain"
+                "Content-Type": "application/json"
             },
-            body: newLimit.toString()
+            body: JSON.stringify(newLimit)
         });
 
         if (!response.ok) {
