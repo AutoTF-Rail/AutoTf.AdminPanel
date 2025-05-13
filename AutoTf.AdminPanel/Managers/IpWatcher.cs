@@ -9,6 +9,8 @@ public class IpWatcher : IHostedService
     private readonly DockerManager _docker;
     private readonly PleskManager _plesk;
     private readonly Credentials _credentials;
+
+    private string _latestAuthIp = string.Empty; 
     
     private Timer? _currentTimer;
 
@@ -43,6 +45,9 @@ public class IpWatcher : IHostedService
             Console.WriteLine("Could not retreive authentik IP.");
             return;
         }
+
+        if (_latestAuthIp == containerIp)
+            return;
         
         Console.WriteLine($"Found new authentik IP {containerIp}.");
 
@@ -53,7 +58,8 @@ public class IpWatcher : IHostedService
         Parallel.ForEach(pleskRecords, domain =>
         {
             string? currentHost = _plesk.GetAuthHost(domain); // http://xx.xx.xx.xx:9000
-            if (currentHost == null || !currentHost.Contains(containerIp))
+            
+            if (currentHost == null || currentHost.Contains(containerIp))
                 return;
 
             matched++;
