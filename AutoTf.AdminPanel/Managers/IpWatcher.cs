@@ -22,11 +22,15 @@ public class IpWatcher : IHostedService
         _credentials = credentials.Value;
     }
 
-
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         await CheckForNewIp();
         StartTimer();
+    }
+    
+    public string GetAuthIp()
+    {
+        return _latestAuthIp;
     }
 
     private void StartTimer()
