@@ -48,8 +48,10 @@ public class IpWatcher : IHostedService
 
         if (_latestAuthIp == containerIp)
             return;
+
+        _latestAuthIp = containerIp;
         
-        Console.WriteLine($"Found new authentik IP {containerIp}.");
+        Console.WriteLine($"Found new authentik IP {_latestAuthIp}.");
 
         List<string> pleskRecords = _plesk.Records;
 
@@ -59,11 +61,11 @@ public class IpWatcher : IHostedService
         {
             string? currentHost = _plesk.GetAuthHost(domain); // http://xx.xx.xx.xx:9000
             
-            if (currentHost == null || currentHost.Contains(containerIp))
+            if (currentHost == null || currentHost.Contains(_latestAuthIp))
                 return;
 
             matched++;
-            _plesk.UpdateAuthHost(domain, $"http://{containerIp}:9000");
+            _plesk.UpdateAuthHost(domain, $"http://{_latestAuthIp}:9000");
         });
         
         _plesk.ReloadNginx();
