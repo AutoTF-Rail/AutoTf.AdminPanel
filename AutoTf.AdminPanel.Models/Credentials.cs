@@ -10,4 +10,7 @@ public class Credentials
     public string CloudflareKey { get; set; }
     
     public ServerConfig DefaultConfig { get; set; }
+    
+    public string AuthServerContainerId { get; set; }
+    public string AuthDefaultNetworkId { get; set; }
 }

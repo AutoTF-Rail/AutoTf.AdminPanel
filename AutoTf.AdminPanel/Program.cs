@@ -23,6 +23,7 @@ public class Program
         builder.Services.AddHostedSingleton<CloudflareManager>();
         builder.Services.AddHostedSingleton<AuthManager>();
         builder.Services.AddHostedSingleton<PleskManager>();
+        builder.Services.AddHostedSingleton<IpWatcher>();
         
         // stored in appsettings.Development.json or set manually in .env
         builder.Services.Configure<Credentials>(options =>
@@ -54,6 +55,9 @@ public class Program
 
                 DefaultAuthentikHost = builder.Configuration["DefaultAuthentikHost"] ?? "key",
             };
+            
+            options.AuthServerContainerId = builder.Configuration["AuthServerContainerId"] ?? "key";
+            options.AuthDefaultNetworkId = builder.Configuration["AuthDefaultNetworkId"] ?? "key";
         });
 
         WebApplication app = builder.Build();

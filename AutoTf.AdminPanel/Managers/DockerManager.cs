@@ -227,6 +227,13 @@ public class DockerManager
         return (await Client.Networks.ListNetworksAsync()).Select(x => x.Name).ToList();
     }
 
+    public async Task<string?> GetContainerNetworkIp(string containerId, string networkId)
+    {
+        EndpointSettings? network = (await Client.Containers.InspectContainerAsync(containerId)).NetworkSettings.Networks.Values.FirstOrDefault(x => x.NetworkID == networkId);
+        
+        return network?.IPAddress;
+    }
+
     public async Task<int> GetTrainCount(string id)
     {
         ContainerListResponse? container = await GetContainerById(id);
