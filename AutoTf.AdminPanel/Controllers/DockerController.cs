@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using AutoTf.AdminPanel.Managers;
 using AutoTf.AdminPanel.Models;
+using AutoTf.AdminPanel.Models.Interfaces;
 using AutoTf.AdminPanel.Models.Requests;
 using AutoTf.AdminPanel.Models.Requests.Authentik;
 using Docker.DotNet.Models;
@@ -12,9 +13,9 @@ namespace AutoTf.AdminPanel.Controllers;
 [Route("/api/docker")]
 public class DockerController : ControllerBase
 {
-    private readonly DockerManager _docker;
+    private readonly IDockerManager _docker;
 
-    public DockerController(DockerManager docker)
+    public DockerController(IDockerManager docker)
     {
         _docker = docker;
     }

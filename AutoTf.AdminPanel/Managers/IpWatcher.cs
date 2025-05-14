@@ -7,7 +7,7 @@ namespace AutoTf.AdminPanel.Managers;
 
 public class IpWatcher : IIpWatcher
 {
-    private readonly DockerManager _docker;
+    private readonly IDockerManager _docker;
     private readonly PleskManager _plesk;
     private readonly Credentials _credentials;
 
@@ -15,7 +15,7 @@ public class IpWatcher : IIpWatcher
     
     private Timer? _currentTimer;
 
-    public IpWatcher(DockerManager docker, PleskManager plesk, IOptions<Credentials> credentials)
+    public IpWatcher(IDockerManager docker, PleskManager plesk, IOptions<Credentials> credentials)
     {
         _docker = docker;
         _plesk = plesk;

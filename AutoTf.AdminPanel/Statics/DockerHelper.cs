@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Sockets;
 using AutoTf.AdminPanel.Managers;
+using AutoTf.AdminPanel.Models.Interfaces;
 using AutoTf.AdminPanel.Models.Requests;
 using Docker.DotNet.Models;
 
@@ -8,7 +9,7 @@ namespace AutoTf.AdminPanel.Statics;
 
 public static class DockerHelper
 {
-    public static async Task<Dictionary<string, EndpointSettings>> ConfigureNetwork(CreateContainer parameters, DockerManager dockerManager)
+    public static async Task<Dictionary<string, EndpointSettings>> ConfigureNetwork(CreateContainer parameters, IDockerManager dockerManager)
     {
         Dictionary<string, EndpointSettings> dict = new Dictionary<string, EndpointSettings>();
         NetworkResponse? defaultNetwork = await dockerManager.GetNetwork(parameters.DefaultNetwork);

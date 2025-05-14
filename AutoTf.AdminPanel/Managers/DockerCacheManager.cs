@@ -1,15 +1,16 @@
 using System.Collections.Concurrent;
+using AutoTf.AdminPanel.Models.Interfaces;
 using Docker.DotNet.Models;
 
 namespace AutoTf.AdminPanel.Managers;
 
 public class DockerCacheManager : IHostedService
 {
-    private readonly DockerManager _docker;
+    private readonly IDockerManager _docker;
     private readonly ConcurrentDictionary<string, ContainerStatsResponse> _statsCache = new();
     private readonly Dictionary<string, CancellationTokenSource> _streamTokens = new();
 
-    public DockerCacheManager(DockerManager docker)
+    public DockerCacheManager(IDockerManager docker)
     {
         _docker = docker;
     }
