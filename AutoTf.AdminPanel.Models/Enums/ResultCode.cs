@@ -7,5 +7,6 @@ public enum ResultCode
     ValidationError,
     Unauthorized,
     InternalServerError,
+    BadRequest,
     Unknown
 }

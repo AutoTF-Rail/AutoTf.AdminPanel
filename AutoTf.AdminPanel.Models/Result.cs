@@ -35,6 +35,7 @@ public class Result<T> : IConvertToActionResult
             ResultCode.NotFound => new NotFoundObjectResult(new { error = Error }),
             ResultCode.Unauthorized => new UnauthorizedResult(), // TODO: Fix and add error message
             ResultCode.ValidationError => new BadRequestObjectResult(new { error = Error }),
+            ResultCode.BadRequest => new BadRequestObjectResult(new { error = Error }),
             ResultCode.InternalServerError => new ObjectResult(new { error = Error }) { StatusCode = 500 },
             _ => new BadRequestObjectResult(new { error = Error }) 
         };
@@ -54,7 +55,7 @@ public static class Result
     {
         HttpStatusCode.NotFound => ResultCode.NotFound,
         HttpStatusCode.Unauthorized => ResultCode.Unauthorized,
-        HttpStatusCode.BadRequest => ResultCode.ValidationError,
+        HttpStatusCode.BadRequest => ResultCode.BadRequest,
         _ => ResultCode.InternalServerError
     };
 }

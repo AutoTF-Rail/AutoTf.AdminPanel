@@ -1,6 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using AutoTf.AdminPanel.Managers;
+using AutoTf.AdminPanel.Models;
 using AutoTf.AdminPanel.Models.Requests;
+using AutoTf.AdminPanel.Models.Requests.Authentik;
 using Docker.DotNet.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,25 +26,25 @@ public class DockerController : ControllerBase
     }
 
     [HttpPost("create")]
-    public async Task<ActionResult<CreateContainerResponse>> CreateContainer([FromBody] CreateContainer parameters)
+    public async Task<Result<CreateContainerResponse>> CreateContainer([FromBody] CreateContainer parameters)
     {
         return await _docker.CreateContainer(parameters);
     }
 
     [HttpPost("start")]
-    public async Task<ActionResult<bool>> StartContainer([FromBody, Required] string id)
+    public async Task<Result<object>> StartContainer([FromBody, Required] string id)
     {
         return await _docker.StartContainer(id);
     }
 
     [HttpPost("stop")]
-    public async Task<ActionResult<bool>> StopContainer([FromBody, Required] string id)
+    public async Task<Result<object>> StopContainer([FromBody, Required] string id)
     {
         return await _docker.StopContainer(id);
     }
 
     [HttpPost("kill")]
-    public async Task<ActionResult<bool>> KillContainer([FromBody, Required] string id)
+    public async Task<Result<object>> KillContainer([FromBody, Required] string id)
     {
         return await _docker.KillContainer(id);
     }
@@ -60,67 +62,49 @@ public class DockerController : ControllerBase
     }
 
     [HttpPost("delete")]
-    public async Task<IActionResult> DeleteContainer([FromBody, Required] string id)
+    public async Task<Result<object>> DeleteContainer([FromBody, Required] string id)
     {
-        if (await _docker.DeleteContainer(id))
-            return Ok();
-
-        return Problem("Could not delete container because it was either not found or is still running.");
+        return await _docker.DeleteContainer(id);
     }
 
     [HttpGet("getByName")]
-    public async Task<ActionResult<ContainerListResponse>> GetByName([FromBody, Required] string name)
+    public async Task<Result<ContainerListResponse>> GetByName([FromBody, Required] string name)
     {
-        ContainerListResponse? containerListResponse = await _docker.GetContainerByName(name);
-        
-        if (containerListResponse == null)
-            return Problem("Could not find container.");
-        
-        return containerListResponse;
+        return await _docker.GetContainerByName(name);
     }
 
     [HttpGet("getById/{id}")]
-    public async Task<ActionResult<ContainerListResponse>> GetById(string id)
+    public async Task<Result<ContainerListResponse>> GetById(string id)
     {
-        ContainerListResponse? containerListResponse = await _docker.GetContainerById(id);
-        
-        if (containerListResponse == null)
-            return Problem("Could not find container.");
-        
-        return containerListResponse;
+        return await _docker.GetContainerById(id);
     }
 
     [HttpGet("{id}/inspect")]
-    public async Task<ActionResult<ContainerInspectResponse>> Inspect(string id)
+    public async Task<Result<ContainerInspectResponse>> Inspect(string id)
     {
-        ContainerInspectResponse? response = await _docker.InspectContainerById(id);
-        
-        if (response == null)
-            return Problem("Could not find container.");
-        
-        return response;
+        return await _docker.InspectContainerById(id);
     }
 
     [HttpGet("{id}/size")]
-    public async Task<ActionResult<float>> GetSize(string id)
+    public async Task<Result<float>> GetSize(string id)
     {
-        return MathF.Round((float)(await _docker.GetContainerSize(id) / (1024.0 * 1024.0 * 1024.0)), 2);
+        return await _docker.GetContainerSizeGb(id);
     }
 
     [HttpGet("{id}/trainCount")]
-    public async Task<ActionResult<int>> TrainCount(string id)
+    public async Task<Result<int>> TrainCount(string id)
     {
         return await _docker.GetTrainCount(id);
     }
 
     [HttpGet("{id}/allowedTrainsCount")]
-    public async Task<ActionResult<int>> AllowedTrainsCount(string id)
+    public async Task<Result<int>> AllowedTrainsCount(string id)
     {
         return await _docker.GetAllowedTrainsCount(id);
     }
     
     [HttpPost("{id}/updateAllowedTrains")]
-    public async Task<ActionResult> UpdateAllowedTrains(string id, [FromBody, Required] int allowedTrains)
+    public async Task<Result<object>> UpdateAllowedTrains(string id, [FromBody, Required] int allowedTrains)
     {
         return await _docker.UpdateAllowedTrains(id, allowedTrains);
     }

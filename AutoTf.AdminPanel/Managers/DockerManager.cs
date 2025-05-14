@@ -1,8 +1,9 @@
+using AutoTf.AdminPanel.Models;
+using AutoTf.AdminPanel.Models.Enums;
 using AutoTf.AdminPanel.Models.Requests;
 using AutoTf.AdminPanel.Statics;
 using Docker.DotNet;
 using Docker.DotNet.Models;
-using Microsoft.AspNetCore.Mvc;
 
 namespace AutoTf.AdminPanel.Managers;
 
@@ -32,27 +33,38 @@ public class DockerManager
         return containers.Where(x => x.Labels.ContainsKey("app.id") && x.Labels["app.id"] == "central-server-app").ToList();
     }
 
-    public long GetContainerSize(ContainerListResponse container)
+    public Result<float> GetContainerSize(ContainerListResponse container)
     {
         return GetDirectorySize(Path.Combine("/etc/AutoTf/CentralServer/", container.Names.First().TrimStart('/')));
     }
 
-    public async Task<float> GetContainerSize(string containerId)
+    public async Task<Result<float>> GetContainerSizeGb(string containerId)
     {
-        ContainerListResponse? container = await GetContainerById(containerId);
+        Result<float> containerSize = await GetContainerSize(containerId);
         
-        if (container == null)
-            return -1000;
+        if (!containerSize.IsSuccess)
+            return containerSize;
+        
+        return Result.Ok(MathF.Round((float)(containerSize.Value / (1024.0 * 1024.0 * 1024.0)), 2));
+    }
 
-        return GetContainerSize(container);
+    public async Task<Result<float>> GetContainerSize(string containerId)
+    {
+        Result<ContainerListResponse> container = await GetContainerById(containerId);
+        
+        if (!container.IsSuccess || container.Value == null)
+            return Result.Fail<float>(ResultCode.NotFound, $"Could not find container {containerId}.");
+
+        return GetContainerSize(container.Value);
     }
     
-    private long GetDirectorySize(string path)
+    private Result<float> GetDirectorySize(string path)
     {
         if (!Directory.Exists(path))
-            return -2000;
+            return Result.Fail<float>(ResultCode.NotFound, $"Could not find directory {path}.");
 
-        long size = 0;
+        float size = 0;
+        
         foreach (string file in Directory.EnumerateFiles(path, "*", SearchOption.AllDirectories))
         {
             try
@@ -65,7 +77,7 @@ public class DockerManager
             }
         }
         
-        return size;
+        return Result.Ok(size);
     }
 
     public async Task<bool> ContainerExists(string id)
@@ -73,36 +85,38 @@ public class DockerManager
         return (await GetAll()).Any(x => x.ID == id);
     }
 
-    public async Task<ContainerListResponse?> GetContainerByName(string name)
+    public async Task<Result<ContainerListResponse>> GetContainerByName(string name)
     {
         ContainerListResponse? containerListResponse = (await GetAll()).FirstOrDefault(x => x.Names.Any(y => y.Contains(name.ToLower())));
 
         if (containerListResponse == null)
         {
-            return null;
+            return Result.Fail<ContainerListResponse>(ResultCode.NotFound, $"Could not find container \"{name}\".");
         }
 
-        return containerListResponse;
+        return Result.Ok(containerListResponse);
     }
 
-    public async Task<ContainerListResponse?> GetContainerById(string id)
+    public async Task<Result<ContainerListResponse>> GetContainerById(string id)
     {
         ContainerListResponse? containerListResponse = (await GetAll()).FirstOrDefault(x => x.ID == id);
 
         if (containerListResponse == null)
         {
-            return null;
+            return Result.Fail<ContainerListResponse>(ResultCode.NotFound, $"Could not find container {id}.");
         }
 
-        return containerListResponse;
+        return Result.Ok(containerListResponse);
     }
 
-    public async Task<ContainerInspectResponse?> InspectContainerById(string id)
+    public async Task<Result<ContainerInspectResponse>> InspectContainerById(string id)
     {
         if (!await ContainerExists(id))
-            return null;
+        {
+            return Result.Fail<ContainerInspectResponse>(ResultCode.NotFound, $"Could not find container {id}.");
+        }
 
-        return await Client.Containers.InspectContainerAsync(id);
+        return Result.Ok(await Client.Containers.InspectContainerAsync(id));
     }
 
     public async Task<bool> ContainerRunning(string id)
@@ -112,109 +126,133 @@ public class DockerManager
         return container.State.Status == "running";
     }
 
-    public async Task<CreateContainerResponse> CreateContainer(CreateContainer parameters)
+    public async Task<Result<CreateContainerResponse>> CreateContainer(CreateContainer parameters)
     {
-        Dictionary<string,EndpointSettings> networks = await DockerHelper.ConfigureNetwork(parameters, this);
-        parameters.ContainerName = parameters.ContainerName.ToLower();
-        
-        if (string.IsNullOrEmpty(parameters.ContainerName))
-            parameters.ContainerName = parameters.EvuName.ToLower();
-
-        Dictionary<string, EmptyStruct> exposedPorts = new Dictionary<string, EmptyStruct>();
-        Dictionary<string, IList<PortBinding>> portBindings = new Dictionary<string, IList<PortBinding>>();
-        
-        foreach (KeyValuePair<string, string> portMapping in parameters.PortMappings)
+        try
         {
-            if (portMapping.Key == "" || portMapping.Value == "")
-                throw new Exception("Ports were empty.");
+            Dictionary<string,EndpointSettings> networks = await DockerHelper.ConfigureNetwork(parameters, this);
+            parameters.ContainerName = parameters.ContainerName.ToLower();
             
-            string hostPort = portMapping.Key;
-            string containerPort = portMapping.Value;
+            if (string.IsNullOrEmpty(parameters.ContainerName))
+                parameters.ContainerName = parameters.EvuName.ToLower();
 
-            exposedPorts[containerPort + "/tcp"] = new EmptyStruct();
-
-            if (!portBindings.ContainsKey(containerPort + "/tcp"))
-                portBindings[containerPort + "/tcp"] = new List<PortBinding>();
+            Dictionary<string, EmptyStruct> exposedPorts = new Dictionary<string, EmptyStruct>();
+            Dictionary<string, IList<PortBinding>> portBindings = new Dictionary<string, IList<PortBinding>>();
             
-            portBindings[containerPort + "/tcp"].Add(new PortBinding { HostPort = hostPort });
-        }
-        
-        return await Client.Containers.CreateContainerAsync(new CreateContainerParameters()
-        {
-            Name = parameters.ContainerName,
-            Image = parameters.Image,
-            ExposedPorts = exposedPorts,
-            HostConfig = new HostConfig
+            foreach (KeyValuePair<string, string> portMapping in parameters.PortMappings)
             {
-                PortBindings = portBindings,
-                RestartPolicy = new RestartPolicy()
+                if (portMapping.Key == "" || portMapping.Value == "")
+                    return Result.Fail<CreateContainerResponse>(ResultCode.BadRequest, "Ports were empty");
+                
+                string hostPort = portMapping.Key;
+                string containerPort = portMapping.Value;
+
+                exposedPorts[containerPort + "/tcp"] = new EmptyStruct();
+
+                if (!portBindings.ContainsKey(containerPort + "/tcp"))
+                    portBindings[containerPort + "/tcp"] = new List<PortBinding>();
+                
+                portBindings[containerPort + "/tcp"].Add(new PortBinding { HostPort = hostPort });
+            }
+            
+            return Result<CreateContainerResponse>.Ok(await Client.Containers.CreateContainerAsync(new CreateContainerParameters()
+            {
+                Name = parameters.ContainerName,
+                Image = parameters.Image,
+                ExposedPorts = exposedPorts,
+                HostConfig = new HostConfig
                 {
-                    Name = RestartPolicyKind.UnlessStopped
+                    PortBindings = portBindings,
+                    RestartPolicy = new RestartPolicy()
+                    {
+                        Name = RestartPolicyKind.UnlessStopped
+                    },
+                    Binds = new List<string>()
+                    {
+                        $"/etc/AutoTf/CentralServer/{parameters.ContainerName}:/Data"
+                    }
                 },
-                Binds = new List<string>()
+                NetworkingConfig = new NetworkingConfig()
                 {
-                    $"/etc/AutoTf/CentralServer/{parameters.ContainerName}:/Data"
-                }
-            },
-            NetworkingConfig = new NetworkingConfig()
-            {
-                EndpointsConfig = networks
-            },
-            Env = new List<string>()
-            {
-                $"evuName={parameters.EvuName}",
-                $"containerName={parameters.ContainerName}",
-                $"allowedTrainsCount={parameters.AllowedTrainsCount}"
-            },
-        });
+                    EndpointsConfig = networks
+                },
+                Env = new List<string>()
+                {
+                    $"evuName={parameters.EvuName}",
+                    $"containerName={parameters.ContainerName}",
+                    $"allowedTrainsCount={parameters.AllowedTrainsCount}"
+                },
+            }));
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Something went wrong when creating a container:");
+            Console.WriteLine(e.ToString());
+
+            return Result.Fail<CreateContainerResponse>(ResultCode.InternalServerError, "An unexpected error occurred while creating the container.");
+        }
     }
     
-    public async Task<bool> StartContainer(string containerId)
+    public async Task<Result<object>> StartContainer(string containerId)
     {
         if (!await ContainerExists(containerId))
-            return false;
+            return Result.Fail<object>(ResultCode.NotFound, $"Could not find container {containerId}.");
+
+        bool result = await Client.Containers.StartContainerAsync(containerId, new ContainerStartParameters());
         
-        return await Client.Containers.StartContainerAsync(containerId, new ContainerStartParameters());
+        if (result)
+            return Result.Ok();
+
+        return Result.Fail<object>(ResultCode.InternalServerError, $"Could not start container {containerId}.");
     }
 
-    public async Task<bool> StopContainer(string containerId)
+    public async Task<Result<object>> StopContainer(string containerId)
     {
         if (!await ContainerExists(containerId))
-            return false;
+            return Result.Fail<object>(ResultCode.NotFound, $"Could not find container {containerId}.");
         
-        return await Client.Containers.StopContainerAsync(containerId, new ContainerStopParameters());
+        bool result = await Client.Containers.StopContainerAsync(containerId, new ContainerStopParameters());
+        
+        if (result)
+            return Result.Ok();
+
+        return Result.Fail<object>(ResultCode.InternalServerError, $"Could not stop container {containerId}.");
     }
 
-    public async Task<bool> KillContainer(string containerId)
+    public async Task<Result<object>> KillContainer(string containerId)
     {
         if (!await ContainerExists(containerId))
-            return false;
-        
+            return Result.Fail<object>(ResultCode.NotFound, $"Could not find container {containerId}.");
+
         if (!await ContainerRunning(containerId))
-            return false;
-        
+            return Result.Ok();
+
         await Client.Containers.KillContainerAsync(containerId, new ContainerKillParameters());
 
-        return true;
+        return Result.Ok();
     }
 
-    public async Task<bool> DeleteContainer(string containerId)
+    public async Task<Result<object>> DeleteContainer(string containerId)
     {
         if (!await ContainerExists(containerId))
-            return false;
+            return Result.Fail<object>(ResultCode.NotFound, $"Could not find container {containerId}.");
         
         if (await ContainerRunning(containerId))
-            return false;
+            return Result.Fail<object>(ResultCode.InternalServerError, $"Could not delete container {containerId} because it is still running.");
 
-        ContainerListResponse container = (await GetContainerById(containerId))!;
+        Result<ContainerListResponse> container = await GetContainerById(containerId);
+        
+        if (!container.IsSuccess || container.Value == null)
+            return Result.Fail<object>(container.ResultCode, container.Error);
+        
         await Client.Containers.RemoveContainerAsync(containerId, new ContainerRemoveParameters());
         
-        string dir = $"/etc/AutoTf/CentralServer/{container.Names.First()}";
+        string dir = $"/etc/AutoTf/CentralServer/{container.Value.Names.First()}";
         
         if(Directory.Exists(dir))
             Directory.Delete(dir, true);
 
-        return true;
+        return Result.Ok();
     }
 
     public async Task<NetworkResponse?> GetNetwork(string name)
@@ -234,48 +272,51 @@ public class DockerManager
         return network?.IPAddress;
     }
 
-    public async Task<int> GetTrainCount(string id)
+    public async Task<Result<int>> GetTrainCount(string id)
     {
-        ContainerListResponse? container = await GetContainerById(id);
+        Result<ContainerListResponse> container = await GetContainerById(id);
         
-        if (container == null)
-            return 0;
+        if (!container.IsSuccess || container.Value == null)
+            return Result.Ok(0);
 
-        KeyValuePair<string, EndpointSettings>? network = container.NetworkSettings.Networks.FirstOrDefault();
+        KeyValuePair<string, EndpointSettings>? network = container.Value.NetworkSettings.Networks.FirstOrDefault();
 
         if (network == null)
-            return 0;
+            return Result.Ok(0);
 
-        return await HttpHelper.SendGet<int>($"http://{network.Value.Value.IPAddress}:8080/sync/device/trainCount");
+        return Result<int>.Ok(await HttpHelper.SendGet<int>($"http://{network.Value.Value.IPAddress}:8080/sync/device/trainCount"));
     }
 
-    public async Task<int> GetAllowedTrainsCount(string id)
+    public async Task<Result<int>> GetAllowedTrainsCount(string id)
     {
-        ContainerListResponse? container = await GetContainerById(id);
+        Result<ContainerListResponse> container = await GetContainerById(id);
         
-        if (container == null)
-            return 0;
+        if (!container.IsSuccess || container.Value == null)
+            return Result.Ok(0);
 
-        KeyValuePair<string, EndpointSettings>? network = container.NetworkSettings.Networks.FirstOrDefault();
+        KeyValuePair<string, EndpointSettings>? network = container.Value.NetworkSettings.Networks.FirstOrDefault();
 
         if (network == null)
-            return 0;
+            return Result.Ok(0);
 
-        return await HttpHelper.SendGet<int>($"http://{network.Value.Value.IPAddress}:8080/sync/device/allowedTrainsCount");
+        return Result<int>.Ok( await HttpHelper.SendGet<int>($"http://{network.Value.Value.IPAddress}:8080/sync/device/allowedTrainsCount"));
     }
 
-    public async Task<ActionResult> UpdateAllowedTrains(string id, int allowedTrains)
+    public async Task<Result<object>> UpdateAllowedTrains(string id, int allowedTrains)
     {
         if (!await ContainerExists(id))
-            return new NotFoundResult();
+            return Result.Fail<object>(ResultCode.NotFound, $"Could not find container {id}.");
         
-        ContainerListResponse container = (await GetContainerById(id))!;
+        Result<ContainerListResponse> container = (await GetContainerById(id));
         
-        string dir = $"/etc/AutoTf/CentralServer/{container.Names.First()}";
+        if (!container.IsSuccess || container.Value == null)
+            return Result.Fail<object>(ResultCode.NotFound, $"Could not find container {id}.");
+        
+        string dir = $"/etc/AutoTf/CentralServer/{container.Value.Names.First()}";
 
         Directory.CreateDirectory(dir);
         await File.WriteAllTextAsync(Path.Combine(dir, "allowedTrainsCount"), allowedTrains.ToString());
 
-        return new OkResult();
+        return Result.Ok();
     }
 }
