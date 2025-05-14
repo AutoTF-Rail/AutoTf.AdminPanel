@@ -2,6 +2,8 @@ using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using AutoTf.AdminPanel.Models;
+using AutoTf.AdminPanel.Models.Enums;
+using AutoTf.AdminPanel.Models.Interfaces;
 using AutoTf.AdminPanel.Models.Requests;
 using AutoTf.AdminPanel.Models.Requests.Authentik;
 using AutoTf.AdminPanel.Statics;
@@ -13,7 +15,7 @@ using Timer = System.Timers.Timer;
 
 namespace AutoTf.AdminPanel.Managers;
 
-public class AuthManager : IHostedService
+public class AuthManager : IAuthManager
 {
     private readonly Credentials _credentials;
     private Timer? _currentTimer;
@@ -31,308 +33,258 @@ public class AuthManager : IHostedService
         StartTimer(300);
     }
 
-    public async Task<TransactionalCreationResponse?> CreateProxy(CreateProxyRequest request)
+    public async Task<Result<TransactionalCreationResponse>>CreateProxy(CreateProxyRequest request)
     {
         try
         {
             request.Name = request.Name.ToLower();
             
-            CreateAppWithProviderModel model = new CreateAppWithProviderModel();
-            model.App.Name = $"Managed application for {request.Name}";
-            model.App.Slug = Regex.Replace(request.Name.ToLower(), "[^a-z]", "");
-            model.App.OpenInNewTab = false;
-            model.App.MetaLaunchUrl = request.LaunchUrl.ToLower();
-            model.App.PolicyEngineMode = "any";
-            model.App.Group = "AutoTF-Managed";
-
-            model.Provider.Name = $"Managed provider for {request.Name}";
-            model.Provider.AuthenticationFlow = null;
-            model.Provider.AuthorizationFlow = request.AuthorizationFlow;
-            model.Provider.InvalidationFlow = request.InvalidationFlow;
-            model.Provider.PropertyMappings = [];
-            model.Provider.InternalHost = request.InternalHost.ToLower();
-            model.Provider.ExternalHost = request.ExternalHost.ToLower();
-            model.Provider.InternalHostSslValidation = true;
-            model.Provider.Certificate = null;
-            model.Provider.SkipPathRegex = "";
-            model.Provider.BasicAuthEnabled = false;
-            model.Provider.BasicAuthUserAttribute = "";
-            model.Provider.BasicAuthPasswordAttribute = "";
-            model.Provider.Mode = "proxy";
-            model.Provider.InterceptHeaderAuth = true;
-            model.Provider.CookieDomain = "";
-            model.Provider.JwtFederationSources = [];
-            model.Provider.JwtFederationProviders = [];
-            model.Provider.AccessTokenValidity = "hours=24";
-            model.Provider.ProviderModel = "authentik_providers_proxy.proxyprovider";
-
-            model.PolicyBindings = request.PolicyBindings;
+            CreateAppWithProviderModel model = new CreateAppWithProviderModel
+            {
+                App =
+                {
+                    Name = $"Managed application for {request.Name}",
+                    Slug = Regex.Replace(request.Name.ToLower(), "[^a-z]", ""),
+                    OpenInNewTab = false,
+                    MetaLaunchUrl = request.LaunchUrl.ToLower(),
+                    PolicyEngineMode = "any",
+                    Group = "AutoTF-Managed"
+                },
+                Provider =
+                {
+                    Name = $"Managed provider for {request.Name}",
+                    AuthenticationFlow = null,
+                    AuthorizationFlow = request.AuthorizationFlow,
+                    InvalidationFlow = request.InvalidationFlow,
+                    PropertyMappings = [],
+                    InternalHost = request.InternalHost.ToLower(),
+                    ExternalHost = request.ExternalHost.ToLower(),
+                    InternalHostSslValidation = true,
+                    Certificate = null,
+                    SkipPathRegex = "",
+                    BasicAuthEnabled = false,
+                    BasicAuthUserAttribute = "",
+                    BasicAuthPasswordAttribute = "",
+                    Mode = "proxy",
+                    InterceptHeaderAuth = true,
+                    CookieDomain = "",
+                    JwtFederationSources = [],
+                    JwtFederationProviders = [],
+                    AccessTokenValidity = "hours=24",
+                    ProviderModel = "authentik_providers_proxy.proxyprovider"
+                },
+                PolicyBindings = request.PolicyBindings
+            };
 
             HttpContent content = new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json");
 
-            return await ApiHttpHelper.SendPut<TransactionalCreationResponse>($"{_credentials.AuthUrl}/api/v3/core/transactional/applications/", content, _apiKey, true);
+            TransactionalCreationResponse? result = await ApiHttpHelper.SendPut<TransactionalCreationResponse>($"{_credentials.AuthUrl}/api/v3/core/transactional/applications/", content, _apiKey, true);
+            
+            if(result == null)
+                return Result.Fail<TransactionalCreationResponse>(ResultCode.InternalServerError, "Failed to create the proxy.");
+            
+            return Result.Ok(result);
         }
         catch (Exception e)
         {
             Console.WriteLine("Something went wrong when creating a application with proxy:");
             Console.WriteLine(e.ToString());
-        }
 
-        return null;
+            return Result.Fail<TransactionalCreationResponse>(ResultCode.InternalServerError, "An unexpected error occurred while creating the proxy.");
+        }
     }
 
-    public async Task<string?> GetOutposts()
+    public async Task<Result<string>> GetOutposts()
     {
-        try
-        {
-            return await ApiHttpHelper.SendGet($"{_credentials.AuthUrl}/api/v3/outposts/instances/?ordering=name&page=1&page_size=200&search=",
-                _apiKey, true);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine("Something went wrong when getting all outposts:");
-            Console.WriteLine(e.ToString());
-        }
-
-        return null;
+        return await ApiHttpHelper.SendGet($"{_credentials.AuthUrl}/api/v3/outposts/instances/?ordering=name&page=1&page_size=200&search=", _apiKey);
     }
 
-    public async Task<OutpostModel?> GetOutpost(string id)
+    public async Task<Result<OutpostModel>> GetOutpost(string id)
     {
-        try
-        {
-            return await ApiHttpHelper.SendGet<OutpostModel>($"{_credentials.AuthUrl}/api/v3/outposts/instances/{id}/",
-                _apiKey, true) ?? null;
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine($"Something went wrong when getting outpost {id}:");
-            Console.WriteLine(e.ToString());
-        }
-
-        return null;
+        return await ApiHttpHelper.SendGet<OutpostModel>($"{_credentials.AuthUrl}/api/v3/outposts/instances/{id}/", _apiKey);
     }
 
-    public async Task<string?> UpdateOutpost(string id, OutpostModel config)
+    public async Task<Result<string>> UpdateOutpost(string id, OutpostModel config)
     {
         try
         {
             HttpContent content = new StringContent(JsonSerializer.Serialize(config), Encoding.UTF8, "application/json");
+
+            string? result = await ApiHttpHelper.SendPut($"{_credentials.AuthUrl}/api/v3/outposts/instances/{id}/", content, _apiKey, true);
             
-            return await ApiHttpHelper.SendPut($"{_credentials.AuthUrl}/api/v3/outposts/instances/{id}/", content, _apiKey, true);
+            if(result == null)
+                return Result.Fail<string>(ResultCode.InternalServerError, $"Failed to update outpost {id}.");
+            
+            return Result.Ok(result);
         }
         catch (Exception e)
         {
-            Console.WriteLine($"Something went wrong when getting outpost {id}:");
+            Console.WriteLine($"Something went wrong when updating outpost {id}:");
             Console.WriteLine(e.ToString());
-        }
 
-        return null;
+            return Result.Fail<string>(ResultCode.InternalServerError, $"An unexpected error occurred while updating outpost {id}.");
+        }
     }
 
-    public async Task<List<Flow>> GetAuthorizationFlows()
+    public async Task<Result<List<Flow>>> GetAuthorizationFlows()
     {
-        try
-        {
-            FlowPaginationRequest? result = await ApiHttpHelper.SendGet<FlowPaginationRequest>($"{_credentials.AuthUrl}/api/v3/flows/instances/?designation=authorization&ordering=slug",
-                _apiKey, true);
-            
-            if (result == null)
-                return new List<Flow>();
+        Result<FlowPaginationRequest> result = await ApiHttpHelper.SendGet<FlowPaginationRequest>($"{_credentials.AuthUrl}/api/v3/flows/instances/?designation=authorization&ordering=slug", _apiKey);
 
-            return result.Results;
-        }
-        catch (Exception e)
+        if (!result.IsSuccess || result.Value?.Results == null)
         {
-            Console.WriteLine("Something went wrong when getting all authorization flows:");
-            Console.WriteLine(e.ToString());
+            return Result.Fail<List<Flow>>(result.ResultCode, result.Error);
         }
 
-        return new List<Flow>();
+        return Result.Ok(result.Value.Results);
     }
 
-    public async Task<List<Flow>> GetInvalidationFlows()
+    public async Task<Result<List<Flow>>> GetInvalidationFlows()
     {
-        try
+        Result<FlowPaginationRequest> result = await ApiHttpHelper.SendGet<FlowPaginationRequest>($"{_credentials.AuthUrl}/api/v3/flows/instances/?designation=invalidation&ordering=slug", _apiKey);
+        
+        if (!result.IsSuccess || result.Value?.Results == null)
         {
-            FlowPaginationRequest? result = await ApiHttpHelper.SendGet<FlowPaginationRequest>($"{_credentials.AuthUrl}/api/v3/flows/instances/?designation=invalidation&ordering=slug",
-                _apiKey, true);
-            
-            if (result == null)
-                return new List<Flow>();
-
-            return result.Results;
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine("Something went wrong when getting all invalidation flows:");
-            Console.WriteLine(e.ToString());
+            return Result.Fail<List<Flow>>(result.ResultCode, result.Error);
         }
 
-        return new List<Flow>();
+        return Result.Ok(result.Value.Results);
     }
 
-    public async Task<List<Group>> GetGroups()
+    public async Task<Result<List<Group>>> GetGroups()
     {
-        try
+        Result<GroupPaginationRequest> result = await ApiHttpHelper.SendGet<GroupPaginationRequest>($"{_credentials.AuthUrl}/api/v3/core/groups/?include_users=false&ordering=name", _apiKey);
+        
+        if (!result.IsSuccess || result.Value?.Results == null)
         {
-            GroupPaginationRequest? result = await ApiHttpHelper.SendGet<GroupPaginationRequest>($"{_credentials.AuthUrl}/api/v3/core/groups/?include_users=false&ordering=name",
-                _apiKey, true);
-            
-            if (result == null)
-                return new List<Group>();
-
-            return result.Results;
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine("Something went wrong when getting all groups:");
-            Console.WriteLine(e.ToString());
+            return Result.Fail<List<Group>>(result.ResultCode, result.Error);
         }
 
-        return new List<Group>();
+        return Result.Ok(result.Value.Results);
     }
 
-    public async Task<ProviderPaginationResult?> GetProviders()
+    public async Task<Result<ProviderPaginationResult>> GetProviders()
     {
-        try
+        Result<ProviderPaginationResult> result = await ApiHttpHelper.SendGet<ProviderPaginationResult>($"{_credentials.AuthUrl}/api/v3/providers/proxy/?application__isnull=false&ordering=name&page=1&page_size=200&search=", _apiKey);
+        
+        if (!result.IsSuccess || result.Value?.Results == null)
         {
-            ProviderPaginationResult? providerPaginationResult = await ApiHttpHelper.SendGet<ProviderPaginationResult>($"{_credentials.AuthUrl}/api/v3/providers/proxy/?application__isnull=false&ordering=name&page=1&page_size=200&search=",
-                _apiKey, true);
-            
-            if (providerPaginationResult == null)
-                return null;
-
-            if (!providerPaginationResult.Results.Any())
-                return providerPaginationResult;
-
-            providerPaginationResult.Results =
-                providerPaginationResult.Results.Where(x => x.Name.Contains("Managed provider for")).ToList();
-
-            return providerPaginationResult;
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine("Something went wrong when getting all providers:");
-            Console.WriteLine(e.ToString());
-        }
-
-        return null;
-    }
-
-    public async Task<ApplicationPaginationResult?> GetApplications()
-    {
-        try
-        {
-            ApplicationPaginationResult? result = await ApiHttpHelper.SendGet<ApplicationPaginationResult>($"{_credentials.AuthUrl}/api/v3/core/applications/?ordering=name&page=1&page_size=200&search=&superuser_full_list=true",
-                _apiKey, true);
-            
-            if (result == null)
-                return null;
-
-            if (!result.Results.Any())
-                return result;
-
-            result.Results =
-                result.Results.Where(x => x.Name.Contains("Managed application for ")).ToList();
-
             return result;
         }
-        catch (Exception e)
-        {
-            Console.WriteLine("Something went wrong when getting all applications:");
-            Console.WriteLine(e.ToString());
-        }
 
-        return null;
+        // If there are no results, we still want to return the pagination metadata
+        if (!result.Value.Results.Any())
+            return result;
+
+        ProviderPaginationResult filtered = new ProviderPaginationResult
+        {
+            Pagination = result.Value.Pagination,
+            Results = result.Value.Results.Where(x => x.Name.Contains("Managed provider for")).ToList()
+        };
+
+        return Result.Ok(filtered);
     }
 
-    public async Task<bool> DeleteProvider(string id)
+    public async Task<Result<ApplicationPaginationResult>> GetApplications()
     {
-        try
-        {
-            return await ApiHttpHelper.SendDelete($"{_credentials.AuthUrl}/api/v3/providers/proxy/{id}/", _apiKey, true);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine($"Something went wrong when deleting provider {id}:");
-            Console.WriteLine(e.ToString());
-        }
-
-        return false;
-    }
-
-    public async Task<bool> DeleteApplication(string slug)
-    {
-        try
-        {
-            return await ApiHttpHelper.SendDelete($"{_credentials.AuthUrl}/api/v3/core/applications/{slug}/", _apiKey, true);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine($"Something went wrong when deleting application {slug}:");
-            Console.WriteLine(e.ToString());
-        }
-
-        return false;
-    }
-
-    public async Task<string?> GetProviderIdByExternalHost(string externalHost)
-    {
-        ProviderPaginationResult? providers = await GetProviders();
+        Result<ApplicationPaginationResult> result = await ApiHttpHelper.SendGet<ApplicationPaginationResult>($"{_credentials.AuthUrl}/api/v3/core/applications/?ordering=name&page=1&page_size=200&search=&superuser_full_list=true", _apiKey);
         
-        if (providers == null || !providers.Results.Any())
-            return null;
+        if (!result.IsSuccess || result.Value?.Results == null)
+        {
+            return result;
+        }
 
-        Provider? provider = providers.Results.FirstOrDefault(x => x.ExternalHost.ToLower() == externalHost.ToLower());
-       
+        // If there are no results, we still want to return the pagination metadata
+        if (!result.Value.Results.Any())
+            return result;
+
+        ApplicationPaginationResult filtered = new ApplicationPaginationResult
+        {
+            Pagination = result.Value.Pagination,
+            Results = result.Value.Results.Where(x => x.Name.Contains("Managed application for ")).ToList()
+        };
+
+        return Result.Ok(filtered);
+    }
+
+    public async Task<Result<string>> DeleteProvider(string id)
+    {
+        return await ApiHttpHelper.SendDelete($"{_credentials.AuthUrl}/api/v3/providers/proxy/{id}/", _apiKey);
+    }
+
+    public async Task<Result<string>> DeleteApplication(string slug)
+    {
+        return await ApiHttpHelper.SendDelete($"{_credentials.AuthUrl}/api/v3/core/applications/{slug}/", _apiKey);
+    }
+
+    public async Task<Result<string>> GetProviderIdByExternalHost(string externalHost)
+    {
+        Result<ProviderPaginationResult> result = await GetProviders();
+        
+        if (!result.IsSuccess || result.Value?.Results == null)
+        {
+            return Result.Fail<string>(result.ResultCode, result.Error);
+        }
+
+        externalHost = externalHost.ToLower();
+        Provider? provider = result.Value.Results.FirstOrDefault(x => x.ExternalHost.ToLower() == externalHost);
+        
         if (provider == null)
-            return null;
+            return Result.Fail<string>(ResultCode.NotFound, $"Could not find a provider by the given external host \"{externalHost}\".");
         
-        return provider.Pk;
+        if (string.IsNullOrEmpty(provider.Pk))
+            return Result.Fail<string>(ResultCode.InternalServerError, "Provider found but had an invalid ID.");
+
+        return Result.Ok(provider.Pk);
     }
 
-    public async Task<string?> GetApplicationSlugByLaunchUrl(string launchUrl)
+    public async Task<Result<string>> GetApplicationSlugByLaunchUrl(string launchUrl)
     {
-        ApplicationPaginationResult? providers = await GetApplications();
+        Result<ApplicationPaginationResult> result = await GetApplications();
         
-        if (providers == null || !providers.Results.Any())
-            return null;
+        if (!result.IsSuccess || result.Value?.Results == null)
+        {
+            return Result.Fail<string>(result.ResultCode, result.Error);
+        }
 
-        Application? app = providers.Results.FirstOrDefault(x => x.LaunchUrl != null && x.LaunchUrl.ToLower() == launchUrl.ToLower());
+        launchUrl = launchUrl.ToLower();
+        Application? app = result.Value.Results.FirstOrDefault(x => x.LaunchUrl != null && x.LaunchUrl.ToLower() == launchUrl);
        
         if (app == null)
-            return null;
+            return Result.Fail<string>(ResultCode.NotFound, $"Could not find a application by the given launch url \"{launchUrl}\".");
         
-        return app.Slug;
+        return Result.Ok(app.Slug);
     }
 
-    public async Task<string?> AssignToOutpost(string outpostId, string providerPk)
+    public async Task<Result<string>> AssignToOutpost(string outpostId, string providerPk)
     {
         // TODO: Check for existance
-        OutpostModel? outpostModel = await GetOutpost(outpostId);
-        
-        if (outpostModel == null)
-            return $"Could not find outpost {outpostId}.";
+        Result<OutpostModel> result = await GetOutpost(outpostId);
+
+        if (!result.IsSuccess || result.Value == null)
+        {
+            return Result.Fail<string>(result.ResultCode, result.Error);
+        }
         
         // TODO: Check for provider existance 
-        outpostModel.Providers.Add(providerPk);
+        result.Value!.Providers.Add(providerPk);
 
-        return await UpdateOutpost(outpostId, outpostModel);
+        return await UpdateOutpost(outpostId, result.Value);
     }
 
-    public async Task<string?> UnassignFromOutpost(string outpostId, string providerPk)
+    public async Task<Result<string>> UnassignFromOutpost(string outpostId, string providerPk)
     {
         // TODO: Check for existance
-        OutpostModel? outpostModel = await GetOutpost(outpostId);
+        Result<OutpostModel> result = await GetOutpost(outpostId);
         
-        if (outpostModel == null)
-            return $"Could not find outpost {outpostId}.";
+        if (!result.IsSuccess || result.Value == null)
+        {
+            return Result.Fail<string>(result.ResultCode, result.Error);
+        }
         
         // TODO: Check for provider existance 
-        outpostModel.Providers.Remove(providerPk);
+        result.Value.Providers.Remove(providerPk);
 
-        return await UpdateOutpost(outpostId, outpostModel);
+        return await UpdateOutpost(outpostId, result.Value);
     }
     
     #region Core

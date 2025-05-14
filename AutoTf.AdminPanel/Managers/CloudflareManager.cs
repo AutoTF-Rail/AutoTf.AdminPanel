@@ -71,7 +71,9 @@ public class CloudflareManager : IHostedService
     {
         try
         {
-            if (!await ApiHttpHelper.SendDelete($"https://api.cloudflare.com/client/v4/zones/{_credentials.CloudflareZone}/dns_records/{id}", _credentials.CloudflareKey)) 
+            Result<string> result = await ApiHttpHelper.SendDelete($"https://api.cloudflare.com/client/v4/zones/{_credentials.CloudflareZone}/dns_records/{id}", _credentials.CloudflareKey);
+            
+            if (!result.IsSuccess)
                 return false;
 
             await UpdateCache();
@@ -136,12 +138,12 @@ public class CloudflareManager : IHostedService
         {
             Console.WriteLine("Updating cloudflare records cache.");
             
-            DnsRecords? dnsRecords = await ApiHttpHelper.SendGet<DnsRecords>($"https://api.cloudflare.com/client/v4/zones/{_credentials.CloudflareZone}/dns_records", _credentials.CloudflareKey, true);
+            Result<DnsRecords> dnsRecords = await ApiHttpHelper.SendGet<DnsRecords>($"https://api.cloudflare.com/client/v4/zones/{_credentials.CloudflareZone}/dns_records", _credentials.CloudflareKey);
+            
+            if (!dnsRecords.IsSuccess || dnsRecords.Value == null)
+                throw new Exception($"Empty return from Cloudflare API. {dnsRecords.Error}");
 
-            if (dnsRecords == null)
-                throw new Exception("Empty return from Cloudflare API.");
-
-            Records = dnsRecords.Records.Where(x => x.Comment != null && x.Comment.Contains("Managed by AutoTF Admin Panel.")).ToList();
+            Records = dnsRecords.Value.Records.Where(x => x.Comment != null && x.Comment.Contains("Managed by AutoTF Admin Panel.")).ToList();
             
             Console.WriteLine($"Finished updating cloudflare records cache with {Records.Count} records.");
         }

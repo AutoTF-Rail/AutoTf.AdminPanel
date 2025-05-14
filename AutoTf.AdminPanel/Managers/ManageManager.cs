@@ -1,5 +1,8 @@
 using System.Text;
 using System.Text.Json;
+using AutoTf.AdminPanel.Models;
+using AutoTf.AdminPanel.Models.Enums;
+using AutoTf.AdminPanel.Models.Interfaces;
 using AutoTf.AdminPanel.Models.Manage;
 using AutoTf.AdminPanel.Models.Requests;
 using AutoTf.AdminPanel.Models.Requests.Authentik;
@@ -12,12 +15,12 @@ namespace AutoTf.AdminPanel.Managers;
 
 public class ManageManager
 {
-    private readonly AuthManager _auth;
+    private readonly IAuthManager _auth;
     private readonly CloudflareManager _cloudflare;
     private readonly PleskManager _plesk;
     private readonly DockerManager _docker;
 
-    public ManageManager(DockerManager docker, AuthManager auth, CloudflareManager cloudflare, PleskManager plesk)
+    public ManageManager(DockerManager docker, IAuthManager auth, CloudflareManager cloudflare, PleskManager plesk)
     {
         _auth = auth;
         _cloudflare = cloudflare;
@@ -50,13 +53,12 @@ public class ManageManager
         List<ContainerListResponse> containers = await _docker.GetAll();
         List<string> pleskDomains = _plesk.Records;
         
-        ProviderPaginationResult? authResult = await _auth.GetProviders();
+        Result<ProviderPaginationResult> authResult = await _auth.GetProviders();
 
-        if (authResult == null)
+        if (!authResult.IsSuccess || authResult.Value == null)
             return new List<ManageBody>();
         
-        List<Provider> providers = authResult.Results;
-        
+        List<Provider> providers = authResult.Value.Results;
         
         foreach (ContainerListResponse container in containers)
         {
@@ -127,12 +129,12 @@ public class ManageManager
         List<ContainerListResponse> containers = await _docker.GetAll();
         List<string> pleskDomains = _plesk.Records;
         
-        ProviderPaginationResult? authResult = await _auth.GetProviders();
+        Result<ProviderPaginationResult> authResult = await _auth.GetProviders();
 
-        if (authResult == null)
+        if (!authResult.IsSuccess || authResult.Value == null)
             return new List<ContainerListResponse>();
         
-        List<Provider> providers = authResult.Results;
+        List<Provider> providers = authResult.Value.Results;
         
         
         foreach (ContainerListResponse container in containers)
@@ -160,12 +162,12 @@ public class ManageManager
         List<ContainerListResponse> containers = await _docker.GetAll();
         List<string> pleskDomains = _plesk.Records;
         
-        ProviderPaginationResult? authResult = await _auth.GetProviders();
+        Result<ProviderPaginationResult> authResult = await _auth.GetProviders();
 
-        if (authResult == null)
+        if (!authResult.IsSuccess || authResult.Value == null)
             return new List<string>();
         
-        List<Provider> providers = authResult.Results;
+        List<Provider> providers = authResult.Value.Results;
         
         foreach (ContainerListResponse container in containers)
         {
@@ -230,30 +232,32 @@ public class ManageManager
         // Authentik
         CreateProxyRequest proxy = request.Proxy.ConvertToRequest(endpoint.IPAddress, request.Plesk.SubDomain);
 
-        TransactionalCreationResponse? proxyResult = await _auth.CreateProxy(proxy);
+        Result<TransactionalCreationResponse> proxyResult = await _auth.CreateProxy(proxy);
         
-        if (proxyResult == null)
-            return await AssembleProblem("Something went wrong when creating the provider.", record.Id, container.ID);
+        if (proxyResult.ResultCode != ResultCode.Success)
+            return await AssembleProblem(proxyResult.Error, record.Id, container.ID);
 
-        if (proxyResult.Applied == false)
+        TransactionalCreationResponse proxyResultValue = proxyResult.Value!;
+
+        if (proxyResultValue.Applied == false)
         {
-            if(proxyResult.Logs != null && proxyResult.Logs.Any())
-                return await AssembleProblem($"Something went wrong when creating the provider. Logs: {string.Join(Environment.NewLine, proxyResult.Logs)}", record.Id,
+            if(proxyResultValue.Logs != null && proxyResultValue.Logs.Any())
+                return await AssembleProblem($"Something went wrong when creating the provider. Logs: {string.Join(Environment.NewLine, proxyResultValue.Logs)}", record.Id,
                     container.ID);
             return await AssembleProblem("Something went wrong when creating the provider. The operation was not successful.", record.Id,
                 container.ID);
         }
 
-        string? providerId = await _auth.GetProviderIdByExternalHost(request.Proxy.ExternalHost);
+        Result<string> providerId = await _auth.GetProviderIdByExternalHost(request.Proxy.ExternalHost);
 
-        if (providerId == null)
-            return await AssembleProblem("The created provider could not be found.", record.Id, container.ID);
+        if (!providerId.IsSuccess || providerId.Value == null)
+            return await AssembleProblem($"The created provider could not be found. {providerId.Error}", record.Id, container.ID);
 
         // idk how to validate this properly yet
-        string? assignResult = await _auth.AssignToOutpost(request.Proxy.OutpostId, providerId);
+        Result<string> assignResult = await _auth.AssignToOutpost(request.Proxy.OutpostId, providerId.Value);
         
-        if (assignResult == null)
-            return await AssembleProblem("Failed while assigning the provider to the outpost.", record.Id, container.ID, request.Proxy.ExternalHost);
+        if (!assignResult.IsSuccess || assignResult.Value == null)
+            return await AssembleProblem($"Failed while assigning the provider to the outpost. {assignResult.Error}", record.Id, container.ID, request.Proxy.ExternalHost);
         
         // Plesk
         if (!_plesk.CreateSubdomain(request.Plesk.SubDomain, request.Plesk.RootDomain, request.Plesk.Email, request.Plesk.AuthentikHost))
@@ -296,16 +300,17 @@ public class ManageManager
 
         if (externalHost != null)
         {
-            string? providerId = await _auth.GetProviderIdByExternalHost(externalHost);
-            string? applicationSlug = await _auth.GetApplicationSlugByLaunchUrl(externalHost);
+            Result<string> providerId = await _auth.GetProviderIdByExternalHost(externalHost);
+            Result<string> applicationSlug = await _auth.GetApplicationSlugByLaunchUrl(externalHost);
 
-            if (providerId != null)
-                proxyDeletionSuccess = await _auth.DeleteProvider(providerId);
+            // TODO: Maybe save the entire result instead so that we can add possible error messages
+            if (providerId.IsSuccess && providerId.Value != null)
+                proxyDeletionSuccess = (await _auth.DeleteProvider(providerId.Value)).IsSuccess;
             else
                 error += $" Could not find provider by external host {externalHost}.";
             
-            if(applicationSlug != null)
-                applicationDeletionSuccess = await _auth.DeleteApplication(applicationSlug);
+            if(applicationSlug.IsSuccess && applicationSlug.Value != null)
+                applicationDeletionSuccess = (await _auth.DeleteApplication(applicationSlug.Value)).IsSuccess;
             else
                 error += $" Could not find application Slug by launch url {externalHost}.";
         }

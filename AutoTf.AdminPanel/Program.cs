@@ -1,6 +1,7 @@
 using AutoTf.AdminPanel.Extensions;
 using AutoTf.AdminPanel.Managers;
 using AutoTf.AdminPanel.Models;
+using AutoTf.AdminPanel.Models.Interfaces;
 
 namespace AutoTf.AdminPanel;
 
@@ -21,9 +22,9 @@ public class Program
         builder.Services.AddHostedSingleton<ServerStatsCacheManager>();
         builder.Services.AddHostedSingleton<DockerCacheManager>();
         builder.Services.AddHostedSingleton<CloudflareManager>();
-        builder.Services.AddHostedSingleton<AuthManager>();
+        builder.Services.AddHostedSingleton<IAuthManager, AuthManager>();
         builder.Services.AddHostedSingleton<PleskManager>();
-        builder.Services.AddHostedSingleton<IpWatcher>();
+        builder.Services.AddHostedSingleton<IIpWatcher, IpWatcher>();
         
         // stored in appsettings.Development.json or set manually in .env
         builder.Services.Configure<Credentials>(options =>

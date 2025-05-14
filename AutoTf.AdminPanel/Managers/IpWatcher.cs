@@ -1,10 +1,11 @@
 using AutoTf.AdminPanel.Models;
+using AutoTf.AdminPanel.Models.Interfaces;
 using Microsoft.Extensions.Options;
 using Timer = System.Timers.Timer;
 
 namespace AutoTf.AdminPanel.Managers;
 
-public class IpWatcher : IHostedService
+public class IpWatcher : IIpWatcher
 {
     private readonly DockerManager _docker;
     private readonly PleskManager _plesk;

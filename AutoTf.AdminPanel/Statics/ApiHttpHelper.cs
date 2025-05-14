@@ -1,79 +1,86 @@
 using System.Net.Http.Headers;
 using System.Text.Json;
+using AutoTf.AdminPanel.Models;
+using AutoTf.AdminPanel.Models.Enums;
+using Docker.DotNet.Models;
 
 namespace AutoTf.AdminPanel.Statics;
 
 public class ApiHttpHelper
 {
-    public static async Task<bool> SendDelete(string endpoint, string apiKey, bool reThrow = false, int timeoutSeconds = 5)
+    public static async Task<Result<string>> SendDelete(string endpoint, string apiKey, int timeoutSeconds = 5)
     {
+        using HttpClient client = new HttpClient();
+        client.Timeout = TimeSpan.FromSeconds(timeoutSeconds);
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
+        
         try
         {
-            using HttpClient client = new HttpClient();
-            client.Timeout = TimeSpan.FromSeconds(timeoutSeconds);
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
-            
             HttpResponseMessage response = await client.DeleteAsync(endpoint);
-            
-            if (reThrow)
-                response.EnsureSuccessStatusCode();
 
-            return response.IsSuccessStatusCode;
+            string content = await response.Content.ReadAsStringAsync();
+
+            if (response.IsSuccessStatusCode)
+                return Result.Ok(content);
+
+            return Result.Fail<string>(Result.MapStatusToResultCode(response.StatusCode), content);
         }
         catch (Exception ex)
         {
-            if (reThrow)
-                throw;
-            else
+            return Result.Fail<string>(ResultCode.InternalServerError, $"Exception occurred: {ex.Message}");
+        }
+    }
+    
+    public static async Task<Result<string>> SendGet(string endpoint, string apiKey, int timeoutSeconds = 5)
+    {
+        using HttpClient client = new HttpClient();
+        client.Timeout = TimeSpan.FromSeconds(timeoutSeconds);
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
+        
+        try
+        {
+            HttpResponseMessage response = await client.GetAsync(endpoint);
+
+            string content = await response.Content.ReadAsStringAsync();
+
+            if (response.IsSuccessStatusCode)
+                return Result.Ok(content);
+
+            return Result.Fail<string>(Result.MapStatusToResultCode(response.StatusCode), content);
+        }
+        catch (Exception ex)
+        {
+            return Result.Fail<string>(ResultCode.InternalServerError, $"Exception occurred: {ex.Message}");
+        }
+    }
+    
+    public static async Task<Result<T>> SendGet<T>(string endpoint, string apiKey, int timeoutSeconds = 5)
+    {
+        using HttpClient client = new HttpClient();
+        client.Timeout = TimeSpan.FromSeconds(timeoutSeconds);
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
+        
+        try
+        {
+            HttpResponseMessage response = await client.GetAsync(endpoint);
+
+            string content = await response.Content.ReadAsStringAsync();
+
+            if (response.IsSuccessStatusCode)
             {
-                Console.WriteLine(ex.ToString());
+                T? value = JsonSerializer.Deserialize<T>(content);
+
+                if (value == null)
+                    return Result.Fail<T>(ResultCode.InternalServerError, "Deserialization returned null.");
+
+                return Result.Ok(value);
             }
-            
-            return false;
-        }
-    }
-    
-    public static async Task<string?> SendGet(string endpoint, string apiKey, bool reThrow = false, int timeoutSeconds = 5)
-    {
-        try
-        {
-            using HttpClient client = new HttpClient();
-            client.Timeout = TimeSpan.FromSeconds(timeoutSeconds);
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
-            
-            HttpResponseMessage response = await client.GetAsync(endpoint);
-            response.EnsureSuccessStatusCode();
 
-            return await response.Content.ReadAsStringAsync();
+            return Result.Fail<T>(Result.MapStatusToResultCode(response.StatusCode), content);
         }
-        catch
+        catch (Exception ex)
         {
-            if(reThrow)
-                throw;
-
-            return default;
-        }
-    }
-    
-    public static async Task<T?> SendGet<T>(string endpoint, string apiKey, bool reThrow = false, int timeoutSeconds = 5)
-    {
-        try
-        {
-            using HttpClient client = new HttpClient();
-            client.Timeout = TimeSpan.FromSeconds(timeoutSeconds);
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
-            
-            HttpResponseMessage response = await client.GetAsync(endpoint);
-            response.EnsureSuccessStatusCode();
-
-            return JsonSerializer.Deserialize<T>(await response.Content.ReadAsStringAsync());
-        }
-        catch
-        {
-            if(reThrow)
-                throw;
-
-            return default;
+            return Result.Fail<T>(ResultCode.InternalServerError, $"Exception occurred: {ex.Message}");
         }
     }
     

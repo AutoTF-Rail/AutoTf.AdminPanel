@@ -1,5 +1,5 @@
-using AutoTf.AdminPanel.Managers;
 using AutoTf.AdminPanel.Models;
+using AutoTf.AdminPanel.Models.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
@@ -9,10 +9,10 @@ namespace AutoTf.AdminPanel.Controllers;
 [Route("/api/system")]
 public class SystemController : ControllerBase
 {
-    private readonly IpWatcher _ipWatcher;
+    private readonly IIpWatcher _ipWatcher;
     private readonly Credentials _credentials;
     
-    public SystemController(IOptions<Credentials> options, IpWatcher ipWatcher)
+    public SystemController(IOptions<Credentials> options, IIpWatcher ipWatcher)
     {
         _ipWatcher = ipWatcher;
         _credentials = options.Value;

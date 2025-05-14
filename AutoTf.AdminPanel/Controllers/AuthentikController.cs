@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
-using AutoTf.AdminPanel.Managers;
+using AutoTf.AdminPanel.Models;
+using AutoTf.AdminPanel.Models.Interfaces;
 using AutoTf.AdminPanel.Models.Requests;
 using AutoTf.AdminPanel.Models.Requests.Authentik;
-using AutoTf.AdminPanel.Statics;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AutoTf.AdminPanel.Controllers;
@@ -11,140 +11,94 @@ namespace AutoTf.AdminPanel.Controllers;
 [Route("/api/authentik")]
 public class AuthentikController : ControllerBase
 {
-    private readonly AuthManager _auth;
+    private readonly IAuthManager _auth;
 
-    public AuthentikController(AuthManager auth)
+    public AuthentikController(IAuthManager auth)
     {
         _auth = auth;
     }
 
     [HttpPost("create")]
-    public async Task<ActionResult<TransactionalCreationResponse>> Create([FromBody, Required] CreateProxyRequest request)
+    public async Task<Result<TransactionalCreationResponse>> Create([FromBody, Required] CreateProxyRequest request)
     {
-        TransactionalCreationResponse? result = await _auth.CreateProxy(request);
-        
-        if (result == null)
-            return Problem("Something went wrong when creating the proxy.");
-
-        return result;
+        return await _auth.CreateProxy(request);
     }
 
     [HttpPost("outpost/{id}/assign")]
-    public async Task<ActionResult<string>> AssignToOutpost(string id, [FromBody, Required] string providerPk)
+    public async Task<Result<string>> AssignToOutpost(string id, [FromBody, Required] string providerPk)
     {
-        string? result = await _auth.AssignToOutpost(id, providerPk);
-        
-        if (result == null)
-            return Problem("Could not update outpost.");
-
-        return result;
+       return await _auth.AssignToOutpost(id, providerPk);
     }
 
     [HttpPost("outpost/{id}/unassign")]
-    public async Task<ActionResult<string>> UnassignFromOutpost(string id, [FromBody, Required] string providerPk)
+    public async Task<Result<string>> UnassignFromOutpost(string id, [FromBody, Required] string providerPk)
     {
-        string? result = await _auth.UnassignFromOutpost(id, providerPk);
-        
-        if (result == null)
-            return Problem("Could not update outpost.");
-
-        return result;
+        return await _auth.UnassignFromOutpost(id, providerPk);
     }
 
     [HttpGet("outposts")]
-    public async Task<ActionResult<string>> Outposts()
+    public async Task<Result<string>> Outposts()
     {
-        string? result = await _auth.GetOutposts();
-        
-        if (result == null)
-            return Problem(result);
-
-        return result;
+        return await _auth.GetOutposts();
     }
 
     [HttpGet("outpost/{id}")]
-    public async Task<ActionResult<OutpostModel>> Outpost(string id)
+    public async Task<Result<OutpostModel>> Outpost(string id)
     {
-        OutpostModel? result = await _auth.GetOutpost(id);
-        
-        if (result == null)
-            return Problem("Could not find outpost.");
-
-        return result;
+        return await _auth.GetOutpost(id);
     }
 
     [HttpPut("outpost/{id}")]
-    public async Task<ActionResult<string>> UpdateOutpost(string id, [FromBody, Required] OutpostModel config)
+    public async Task<Result<string>> UpdateOutpost(string id, [FromBody, Required] OutpostModel config)
     {
-        string? result = await _auth.UpdateOutpost(id, config);
-        
-        if (result == null)
-            return Problem(result);
-
-        return result;
+        return await _auth.UpdateOutpost(id, config);
     }
 
     [HttpGet("providers")]
-    public async Task<ActionResult<ProviderPaginationResult>> Providers()
+    public async Task<Result<ProviderPaginationResult>> Providers()
     {
-        ProviderPaginationResult? result = await _auth.GetProviders();
-        
-        if (result == null)
-            return Problem("Failed to send the request to authentik.");
-
-        return result;
+        return await _auth.GetProviders();
     }
 
     [HttpGet("applications")]
-    public async Task<ActionResult<ApplicationPaginationResult>> Applications()
+    public async Task<Result<ApplicationPaginationResult>> Applications()
     {
-        ApplicationPaginationResult? result = await _auth.GetApplications();
-        
-        if (result == null)
-            return Problem("Failed to send the request to authentik.");
-
-        return result;
+        return await _auth.GetApplications();
     }
 
     [HttpGet("providerId")]
-    public async Task<ActionResult<string>> ProviderByExternalHost([FromBody, Required] string externalHost)
+    public async Task<Result<string>> ProviderByExternalHost([FromBody, Required] string externalHost)
     {
-        string? result = await _auth.GetProviderIdByExternalHost(externalHost);
-        
-        if (result == null)
-            return Problem("Failed to find the provider.");
-
-        return result;
+        return await _auth.GetProviderIdByExternalHost(externalHost);
     }
 
     [HttpDelete("provider/{id}")]
-    public async Task<ActionResult<bool>> DeleteProvider(string id)
+    public async Task<Result<string>> DeleteProvider(string id)
     {
-        // TODO: Check for existance
         return await _auth.DeleteProvider(id);
     }
 
     [HttpDelete("application/{slug}")]
-    public async Task<ActionResult<bool>> DeleteApplication(string slug)
+    public async Task<Result<string>> DeleteApplication(string slug)
     {
         // TODO: Check for existance
         return await _auth.DeleteApplication(slug);
     }
 
     [HttpGet("flows/authorization")]
-    public async Task<ActionResult<List<Flow>>> AuthorizationFlows()
+    public async Task<Result<List<Flow>>> AuthorizationFlows()
     {
         return await _auth.GetAuthorizationFlows();
     }
 
     [HttpGet("flows/invalidation")]
-    public async Task<ActionResult<List<Flow>>> InvalidationFlows()
+    public async Task<Result<List<Flow>>> InvalidationFlows()
     {
         return await _auth.GetInvalidationFlows();
     }
 
     [HttpGet("groups")]
-    public async Task<ActionResult<List<Group>>> Groups()
+    public async Task<Result<List<Group>>> Groups()
     {
         return await _auth.GetGroups();
     }
