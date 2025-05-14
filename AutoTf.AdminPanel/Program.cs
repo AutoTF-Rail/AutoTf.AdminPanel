@@ -16,7 +16,7 @@ public class Program
         builder.Services.AddControllers();
 
         builder.Services.AddSingleton<IDockerManager, DockerManager>();
-        builder.Services.AddSingleton<DockerStatsManager>();
+        builder.Services.AddSingleton<IDockerStatsManager, DockerStatsManager>();
         builder.Services.AddSingleton<ManageManager>();
         
         builder.Services.AddHostedSingleton<ServerStatsCacheManager>();

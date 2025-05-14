@@ -1,4 +1,5 @@
-using AutoTf.AdminPanel.Managers;
+using AutoTf.AdminPanel.Models;
+using AutoTf.AdminPanel.Models.Interfaces;
 using AutoTf.AdminPanel.Models.Requests;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,9 +9,9 @@ namespace AutoTf.AdminPanel.Controllers;
 [Route("/api/docker/stats")]
 public class DockerStatsController : ControllerBase
 {
-    private readonly DockerStatsManager _docker;
+    private readonly IDockerStatsManager _docker;
 
-    public DockerStatsController(DockerStatsManager docker)
+    public DockerStatsController(IDockerStatsManager docker)
     {
         _docker = docker;
     }
@@ -42,47 +43,27 @@ public class DockerStatsController : ControllerBase
     #region Container
 
     [HttpGet("{containerId}")]
-    public ActionResult<ContainerStats> Stats(string containerId)
+    public Result<ContainerStats> Stats(string containerId)
     {
-        ContainerStats? stats = _docker.Stats(containerId);
-
-        if (stats == null)
-            return NotFound("Could not find container.");
-
-        return stats;
+        return _docker.Stats(containerId);
     }
 
     [HttpGet("{containerId}/memory")]
-    public ActionResult<MemoryStats> Memory(string containerId)
+    public Result<MemoryStats> Memory(string containerId)
     {
-        MemoryStats? stats = _docker.Memory(containerId);
-
-        if (stats == null)
-            return NotFound("Could not find container.");
-
-        return stats;
+        return _docker.Memory(containerId);
     }
 
     [HttpGet("{containerId}/network")]
-    public ActionResult<NetworkStats> Network(string containerId)
+    public Result<NetworkStats> Network(string containerId)
     {
-        NetworkStats? stats = _docker.Network(containerId);
-
-        if (stats == null)
-            return NotFound("Could not find container.");
-
-        return stats;
+        return _docker.Network(containerId);
     }
 
     [HttpGet("{containerId}/cpu")]
-    public ActionResult<double> Cpu(string containerId)
+    public Result<double> Cpu(string containerId)
     {
-        double? stats = _docker.Cpu(containerId);
-
-        if (stats == null)
-            return NotFound("Could not find container.");
-
-        return stats;
+        return _docker.Cpu(containerId);
     }
     
     #endregion

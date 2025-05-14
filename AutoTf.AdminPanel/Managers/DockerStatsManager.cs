@@ -1,4 +1,7 @@
 using System.Collections.Concurrent;
+using AutoTf.AdminPanel.Models;
+using AutoTf.AdminPanel.Models.Enums;
+using AutoTf.AdminPanel.Models.Interfaces;
 using AutoTf.AdminPanel.Models.Requests;
 using Docker.DotNet.Models;
 using MemoryStats = AutoTf.AdminPanel.Models.Requests.MemoryStats;
@@ -6,7 +9,7 @@ using NetworkStats = AutoTf.AdminPanel.Models.Requests.NetworkStats;
 
 namespace AutoTf.AdminPanel.Managers;
 
-public class DockerStatsManager
+public class DockerStatsManager : IDockerStatsManager
 {
     private readonly DockerCacheManager _docker;
     private readonly ServerStatsCacheManager _server;
@@ -118,53 +121,53 @@ public class DockerStatsManager
         return Network(stats);
     }
 
-    public MemoryStats? Memory(string containerId)
+    public Result<MemoryStats> Memory(string containerId)
     {
         ContainerStatsResponse? response = _docker.GetCachedStats(containerId);
 
         if (response == null)
-            return null;
+            return Result.Fail<MemoryStats>(ResultCode.NotFound, $"Could not find container {containerId}.");
 
-        return Memory(response);
+        return Result.Ok(Memory(response));
     }
 
-    public double? Cpu(string containerId)
+    public Result<double> Cpu(string containerId)
     {
         ContainerStatsResponse? response = _docker.GetCachedStats(containerId);
 
         if (response == null)
-            return null;
+            return Result.Fail<double>(ResultCode.NotFound, $"Could not find container {containerId}.");
 
-        return Cpu(response);
+        return Result.Ok(Cpu(response));
     }
 
-    public NetworkStats? Network(string containerId)
+    public Result<NetworkStats> Network(string containerId)
     {
         ContainerStatsResponse? response = _docker.GetCachedStats(containerId);
 
         if (response == null)
-            return null;
+            return Result.Fail<NetworkStats>(ResultCode.NotFound, $"Could not find container {containerId}.");
 
-        return Network(response);
+        return Result.Ok(Network(response));
     }
 
-    public ContainerStats? Stats(string containerId)
+    public Result<ContainerStats> Stats(string containerId)
     {
         ContainerStatsResponse? response = _docker.GetCachedStats(containerId);
 
         if (response == null)
-            return null;
+            return Result.Fail<ContainerStats>(ResultCode.NotFound, $"Could not find container {containerId}.");
 
         NetworkStats network = Network(response);
         MemoryStats memory = Memory(response);
         double cpuUsage = Cpu(response);
 
-        return new ContainerStats()
+        return Result.Ok(new ContainerStats()
         {
             Network = network,
             Memory = memory,
             CpuUsage = cpuUsage
-        };
+        });
     }
     
     #region Core
