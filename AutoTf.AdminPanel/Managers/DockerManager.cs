@@ -1,5 +1,6 @@
 using AutoTf.AdminPanel.Models;
 using AutoTf.AdminPanel.Models.Enums;
+using AutoTf.AdminPanel.Models.Interfaces;
 using AutoTf.AdminPanel.Models.Requests;
 using AutoTf.AdminPanel.Statics;
 using Docker.DotNet;
@@ -7,7 +8,7 @@ using Docker.DotNet.Models;
 
 namespace AutoTf.AdminPanel.Managers;
 
-public class DockerManager
+public class DockerManager : IDockerManager
 {
     public readonly DockerClient Client;
 
