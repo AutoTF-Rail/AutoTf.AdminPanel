@@ -3,6 +3,8 @@ let _container = null
 let startButton = null;
 let stopButton = null;
 
+let hasMadeChanges = false;
+
 
 async function saveAllowedTrains() {
     const newLimit = parseInt(document.getElementById("manageAllowedTrains").value, 10);
@@ -12,6 +14,7 @@ async function saveAllowedTrains() {
         return;
     }
 
+    hasMadeChanges = true;
     try {
         const response = await fetch(`https://admin.autotf.de/api/docker/${_container.containerId}/updateAllowedTrains`, {
             method: "POST",
@@ -36,6 +39,8 @@ async function saveAllowedTrains() {
 async function openManageDialog(container) {
     invokeLoadingScreen(true);
     console.log("Opening manage dialog for: ", container.containerId);
+    
+    hasMadeChanges = false;
     
     _container = container;
 
@@ -89,9 +94,10 @@ async function openManageDialog(container) {
 
 async function closeManageDialog() {
     document.getElementById('manageDialog').classList.remove('open');
-    await fetchManaged();
-    await fetchOtherStats();
-    
+    if (hasMadeChanges) {
+        await fetchManaged();
+        await fetchOtherStats();
+    }
 }
 
 // Placeholder actions 
@@ -103,6 +109,7 @@ function updateContainer() { alert("Updating..."); }
 async function deleteContainer() {
     invokeLoadingScreen(true);
     if (confirm(`Are you sure you want to delete this container?`)) {
+        hasMadeChanges = true;
         await fetch(`/api/manage/${_container.id}`, { method: 'DELETE' });
         await fetchManaged();
         await closeManageDialog();
