@@ -36,7 +36,7 @@ async function fetchManaged() {
         const item = document.createElement('li');
         item.className = 'container-item';
 
-        const containerInfo = await fetch(`/api/docker/getById/${container.containerId}`);
+        const containerInfo = await fetch(`/api/docker/${container.containerId}`);
         const containerBody = await containerInfo.json();
 
         const trainCountRes = await fetch(`/api/docker/${container.containerId}/trainCount`);
