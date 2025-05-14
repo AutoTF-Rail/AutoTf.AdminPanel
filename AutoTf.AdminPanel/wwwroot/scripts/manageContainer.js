@@ -62,7 +62,7 @@ async function openManageDialog(container) {
     document.getElementById('statStorage').innerHTML = `${size} GB`;
     
 
-    const containerInfo = await fetch(`/api/docker/getById/${_container.containerId}`);
+    const containerInfo = await fetch(`/api/docker/${_container.containerId}`);
     const containerBody = await containerInfo.json();
     
     const state = containerBody.state;
