@@ -106,24 +106,9 @@ public class AuthManager : IAuthManager
 
     public async Task<Result<string>> UpdateOutpost(string id, OutpostModel config)
     {
-        try
-        {
-            HttpContent content = new StringContent(JsonSerializer.Serialize(config), Encoding.UTF8, "application/json");
+        HttpContent content = new StringContent(JsonSerializer.Serialize(config), Encoding.UTF8, "application/json");
 
-            string? result = await ApiHttpHelper.SendPut($"{_credentials.AuthUrl}/api/v3/outposts/instances/{id}/", content, _apiKey, true);
-            
-            if(result == null)
-                return Result.Fail<string>(ResultCode.InternalServerError, $"Failed to update outpost {id}.");
-            
-            return Result.Ok(result);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine($"Something went wrong when updating outpost {id}:");
-            Console.WriteLine(e.ToString());
-
-            return Result.Fail<string>(ResultCode.InternalServerError, $"An unexpected error occurred while updating outpost {id}.");
-        }
+        return await ApiHttpHelper.SendPut($"{_credentials.AuthUrl}/api/v3/outposts/instances/{id}/", content, _apiKey);
     }
 
     public async Task<Result<List<Flow>>> GetAuthorizationFlows()

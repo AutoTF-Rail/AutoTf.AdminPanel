@@ -204,8 +204,10 @@ public class ManageManager
             return await AssembleProblem("A container with this name already exists.");
         
         // Cloudflare
-        if (!await _cloudflare.CreateNewEntry(request.DnsRecord))
-            return await AssembleProblem("Failed to create DNS entry.");
+
+        Result<object> entryCreation = await _cloudflare.CreateNewEntry(request.DnsRecord);
+        if (!entryCreation.IsSuccess)
+            return await AssembleProblem($"Failed to create DNS entry. {entryCreation.Error}");
 
         DnsRecord? record = _cloudflare.GetRecordByName(request.DnsRecord.Name, request.DnsRecord.Type);
 
@@ -281,7 +283,7 @@ public class ManageManager
         bool pleskDeletionSuccess = false;
         
         if (recordId != null)
-            entryDeletionSuccess = await _cloudflare.DeleteEntry(recordId);
+            entryDeletionSuccess = (await _cloudflare.DeleteEntry(recordId)).IsSuccess;
 
         if (entryDeletionSuccess)
             error += " Deleted Dns Entry.";

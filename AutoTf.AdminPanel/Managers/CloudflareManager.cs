@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.Json;
 using AutoTf.AdminPanel.Models;
+using AutoTf.AdminPanel.Models.Interfaces;
 using AutoTf.AdminPanel.Models.Requests;
 using AutoTf.AdminPanel.Statics;
 using Microsoft.Extensions.Options;
@@ -8,7 +9,7 @@ using Timer = System.Timers.Timer;
 
 namespace AutoTf.AdminPanel.Managers;
 
-public class CloudflareManager : IHostedService
+public class CloudflareManager : ICloudflareManager
 {
     private Timer _timer = new Timer(TimeSpan.FromMinutes(5));
     private Credentials _credentials;
@@ -33,126 +34,81 @@ public class CloudflareManager : IHostedService
         _timer.Start();
     }
 
-    public async Task<bool> CreateNewEntry(CreateDnsRecord record)
+    public bool DoesEntryExistByName(string name) => Records.Any(x => x.Name == name.ToLower());
+
+    public bool DoesEntryExist(string id) => Records.Any(x => x.Id == id);
+
+    public DnsRecord? GetRecordByName(string name, string type) => Records.FirstOrDefault(x => x.Name.StartsWith(name.ToLower()) && x.Type == type);
+
+    public DnsRecord? GetRecord(string id) => Records.FirstOrDefault(x => x.Id == id);
+
+    public async Task<Result<object>> CreateNewEntry(CreateDnsRecord record)
     {
-        try
-        {
-            record.Comment = "Managed by AutoTF Admin Panel. " + record.Comment;
-            record.Name = record.Name.ToLower();
-            
-            HttpContent content = new StringContent(JsonSerializer.Serialize(record), Encoding.UTF8, "application/json");
-            
-            CreateDnsRecordResult? result = await ApiHttpHelper.SendPost<CreateDnsRecordResult>($"https://api.cloudflare.com/client/v4/zones/{_credentials.CloudflareZone}/dns_records", content, _credentials.CloudflareKey, true);
+        record.Comment = "Managed by AutoTF Admin Panel. " + record.Comment;
+        record.Name = record.Name.ToLower();
+        
+        HttpContent content = new StringContent(JsonSerializer.Serialize(record), Encoding.UTF8, "application/json");
+        
+        Result<CreateDnsRecordResult> result = await ApiHttpHelper.SendPost<CreateDnsRecordResult>($"https://api.cloudflare.com/client/v4/zones/{_credentials.CloudflareZone}/dns_records", content, _credentials.CloudflareKey);
 
-            if (result == null)
-            {
-                Console.WriteLine("Failed to create DNS entry:");
-                foreach (object error in result.Errors)
-                {
-                    Console.WriteLine(error.ToString());
-                }
-
-                return false;
-            }
-            
-            Records.Add(result.Result);
-            return true;
-        }
-        catch (Exception e)
+        if (!result.IsSuccess || result.Value == null)
         {
-            Console.WriteLine($"Something went wrong when configuring the DNS entry for {record.Name}:");
-            Console.WriteLine(e.ToString());
+            return Result.Fail(result.ResultCode, result.Error);
         }
         
-        return false;
+        Records.Add(result.Value.Result);
+
+        return Result.Ok();
     }
 
-    public async Task<bool> DeleteEntry(string id)
+    public async Task<Result<object>> DeleteEntry(string id)
     {
-        try
+        Result<string> result = await ApiHttpHelper.SendDelete($"https://api.cloudflare.com/client/v4/zones/{_credentials.CloudflareZone}/dns_records/{id}", _credentials.CloudflareKey);
+        
+        if (!result.IsSuccess || result.Value == null)
         {
-            Result<string> result = await ApiHttpHelper.SendDelete($"https://api.cloudflare.com/client/v4/zones/{_credentials.CloudflareZone}/dns_records/{id}", _credentials.CloudflareKey);
-            
-            if (!result.IsSuccess)
-                return false;
-
-            await UpdateCache();
-            
-            return true;
+            return Result.Fail(result.ResultCode, result.Error);
         }
-        catch (Exception e)
+
+        await UpdateCache();
+        
+        return Result.Ok();
+    }
+
+    public async Task<Result<object>> UpdateRecord(string id, CreateDnsRecord record)
+    {
+        record.Name = record.Name.ToLower();
+        
+        HttpContent content = new StringContent(JsonSerializer.Serialize(record), Encoding.UTF8, "application/json");
+
+        Result<string> result = await ApiHttpHelper.SendPatch($"https://api.cloudflare.com/client/v4/zones/{_credentials.CloudflareZone}/dns_records/{id}", content, _credentials.CloudflareKey);
+        
+        if (!result.IsSuccess || result.Value == null)
         {
-            Console.WriteLine($"Something went wrong when deleting the DNS entry {id}:");
-            Console.WriteLine(e.ToString());
-            return false;
-        }
-    }
-
-    public bool DoesEntryExistByName(string name)
-    {
-        return Records.Any(x => x.Name == name.ToLower());
-    }
-
-    public bool DoesEntryExist(string id)
-    {
-        return Records.Any(x => x.Id == id);
-    }
-
-    public DnsRecord? GetRecordByName(string name, string type)
-    {
-        return Records.FirstOrDefault(x => x.Name.StartsWith(name.ToLower()) && x.Type == type);
-    }
-
-    public DnsRecord? GetRecord(string id)
-    {
-        return Records.FirstOrDefault(x => x.Id == id);
-    }
-
-    public async Task<string?> UpdateRecord(string id, CreateDnsRecord record)
-    {
-        try
-        {
-            if (!record.Comment.Contains("Managed by AutoTF Admin Panel."))
-                record.Comment = "Managed by AutoTF Admin Panel. " + record.Comment;
-
-            record.Name = record.Name.ToLower();
-            
-            HttpContent content = new StringContent(JsonSerializer.Serialize(record), Encoding.UTF8, "application/json");
-
-            return await ApiHttpHelper.SendPatch(
-                $"https://api.cloudflare.com/client/v4/zones/{_credentials.CloudflareZone}/dns_records/{id}", content,
-                _credentials.CloudflareKey, true);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine("Something went wrong when updating the DNS Record: ");
-            Console.WriteLine(e.ToString());
+            return Result.Fail(result.ResultCode, result.Error);
         }
         
-        return null;
+        await UpdateCache();
+        
+        return Result.Ok();
     }
 
     public async Task UpdateCache()
     {
-        try
-        {
-            Console.WriteLine("Updating cloudflare records cache.");
-            
-            Result<DnsRecords> dnsRecords = await ApiHttpHelper.SendGet<DnsRecords>($"https://api.cloudflare.com/client/v4/zones/{_credentials.CloudflareZone}/dns_records", _credentials.CloudflareKey);
-            
-            if (!dnsRecords.IsSuccess || dnsRecords.Value == null)
-                throw new Exception($"Empty return from Cloudflare API. {dnsRecords.Error}");
+        
+        Console.WriteLine("Updating cloudflare records cache.");
+        
+        Result<DnsRecords> dnsRecords = await ApiHttpHelper.SendGet<DnsRecords>($"https://api.cloudflare.com/client/v4/zones/{_credentials.CloudflareZone}/dns_records", _credentials.CloudflareKey);
 
-            Records = dnsRecords.Value.Records.Where(x => x.Comment != null && x.Comment.Contains("Managed by AutoTF Admin Panel.")).ToList();
-            
-            Console.WriteLine($"Finished updating cloudflare records cache with {Records.Count} records.");
-        }
-        catch (Exception e)
+        if (!dnsRecords.IsSuccess || dnsRecords.Value == null)
         {
-            Console.WriteLine("Something went wrong when updating the DNS cache:");
-            Console.WriteLine(e.ToString());
+            Console.WriteLine($"Failed to update cloudflare cache. {dnsRecords.Error}");
             Environment.Exit(1);
         }
+
+        Records = dnsRecords.Value.Records.Where(x => x.Comment != null && x.Comment.Contains("Managed by AutoTF Admin Panel.")).ToList();
+        
+        Console.WriteLine($"Finished updating cloudflare records cache with {Records.Count} records.");
     }
 
     public Task StopAsync(CancellationToken cancellationToken)

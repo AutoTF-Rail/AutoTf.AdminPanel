@@ -1,4 +1,6 @@
 using AutoTf.AdminPanel.Managers;
+using AutoTf.AdminPanel.Models;
+using AutoTf.AdminPanel.Models.Enums;
 using AutoTf.AdminPanel.Models.Requests;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,43 +18,39 @@ public class CloudflareController : ControllerBase
     }
 
     [HttpPost("create")]
-    public async Task<ActionResult<bool>> CreateRecord([FromBody] CreateDnsRecord record)
+    public async Task<Result<object>> CreateRecord([FromBody] CreateDnsRecord record)
     {
         // TODO: Check that the new values don't already exist
         return await _cloudflare.CreateNewEntry(record);
     }
 
     [HttpDelete("{id}")]
-    public async Task<ActionResult<bool>> DeleteRecord(string id)
+    public async Task<Result<object>> DeleteRecord(string id)
     {
-        // This not only ensures that nothing is deleted that doesn't exist, but it also ensures that nothing is deleted that isnt a Admin Panel managed record.
+        // This not only ensures that nothing is deleted that doesn't exist, but it also ensures that nothing is deleted that isn't a Admin Panel managed record.
         if (!_cloudflare.DoesEntryExist(id))
-            return NotFound("Could not find DNS entry.");
+            return Result.Fail(ResultCode.NotFound, $"Could not find DNS entry {id}.");
         
         return await _cloudflare.DeleteEntry(id);
     }
 
     [HttpGet("{id}")]
-    public ActionResult<DnsRecord> GetRecord(string id)
+    public Result<DnsRecord> GetRecord(string id)
     {
         if (!_cloudflare.DoesEntryExist(id))
-            return NotFound("Could not find DNS entry.");
-        
-        return _cloudflare.GetRecord(id)!;
+            return Result.Fail<DnsRecord>(ResultCode.NotFound, $"Could not find DNS entry {id}.");
+
+        return Result.Ok(_cloudflare.GetRecord(id)!);
     }
 
     [HttpPatch("{id}")]
-    public async Task<ActionResult<string>> UpdateRecord(string id, [FromBody] CreateDnsRecord record)
+    public async Task<Result<object>> UpdateRecord(string id, [FromBody] CreateDnsRecord record)
     {
         if (!_cloudflare.DoesEntryExist(id))
-            return NotFound("Could not find DNS entry.");
+            return Result.Fail(ResultCode.NotFound, $"Could not find DNS entry {id}.");
         
         // TODO: Check that the new values don't already exist
-        string? result = await _cloudflare.UpdateRecord(id, record);
-        if (result == null)
-            return Problem(result);
-
-        return result;
+        return await _cloudflare.UpdateRecord(id, record);
     }
 
     [HttpGet("all")]

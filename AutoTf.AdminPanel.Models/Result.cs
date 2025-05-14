@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace AutoTf.AdminPanel.Models;
 
+/// <summary>
+/// Represents the result of a method, used to report back errors easier. If it is of type object, there is no data, and the Result is only represented by the ResultCode.
+/// </summary>
 public class Result<T> : IConvertToActionResult
 {
     public T? Value { get; }
@@ -41,8 +44,11 @@ public class Result<T> : IConvertToActionResult
 public static class Result
 {
     public static Result<T> Ok<T>(T value) => Result<T>.Ok(value);
+    public static Result<object> Ok() => Result<object>.Ok(new object());
 
     public static Result<T> Fail<T>(ResultCode resultCode, string error) => Result<T>.Fail(resultCode, error);
+
+    public static Result<object> Fail(ResultCode resultCode, string error) => Result<object>.Fail(resultCode, error);
     
     public static ResultCode MapStatusToResultCode(HttpStatusCode statusCode) => statusCode switch
     {
