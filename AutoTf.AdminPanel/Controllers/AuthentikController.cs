@@ -72,6 +72,12 @@ public class AuthentikController : ControllerBase
         return await _auth.GetProviderIdByExternalHost(externalHost);
     }
 
+    [HttpGet("provider/{pk}")]
+    public async Task<Result<Provider>> GetProvider(string pk)
+    {
+        return await _auth.GetProvider(pk);
+    }
+
     [HttpDelete("provider/{id}")]
     public async Task<Result<string>> DeleteProvider(string id)
     {

@@ -184,6 +184,26 @@ public class AuthManager : IAuthManager
         return Result.Ok(filtered);
     }
 
+    public async Task<Result<Provider>> GetProvider(string pk)
+    {
+        Result<ProviderPaginationResult> result = await GetProviders();
+        
+        if (!result.IsSuccess || result.Value?.Results == null)
+        {
+            return Result.Fail<Provider>(result.ResultCode, result.Error);
+        }
+        
+        if (!result.Value.Results.Any())
+            return Result.Fail<Provider>(ResultCode.NotFound, "Did not find any providers.");
+
+        Provider? provider = result.Value.Results.FirstOrDefault(x => x.Pk != null && x.Pk == pk);
+
+        if (provider == null)
+            return Result.Fail<Provider>(ResultCode.NotFound, $"Could not find a provider by the given id {pk}.");
+
+        return Result.Ok(provider);
+    }
+
     public async Task<Result<ApplicationPaginationResult>> GetApplications()
     {
         Result<ApplicationPaginationResult> result = await ApiHttpHelper.SendGet<ApplicationPaginationResult>($"{_credentials.AuthUrl}/api/v3/core/applications/?ordering=name&page=1&page_size=200&search=&superuser_full_list=true", _apiKey);

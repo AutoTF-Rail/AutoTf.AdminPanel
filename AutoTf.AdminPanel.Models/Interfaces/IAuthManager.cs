@@ -30,6 +30,8 @@ public interface IAuthManager : IHostedService
 
     public Task<Result<string>> GetProviderIdByExternalHost(string externalHost);
 
+    public Task<Result<Provider>> GetProvider(string pk);
+
     public Task<Result<string>> GetApplicationSlugByLaunchUrl(string launchUrl);
 
     public Task<Result<string>> AssignToOutpost(string outpostId, string providerPk);
