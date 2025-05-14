@@ -34,11 +34,12 @@ public class ManageManager
 
         foreach (string domain in containers)
         {
-            string? host = _plesk.GetAuthHost(domain);
-            if (host == null)
+            Result<string> host = _plesk.GetAuthHost(domain);
+            
+            if (!host.IsSuccess || host.Value == null)
                 continue;
             
-            if(host == authHost)
+            if(host.Value == authHost)
                 sameHost.Add(domain);
         }
 
@@ -266,8 +267,11 @@ public class ManageManager
             return await AssembleProblem($"Failed while assigning the provider to the outpost. {assignResult.Error}", record.Id, container.ID, request.Proxy.ExternalHost);
         
         // Plesk
-        if (!_plesk.CreateSubdomain(request.Plesk.SubDomain, request.Plesk.RootDomain, request.Plesk.Email, request.Plesk.AuthentikHost))
-            return await AssembleProblem("Something went wrong when creating the subdomain in plesk.", record.Id, container.ID, request.Proxy.ExternalHost);
+
+        Result<object> pleskResult = _plesk.CreateSubdomain(request.Plesk.SubDomain, request.Plesk.RootDomain, request.Plesk.Email, request.Plesk.AuthentikHost);
+        
+        if (!pleskResult.IsSuccess)
+            return await AssembleProblem($"Something went wrong when creating the subdomain in plesk. {pleskResult.Error}", record.Id, container.ID, request.Proxy.ExternalHost);
 
         return null;
     }
@@ -328,7 +332,7 @@ public class ManageManager
 
         
         if (subDomain != null && rootDomain != null)
-            pleskDeletionSuccess = _plesk.DeleteSubDomain(rootDomain, subDomain);
+            pleskDeletionSuccess = _plesk.DeleteSubDomain(rootDomain, subDomain).IsSuccess;
         
         if (pleskDeletionSuccess)
             error += " Deleted plesk site.";

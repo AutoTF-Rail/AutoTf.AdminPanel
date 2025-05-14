@@ -64,9 +64,9 @@ public class IpWatcher : IIpWatcher
 
         Parallel.ForEach(pleskRecords, domain =>
         {
-            string? currentHost = _plesk.GetAuthHost(domain); // http://xx.xx.xx.xx:9000
+            Result<string> currentHost = _plesk.GetAuthHost(domain); // http://xx.xx.xx.xx:9000
             
-            if (currentHost == null || currentHost.Contains(_latestAuthIp))
+            if (!currentHost.IsSuccess || currentHost.Value == null || currentHost.Value.Contains(_latestAuthIp))
                 return;
 
             matched++;
