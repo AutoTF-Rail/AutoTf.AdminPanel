@@ -15,11 +15,11 @@ namespace AutoTf.AdminPanel.Managers;
 public class ManageManager
 {
     private readonly IAuthManager _auth;
-    private readonly CloudflareManager _cloudflare;
+    private readonly ICloudflareManager _cloudflare;
     private readonly PleskManager _plesk;
     private readonly IDockerManager _docker;
 
-    public ManageManager(IDockerManager docker, IAuthManager auth, CloudflareManager cloudflare, PleskManager plesk)
+    public ManageManager(IDockerManager docker, IAuthManager auth, ICloudflareManager cloudflare, PleskManager plesk)
     {
         _auth = auth;
         _cloudflare = cloudflare;

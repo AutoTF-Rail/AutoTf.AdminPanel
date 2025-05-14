@@ -1,5 +1,6 @@
 using AutoTf.AdminPanel.Managers;
 using AutoTf.AdminPanel.Models;
+using AutoTf.AdminPanel.Models.Interfaces;
 using AutoTf.AdminPanel.Models.Requests;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,9 +10,9 @@ namespace AutoTf.AdminPanel.Controllers;
 [Route("/api/cloudflare")]
 public class CloudflareController : ControllerBase
 {
-    private readonly CloudflareManager _cloudflare;
+    private readonly ICloudflareManager _cloudflare;
 
-    public CloudflareController(CloudflareManager cloudflare)
+    public CloudflareController(ICloudflareManager cloudflare)
     {
         _cloudflare = cloudflare;
     }
