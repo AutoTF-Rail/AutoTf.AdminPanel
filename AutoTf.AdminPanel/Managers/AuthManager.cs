@@ -7,8 +7,6 @@ using AutoTf.AdminPanel.Models.Interfaces;
 using AutoTf.AdminPanel.Models.Requests;
 using AutoTf.AdminPanel.Models.Requests.Authentik;
 using AutoTf.AdminPanel.Statics;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Group = AutoTf.AdminPanel.Models.Requests.Authentik.Group;
 using Timer = System.Timers.Timer;
@@ -211,6 +209,21 @@ public class AuthManager : IAuthManager
         return Result.Ok(filtered);
     }
 
+    public async Task<Result<bool>> DoesApplicationExist(string slug)
+    {
+        Result<ApplicationPaginationResult> applications = await GetApplications();
+
+        if (!applications.IsSuccess || applications.Value == null)
+            return Result.Fail<bool>(applications.ResultCode, applications.Error);
+
+        slug = slug.ToLower();
+        
+        if (applications.Value.Results.Any(x => x.Slug.ToLower() == slug))
+            return Result.Ok(true);
+        
+        return Result.Ok(false);
+    }
+
     public async Task<Result<string>> DeleteProvider(string id)
     {
         return await ApiHttpHelper.SendDelete($"{_credentials.AuthUrl}/api/v3/providers/proxy/{id}/", _apiKey);
@@ -218,6 +231,11 @@ public class AuthManager : IAuthManager
 
     public async Task<Result<string>> DeleteApplication(string slug)
     {
+        Result<bool> doesApplicationExist = await DoesApplicationExist(slug);
+        
+        if(!doesApplicationExist.IsSuccess)
+            return Result.Fail<string>(doesApplicationExist.ResultCode, doesApplicationExist.Error);
+        
         return await ApiHttpHelper.SendDelete($"{_credentials.AuthUrl}/api/v3/core/applications/{slug}/", _apiKey);
     }
 
@@ -312,7 +330,7 @@ public class AuthManager : IAuthManager
         
         HttpContent content = new FormUrlEncodedContent(headers);
 
-        TokenRequestModel response = await HttpHelper.SendPost<TokenRequestModel>($"{_credentials.AuthUrl}/application/o/token/", content, false) ?? new TokenRequestModel();
+        TokenRequestModel response = await HttpHelper.SendPost<TokenRequestModel>($"{_credentials.AuthUrl}/application/o/token/", content) ?? new TokenRequestModel();
         
         if (response.ExpiresIn == 0)
         {

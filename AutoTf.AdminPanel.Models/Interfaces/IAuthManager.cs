@@ -25,6 +25,8 @@ public interface IAuthManager : IHostedService
     public Task<Result<ApplicationPaginationResult>> GetApplications();
 
     public Task<Result<string>> DeleteProvider(string id);
+    
+    public Task<Result<bool>> DoesApplicationExist(string slug);
 
     public Task<Result<string>> DeleteApplication(string slug);
 

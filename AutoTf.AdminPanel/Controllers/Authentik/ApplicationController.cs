@@ -19,7 +19,6 @@ public class ApplicationController : ControllerBase
     [HttpDelete("{slug}")]
     public async Task<Result<string>> DeleteApplication(string slug)
     {
-        // TODO: Check for existance
         return await _auth.DeleteApplication(slug);
     }
 

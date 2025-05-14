@@ -123,39 +123,6 @@ public class ManageManager
         return JsonSerializer.Deserialize<ManageBody>(decoded)!;
     }
     
-    public async Task<List<ContainerListResponse>> AllDocker()
-    {
-        List<ContainerListResponse> managedContainers = new List<ContainerListResponse>();
-        
-        List<ContainerListResponse> containers = await _docker.GetAll();
-        List<string> pleskDomains = _plesk.Records;
-        
-        Result<ProviderPaginationResult> authResult = await _auth.GetProviders();
-
-        if (!authResult.IsSuccess || authResult.Value == null)
-            return new List<ContainerListResponse>();
-        
-        List<Provider> providers = authResult.Value.Results;
-        
-        
-        foreach (ContainerListResponse container in containers)
-        {
-            string name = container.Names.First().Replace("/autotf-", "");
-            if (!pleskDomains.Any(x => x.StartsWith(name)))
-                continue;
-            
-            if (!providers.Any(x => x.Name.ToLower().Replace("managed provider for ", "").StartsWith(name)))
-                continue;
-            
-            if (!_cloudflare.Records.Any(x => x.Name.StartsWith(name)))
-                continue;
-            
-            managedContainers.Add(container);
-        }
-
-        return managedContainers;
-    }
-    
     public async Task<List<string>> AllPlesk()
     {
         List<string> managedContainers = new List<string>();
