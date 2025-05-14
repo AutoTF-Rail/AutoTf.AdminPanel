@@ -23,7 +23,7 @@ public class Program
         builder.Services.AddHostedSingleton<DockerCacheManager>();
         builder.Services.AddHostedSingleton<ICloudflareManager, CloudflareManager>();
         builder.Services.AddHostedSingleton<IAuthManager, AuthManager>();
-        builder.Services.AddHostedSingleton<PleskManager>();
+        builder.Services.AddHostedSingleton<IPleskManager, PleskManager>();
         builder.Services.AddHostedSingleton<IIpWatcher, IpWatcher>();
         
         // stored in appsettings.Development.json or set manually in .env

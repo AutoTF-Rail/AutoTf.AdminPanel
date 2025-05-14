@@ -1,5 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using AutoTf.AdminPanel.Managers;
+using AutoTf.AdminPanel.Models;
+using AutoTf.AdminPanel.Models.Interfaces;
 using AutoTf.AdminPanel.Models.Requests;
 using AutoTf.AdminPanel.Statics;
 using Microsoft.AspNetCore.Mvc;
@@ -10,21 +12,21 @@ namespace AutoTf.AdminPanel.Controllers;
 [Route("api/plesk")]
 public class PleskController : ControllerBase
 {
-    private readonly PleskManager _plesk;
+    private readonly IPleskManager _plesk;
 
-    public PleskController(PleskManager plesk)
+    public PleskController(IPleskManager plesk)
     {
         _plesk = plesk;
     }
 
     [HttpPost("create")]
-    public ActionResult<bool> Create([FromBody] CreateSubdomainRequest request)
+    public Result<object> Create([FromBody] CreateSubdomainRequest request)
     {
         return _plesk.CreateSubdomain(request.SubDomain.ToLower(), request.RootDomain.ToLower(), request.Email, request.AuthentikHost);
     }
 
     [HttpDelete("{rootDomain}/{subDomain}")]
-    public ActionResult<bool> Delete(string rootDomain, string subDomain)
+    public Result<object> Delete(string rootDomain, string subDomain)
     {
         return _plesk.DeleteSubDomain(rootDomain, subDomain);
     }
@@ -49,26 +51,22 @@ public class PleskController : ControllerBase
     }
 
     [HttpPost("{rootDomain}/{subDomain}/updateAuthHost")]
-    public IActionResult UpdateAuthHost(string rootDomain, string subDomain, [FromBody, Required] string newAuthHost)
+    public Result<object> UpdateAuthHost(string rootDomain, string subDomain, [FromBody, Required] string newAuthHost)
     {
-        if (_plesk.UpdateAuthHost(rootDomain, subDomain, newAuthHost))
+        Result<object> result = _plesk.UpdateAuthHost(rootDomain, subDomain, newAuthHost);
+        
+        if(result.IsSuccess)
         {
             _plesk.ReloadNginx();
-            return Ok();
         }
 
-        return Problem($"Something went wrong when updating to the new auth host {newAuthHost}.");
+        return result;
     }
 
     [HttpGet("{rootDomain}/{subDomain}/authHost")]
-    public ActionResult<string> GetAuthHost(string rootDomain, string subDomain)
+    public Result<string> GetAuthHost(string rootDomain, string subDomain)
     {
-        string? authHost = _plesk.GetAuthHost(rootDomain, subDomain);
-
-        if (authHost == null)
-            return Problem("Could not read auth host because the subdomain does not exist, or it's invalid.");
-
-        return authHost;
+        return _plesk.GetAuthHost(rootDomain, subDomain);
     }
 
     [HttpGet("{domain}/extract")]

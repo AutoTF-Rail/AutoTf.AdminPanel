@@ -16,10 +16,10 @@ public class ManageManager
 {
     private readonly IAuthManager _auth;
     private readonly ICloudflareManager _cloudflare;
-    private readonly PleskManager _plesk;
+    private readonly IPleskManager _plesk;
     private readonly IDockerManager _docker;
 
-    public ManageManager(IDockerManager docker, IAuthManager auth, ICloudflareManager cloudflare, PleskManager plesk)
+    public ManageManager(IDockerManager docker, IAuthManager auth, ICloudflareManager cloudflare, IPleskManager plesk)
     {
         _auth = auth;
         _cloudflare = cloudflare;

@@ -1,14 +1,16 @@
 using System.Collections.Concurrent;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
+using AutoTf.AdminPanel.Models;
+using AutoTf.AdminPanel.Models.Enums;
+using AutoTf.AdminPanel.Models.Interfaces;
 using AutoTf.AdminPanel.Statics;
 using Timer = System.Timers.Timer;
 
 namespace AutoTf.AdminPanel.Managers;
 
-public class PleskManager : IHostedService
+public class PleskManager : IPleskManager
 {
-    
     private Timer _timer = new Timer(TimeSpan.FromMinutes(5));
 
     public List<string> Records { get; private set; } = [];
@@ -30,7 +32,7 @@ public class PleskManager : IHostedService
     /// <summary>
     /// Creates a subdomain in plesk and automatically issues a lets encrypt certificate for it.
     /// </summary>
-    public bool CreateSubdomain(string subDomain, string rootDomain, string email, string authentikHost)
+    public Result<object> CreateSubdomain(string subDomain, string rootDomain, string email, string authentikHost)
     {
         subDomain = subDomain.ToLower();
         rootDomain = rootDomain.ToLower();
@@ -39,77 +41,79 @@ public class PleskManager : IHostedService
             $"plesk bin subdomain --create {subDomain} -domain {rootDomain} -admin-description \"Externally managed by AutoTF\"");
 
         if (!result.Contains("SUCCESS: Creation of"))
-            return false;
+            return Result.Fail<object>(ResultCode.InternalServerError, $"Failed while creating subdomain \"{subDomain}.{rootDomain}\".");
 
         if (!IssueCertificate(subDomain, rootDomain, email))
-            return false;
+            return Result.Fail<object>(ResultCode.InternalServerError, $"Failed while issuing the certificate for \"{subDomain}.{rootDomain}\".");
 
         PointToAuthentik(subDomain, rootDomain, authentikHost);
         Records.Add($"{subDomain}.{rootDomain}");
-        return true;
+        
+        return Result.Ok();
     }
 
-    public bool DeleteSubDomain(string rootDomain, string subDomain)
+    public Result<object> DeleteSubDomain(string rootDomain, string subDomain)
     {
         subDomain = subDomain.ToLower();
         rootDomain = rootDomain.ToLower();
         string result = CommandExecuter.ExecuteCommand($"plesk bin subdomain --remove {subDomain} -domain {rootDomain}");
 
         if (!result.Contains("SUCCESS: Removal of"))
-            return false;
+            return Result.Fail<object>(ResultCode.InternalServerError, $"Failed while removing subdomain \"{subDomain}.{rootDomain}\".");
 
         string certResult =
             CommandExecuter.ExecuteCommand($"plesk bin certificate --remove 'Lets Encrypt {subDomain}.{rootDomain}' -domain {rootDomain}");
 
         if (!certResult.Contains("was successfully removed"))
-            return false;
+            return Result.Fail<object>(ResultCode.InternalServerError, $"Failed while removing the certificate for \"{subDomain}.{rootDomain}\".");
 
         Task.Run(UpdateCache);
         ReloadNginx();
-        return true;
+        
+        return Result.Ok();
     }
 
-    public bool UpdateAuthHost(string rootDomain, string subDomain, string newAuthHost)
+    public Result<object> UpdateAuthHost(string rootDomain, string subDomain, string newAuthHost)
     {
         return UpdateAuthHost($"{subDomain}.{rootDomain}", newAuthHost);
     }
 
-    public bool UpdateAuthHost(string domain, string newAuthHost)
+    public Result<object> UpdateAuthHost(string domain, string newAuthHost)
     {
         if (!RegexHelper.ValidateAuthHost(newAuthHost))
-            return false;
+            return Result.Fail<object>(ResultCode.InternalServerError, $"Failed while validating the new auth host \"{newAuthHost}\".");
         
         string file = $"/var/www/vhosts/system/{domain}/conf/vhost_nginx.conf";
         
         if (!File.Exists(file))
-            return false;
+            return Result.Fail<object>(ResultCode.NotFound, $"Could not find the domain \"{domain}\".");
 
         string fileContent = File.ReadAllText(file);
         fileContent = Regex.Replace(fileContent, RegexHelper.AuthHostPattern, newAuthHost);
         File.WriteAllText(file, fileContent);
         
-        return true;
+        return Result.Ok();
     }
 
-    public string? GetAuthHost(string rootDomain, string subDomain)
+    public Result<string> GetAuthHost(string rootDomain, string subDomain)
     {
         return GetAuthHost($"{subDomain}.{rootDomain}");
     }
 
-    public string? GetAuthHost(string domain)
+    public Result<string> GetAuthHost(string domain)
     {
         string file = $"/var/www/vhosts/system/{domain}/conf/vhost_nginx.conf";
         
         if (!File.Exists(file))
-            return null;
+            return Result.Fail<string>(ResultCode.NotFound, $"Could not find the domain \"{domain}\".");
         
         string fileContent = File.ReadAllText(file);
         Match match = Regex.Match(fileContent, RegexHelper.AuthHostPattern);
 
         if (!match.Success)
-            return null;
+            return Result.Fail<string>(ResultCode.NotFound, $"Could not find the auth host in the data for domain \"{domain}\".");
 
-        return match.Value;
+        return Result.Ok(match.Value);
     }
 
     public void ReloadNginx()

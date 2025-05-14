@@ -8,14 +8,14 @@ namespace AutoTf.AdminPanel.Managers;
 public class IpWatcher : IIpWatcher
 {
     private readonly IDockerManager _docker;
-    private readonly PleskManager _plesk;
+    private readonly IPleskManager _plesk;
     private readonly Credentials _credentials;
 
     private string _latestAuthIp = string.Empty; 
     
     private Timer? _currentTimer;
 
-    public IpWatcher(IDockerManager docker, PleskManager plesk, IOptions<Credentials> credentials)
+    public IpWatcher(IDockerManager docker, IPleskManager plesk, IOptions<Credentials> credentials)
     {
         _docker = docker;
         _plesk = plesk;

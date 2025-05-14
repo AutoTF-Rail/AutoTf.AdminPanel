@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using AutoTf.AdminPanel.Managers;
+using AutoTf.AdminPanel.Models.Interfaces;
 using AutoTf.AdminPanel.Models.Manage;
 using AutoTf.AdminPanel.Models.Requests;
 using Microsoft.AspNetCore.Mvc;
@@ -11,9 +12,9 @@ namespace AutoTf.AdminPanel.Controllers;
 public class ManageController : ControllerBase
 {
     private readonly ManageManager _manager;
-    private readonly PleskManager _plesk;
+    private readonly IPleskManager _plesk;
 
-    public ManageController(ManageManager manager, PleskManager plesk)
+    public ManageController(ManageManager manager, IPleskManager plesk)
     {
         _manager = manager;
         _plesk = plesk;
