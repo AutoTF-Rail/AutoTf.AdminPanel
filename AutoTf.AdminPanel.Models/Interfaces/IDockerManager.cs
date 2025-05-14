@@ -1,10 +1,12 @@
 using AutoTf.AdminPanel.Models.Requests;
+using Docker.DotNet;
 using Docker.DotNet.Models;
 
 namespace AutoTf.AdminPanel.Models.Interfaces;
 
 public interface IDockerManager
 {
+    DockerClient Client { get; }
     Task<List<ContainerListResponse>> GetAll();
     Result<float> GetContainerSize(ContainerListResponse container);
     Task<Result<float>> GetContainerSize(string containerId);

@@ -10,7 +10,7 @@ namespace AutoTf.AdminPanel.Managers;
 
 public class DockerManager : IDockerManager
 {
-    public readonly DockerClient Client;
+    public DockerClient Client { get; private set; }
 
     public DockerManager()
     {
