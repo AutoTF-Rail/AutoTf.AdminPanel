@@ -31,50 +31,50 @@ public class DockerController : ControllerBase
         return await _docker.CreateContainer(parameters);
     }
 
-    [HttpPost("start")]
-    public async Task<Result<object>> StartContainer([FromBody, Required] string id)
+    [HttpPost("{id}/start")]
+    public async Task<Result<object>> StartContainer(string id)
     {
         return await _docker.StartContainer(id);
     }
 
-    [HttpPost("stop")]
-    public async Task<Result<object>> StopContainer([FromBody, Required] string id)
+    [HttpPost("{id}/stop")]
+    public async Task<Result<object>> StopContainer(string id)
     {
         return await _docker.StopContainer(id);
     }
 
-    [HttpPost("kill")]
-    public async Task<Result<object>> KillContainer([FromBody, Required] string id)
+    [HttpPost("{id}/kill")]
+    public async Task<Result<object>> KillContainer(string id)
     {
         return await _docker.KillContainer(id);
     }
 
-    [HttpPost("exists")]
-    public async Task<ActionResult<bool>> Exists([FromBody, Required] string id)
+    [HttpPost("{id}/exists")]
+    public async Task<ActionResult<bool>> Exists(string id)
     {
         return await _docker.ContainerExists(id);
     }
 
-    [HttpPost("running")]
-    public async Task<ActionResult<bool>> Running([FromBody, Required] string id)
+    [HttpPost("{id}/running")]
+    public async Task<ActionResult<bool>> Running(string id)
     {
         return await _docker.ContainerRunning(id);
     }
 
-    [HttpPost("delete")]
-    public async Task<Result<object>> DeleteContainer([FromBody, Required] string id)
+    [HttpPost("{id}/delete")]
+    public async Task<Result<object>> DeleteContainer(string id)
     {
         return await _docker.DeleteContainer(id);
     }
 
-    [HttpGet("getByName")]
-    public async Task<Result<ContainerListResponse>> GetByName([FromBody, Required] string name)
+    [HttpGet("name/{name}")]
+    public async Task<Result<ContainerListResponse>> GetByName(string name)
     {
         return await _docker.GetContainerByName(name);
     }
 
-    [HttpGet("getById/{id}")]
-    public async Task<Result<ContainerListResponse>> GetById(string id)
+    [HttpGet("{id}")]
+    public async Task<Result<ContainerListResponse>> GetContainer(string id)
     {
         return await _docker.GetContainerById(id);
     }
