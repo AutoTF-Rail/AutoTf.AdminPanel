@@ -118,7 +118,7 @@ async function fetchPlesk() {
 
 // ---- Authentik ----
 async function fetchAuthentik() {
-    const res = await fetch('/api/authentik/providers/');
+    const res = await fetch('/api/authentik/provider/all');
     const data = await res.json();
     const list = document.getElementById('authentikContent');
     list.innerHTML = '';

@@ -70,7 +70,7 @@ function openCreateDialog() {
                     });
                 });
 
-            fetch('/api/authentik/outposts')
+            fetch('/api/authentik/outpost/all')
                 .then(res => res.json())
                 .then(data => {
                     const outpost = document.getElementById('outpost');
