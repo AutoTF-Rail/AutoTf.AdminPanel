@@ -9,7 +9,6 @@ using AutoTf.AdminPanel.Models.Requests.Authentik;
 using AutoTf.AdminPanel.Statics;
 using Docker.DotNet.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Net.Http.Client;
 
 namespace AutoTf.AdminPanel.Managers;
 
@@ -64,11 +63,12 @@ public class ManageManager
         {
             string name = container.Names.First().Replace("/autotf-", "");
             
-            ContainerInspectResponse? inspectedContainer = await _docker.InspectContainerById(container.ID);
-            if (inspectedContainer == null)
+            Result<ContainerInspectResponse> inspectedContainer = await _docker.InspectContainerById(container.ID);
+            
+            if (!inspectedContainer.IsSuccess || inspectedContainer.Value == null)
                 continue;
 
-            string? evuName = inspectedContainer.Config.Env.FirstOrDefault(x => x.StartsWith("evuName="));
+            string? evuName = inspectedContainer.Value.Config.Env.FirstOrDefault(x => x.StartsWith("evuName="));
             
             if (evuName == null)
                 continue;
@@ -199,8 +199,10 @@ public class ManageManager
 
         if (!request.Container.ContainerName.ToLower().StartsWith("autotf-"))
             request.Container.ContainerName = "autotf-" + request.Plesk.SubDomain.ToLower();
+
+        Result<ContainerListResponse> containerByNameResult = await _docker.GetContainerByName(request.Container.ContainerName);
         
-        if (await _docker.GetContainerByName(request.Container.ContainerName) != null)
+        if (containerByNameResult.IsSuccess)
             return await AssembleProblem("A container with this name already exists.");
         
         // Cloudflare
@@ -217,15 +219,17 @@ public class ManageManager
         // Docker
         await _docker.CreateContainer(request.Container);
 
-        ContainerListResponse? container = await _docker.GetContainerByName(request.Container.ContainerName);
+        Result<ContainerListResponse> containerResult = await _docker.GetContainerByName(request.Container.ContainerName);
 
-        if (container == null)
-            return await AssembleProblem("The created container could not be found.", record.Id);
+        if (!containerResult.IsSuccess || containerResult.Value == null)
+            return await AssembleProblem($"The created container could not be found. {containerResult.Error}", record.Id);
+
+        ContainerListResponse container = containerResult.Value;
 
         await _docker.StartContainer(container.ID);
-        container = await _docker.GetContainerByName(request.Container.ContainerName);
+        containerResult = await _docker.GetContainerByName(request.Container.ContainerName);
         
-        if (container == null)
+        if (!containerResult.IsSuccess)
             return await AssembleProblem("The created container could not be found after it was started.", record.Id);
 
         if (!container.NetworkSettings.Networks.TryGetValue(request.Container.DefaultNetwork, out EndpointSettings? endpoint))
@@ -291,11 +295,11 @@ public class ManageManager
 
         if (containerId != null)
         {
-            bool containerKillSuccess = await _docker.KillContainer(containerId);
+            bool containerKillSuccess = (await _docker.KillContainer(containerId)).IsSuccess;
 
             if (containerKillSuccess)
             {
-                if(await _docker.DeleteContainer(containerId))
+                if((await _docker.DeleteContainer(containerId)).IsSuccess)
                     error += containerKillSuccess ? " Deleted container." : "";
             }
         }
@@ -344,7 +348,12 @@ public class ManageManager
         
         foreach (ManageBody container in managedContainers)
         {
-            final += await _docker.GetContainerSize(container.ContainerId!);
+            Result<float> result = await _docker.GetContainerSize(container.ContainerId!);
+            
+            if(!result.IsSuccess)
+                continue;
+            
+            final += result.Value;
         }
 
         return MathF.Round((float)(final / (1024.0 * 1024.0 * 1024.0)), 2);
@@ -357,7 +366,11 @@ public class ManageManager
         
         foreach (ManageBody container in managedContainers)
         {
-            final += await _docker.GetTrainCount(container.ContainerId!);
+            Result<int> result = await _docker.GetTrainCount(container.ContainerId!);
+            
+            if(!result.IsSuccess)
+                continue;
+            final += result.Value;
         }
 
         return final;
@@ -370,7 +383,12 @@ public class ManageManager
         
         foreach (ManageBody container in managedContainers)
         {
-            final += await _docker.GetAllowedTrainsCount(container.ContainerId!);
+            Result<int> result = await _docker.GetAllowedTrainsCount(container.ContainerId!);
+            
+            if(!result.IsSuccess)
+                continue;
+            
+            final += result.Value;
         }
 
         return final;
