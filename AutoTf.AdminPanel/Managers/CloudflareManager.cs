@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.Json;
 using AutoTf.AdminPanel.Models;
+using AutoTf.AdminPanel.Models.Enums;
 using AutoTf.AdminPanel.Models.Interfaces;
 using AutoTf.AdminPanel.Models.Requests;
 using AutoTf.AdminPanel.Statics;
@@ -40,7 +41,13 @@ public class CloudflareManager : ICloudflareManager
 
     public DnsRecord? GetRecordByName(string name, string type) => Records.FirstOrDefault(x => x.Name.StartsWith(name.ToLower()) && x.Type == type);
 
-    public DnsRecord? GetRecord(string id) => Records.FirstOrDefault(x => x.Id == id);
+    public Result<DnsRecord> GetRecord(string id)
+    {
+        if(!DoesEntryExist(id))
+            return Result.Fail<DnsRecord>(ResultCode.NotFound, $"Could not find entry by id {id}.");
+        
+        return Result.Ok(Records.First(x => x.Id == id));
+    }
 
     public async Task<Result<object>> CreateNewEntry(CreateDnsRecord record)
     {
@@ -63,6 +70,9 @@ public class CloudflareManager : ICloudflareManager
 
     public async Task<Result<object>> DeleteEntry(string id)
     {
+        if(!DoesEntryExist(id))
+            return Result.Fail<object>(ResultCode.NotFound, $"Could not find entry by id {id}.");
+        
         Result<string> result = await ApiHttpHelper.SendDelete($"https://api.cloudflare.com/client/v4/zones/{_credentials.CloudflareZone}/dns_records/{id}", _credentials.CloudflareKey);
         
         if (!result.IsSuccess || result.Value == null)
@@ -77,6 +87,9 @@ public class CloudflareManager : ICloudflareManager
 
     public async Task<Result<object>> UpdateRecord(string id, CreateDnsRecord record)
     {
+        if(!DoesEntryExist(id))
+            return Result.Fail<object>(ResultCode.NotFound, $"Could not find entry by id {id}.");
+        
         record.Name = record.Name.ToLower();
         
         HttpContent content = new StringContent(JsonSerializer.Serialize(record), Encoding.UTF8, "application/json");

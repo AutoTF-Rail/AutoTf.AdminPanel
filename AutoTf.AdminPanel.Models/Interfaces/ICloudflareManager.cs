@@ -17,7 +17,7 @@ public interface ICloudflareManager : IHostedService
     
     public DnsRecord? GetRecordByName(string name, string type);
     
-    public DnsRecord? GetRecord(string id);
+    public Result<DnsRecord> GetRecord(string id);
     
     public Task<Result<object>> UpdateRecord(string id, CreateDnsRecord record);
     

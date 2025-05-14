@@ -1,6 +1,5 @@
 using AutoTf.AdminPanel.Managers;
 using AutoTf.AdminPanel.Models;
-using AutoTf.AdminPanel.Models.Enums;
 using AutoTf.AdminPanel.Models.Requests;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,39 +16,29 @@ public class CloudflareController : ControllerBase
         _cloudflare = cloudflare;
     }
 
+    // TODO: Check that the new values don't already exist
     [HttpPost("create")]
     public async Task<Result<object>> CreateRecord([FromBody] CreateDnsRecord record)
     {
-        // TODO: Check that the new values don't already exist
         return await _cloudflare.CreateNewEntry(record);
     }
 
     [HttpDelete("{id}")]
     public async Task<Result<object>> DeleteRecord(string id)
     {
-        // This not only ensures that nothing is deleted that doesn't exist, but it also ensures that nothing is deleted that isn't a Admin Panel managed record.
-        if (!_cloudflare.DoesEntryExist(id))
-            return Result.Fail(ResultCode.NotFound, $"Could not find DNS entry {id}.");
-        
         return await _cloudflare.DeleteEntry(id);
     }
 
     [HttpGet("{id}")]
     public Result<DnsRecord> GetRecord(string id)
     {
-        if (!_cloudflare.DoesEntryExist(id))
-            return Result.Fail<DnsRecord>(ResultCode.NotFound, $"Could not find DNS entry {id}.");
-
-        return Result.Ok(_cloudflare.GetRecord(id)!);
+        return _cloudflare.GetRecord(id);
     }
-
+    
+    // TODO: Check that the new values don't already exist
     [HttpPatch("{id}")]
     public async Task<Result<object>> UpdateRecord(string id, [FromBody] CreateDnsRecord record)
     {
-        if (!_cloudflare.DoesEntryExist(id))
-            return Result.Fail(ResultCode.NotFound, $"Could not find DNS entry {id}.");
-        
-        // TODO: Check that the new values don't already exist
         return await _cloudflare.UpdateRecord(id, record);
     }
 
@@ -60,9 +49,8 @@ public class CloudflareController : ControllerBase
     }
 
     [HttpPost("update")]
-    public async Task<IActionResult> Update()
+    public Task Update()
     {
-        await _cloudflare.UpdateCache();
-        return Ok();
+        return _cloudflare.UpdateCache();
     }
 }
