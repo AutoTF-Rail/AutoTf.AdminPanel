@@ -1,9 +1,7 @@
 using System.ComponentModel.DataAnnotations;
-using AutoTf.AdminPanel.Managers;
 using AutoTf.AdminPanel.Models;
 using AutoTf.AdminPanel.Models.Interfaces;
 using AutoTf.AdminPanel.Models.Requests;
-using AutoTf.AdminPanel.Models.Requests.Authentik;
 using Docker.DotNet.Models;
 using Microsoft.AspNetCore.Mvc;
 

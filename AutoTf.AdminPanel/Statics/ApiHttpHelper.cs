@@ -22,7 +22,7 @@ public class ApiHttpHelper
             if (response.IsSuccessStatusCode)
                 return Result<string>.Ok(content);
 
-            return Result<string>.Fail(Result.MapStatusToResultCode(response.StatusCode), content);
+            return Result<string>.Fail(ResultBase.MapStatusToResultCode(response.StatusCode), content);
         }
         catch (Exception ex)
         {
@@ -45,7 +45,7 @@ public class ApiHttpHelper
             if (response.IsSuccessStatusCode)
                 return Result<string>.Ok(content);
 
-            return Result<string>.Fail(Result.MapStatusToResultCode(response.StatusCode), content);
+            return Result<string>.Fail(ResultBase.MapStatusToResultCode(response.StatusCode), content);
         }
         catch (Exception ex)
         {
@@ -75,7 +75,7 @@ public class ApiHttpHelper
                 return Result<T>.Ok(value);
             }
 
-            return Result<T>.Fail(Result.MapStatusToResultCode(response.StatusCode), content);
+            return Result<T>.Fail(ResultBase.MapStatusToResultCode(response.StatusCode), content);
         }
         catch (Exception ex)
         {
@@ -105,7 +105,7 @@ public class ApiHttpHelper
                 return Result<T>.Ok(value);
             }
 
-            return Result<T>.Fail(Result.MapStatusToResultCode(response.StatusCode), result);
+            return Result<T>.Fail(ResultBase.MapStatusToResultCode(response.StatusCode), result);
         }
         catch (Exception ex)
         {
@@ -152,7 +152,7 @@ public class ApiHttpHelper
                 return Result<string>.Ok(result);
             }
 
-            return Result<string>.Fail(Result.MapStatusToResultCode(response.StatusCode), result);
+            return Result<string>.Fail(ResultBase.MapStatusToResultCode(response.StatusCode), result);
         }
         catch (Exception ex)
         {
@@ -177,7 +177,7 @@ public class ApiHttpHelper
                 return Result<string>.Ok(result);
             }
 
-            return Result<string>.Fail(Result.MapStatusToResultCode(response.StatusCode), result);
+            return Result<string>.Fail(ResultBase.MapStatusToResultCode(response.StatusCode), result);
         }
         catch (Exception ex)
         {

@@ -8,7 +8,6 @@ using AutoTf.AdminPanel.Models.Requests;
 using AutoTf.AdminPanel.Models.Requests.Authentik;
 using AutoTf.AdminPanel.Statics;
 using Docker.DotNet.Models;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AutoTf.AdminPanel.Managers;

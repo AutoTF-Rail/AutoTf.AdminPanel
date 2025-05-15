@@ -44,7 +44,6 @@ public static class CommandExecuter
 			process.Start();
 			process.WaitForExit();
 
-			string output = process.StandardOutput.ReadToEnd();
 			string error = process.StandardError.ReadToEnd();
 
 			if (!string.IsNullOrEmpty(error) && !command.Contains("which"))

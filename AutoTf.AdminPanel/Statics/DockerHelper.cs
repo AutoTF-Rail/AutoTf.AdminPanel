@@ -1,6 +1,3 @@
-using System.Net;
-using System.Net.Sockets;
-using AutoTf.AdminPanel.Managers;
 using AutoTf.AdminPanel.Models.Interfaces;
 using AutoTf.AdminPanel.Models.Requests;
 using Docker.DotNet.Models;
@@ -23,7 +20,7 @@ public static class DockerHelper
         if (string.IsNullOrEmpty(newIp))
             newIp = GetFreeIp(defaultNetwork, containersInNetwork); 
         
-        dict.Add(parameters.DefaultNetwork!, new EndpointSettings()
+        dict.Add(parameters.DefaultNetwork!, new EndpointSettings
         {
             IPAddress = newIp,
             Gateway = defaultNetwork.IPAM.Config.First().Gateway,
@@ -39,7 +36,7 @@ public static class DockerHelper
         IEnumerable<string> containersInAdditionalNetwork = (await dockerManager.GetAll()).Where(x => x.NetworkSettings.Networks.ContainsKey(parameters.AdditionalNetwork)).Select(x => x.NetworkSettings.Networks[parameters.AdditionalNetwork].IPAddress);
 
         string additionalIp = GetFreeIp(additionalNetwork, containersInAdditionalNetwork);
-        dict.Add(parameters.AdditionalNetwork, new EndpointSettings()
+        dict.Add(parameters.AdditionalNetwork, new EndpointSettings
         {
             IPAddress = additionalIp,
             Gateway = defaultNetwork.IPAM.Config.First().Gateway

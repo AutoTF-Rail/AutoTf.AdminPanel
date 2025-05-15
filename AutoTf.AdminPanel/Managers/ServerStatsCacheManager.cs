@@ -86,11 +86,4 @@ public class ServerStatsCacheManager : IHostedService
 
         return (usedMemory / 1024, totalMemory / 1024); // in MB
     }
-
-    private float GetAvailableMemory()
-    {
-        string[] memInfo = File.ReadAllLines("/proc/meminfo");
-        float freeMemory = float.Parse(memInfo.First(x => x.StartsWith("MemFree")).Split(':')[1].Trim().Replace(" kB", ""));
-        return freeMemory / 1024; 
-    }
 }
