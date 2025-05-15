@@ -46,7 +46,7 @@ public class DockerManager : IDockerManager
         if (!containerSize.IsSuccess)
             return containerSize;
         
-        return Result.Ok(MathF.Round((float)(containerSize.Value / (1024.0 * 1024.0 * 1024.0)), 2));
+        return Result<float>.Ok(MathF.Round((float)(containerSize.Value / (1024.0 * 1024.0 * 1024.0)), 2));
     }
 
     public async Task<Result<float>> GetContainerSize(string containerId)
@@ -54,7 +54,7 @@ public class DockerManager : IDockerManager
         Result<ContainerListResponse> container = await GetContainerById(containerId);
         
         if (!container.IsSuccess || container.Value == null)
-            return Result.Fail<float>(ResultCode.NotFound, $"Could not find container {containerId}.");
+            return Result<float>.Fail(ResultCode.NotFound, $"Could not find container {containerId}.");
 
         return GetContainerSize(container.Value);
     }
@@ -62,7 +62,7 @@ public class DockerManager : IDockerManager
     private Result<float> GetDirectorySize(string path)
     {
         if (!Directory.Exists(path))
-            return Result.Fail<float>(ResultCode.NotFound, $"Could not find directory {path}.");
+            return Result<float>.Fail(ResultCode.NotFound, $"Could not find directory {path}.");
 
         float size = 0;
         
@@ -78,7 +78,7 @@ public class DockerManager : IDockerManager
             }
         }
         
-        return Result.Ok(size);
+        return Result<float>.Ok(size);
     }
 
     public async Task<bool> ContainerExists(string id)
@@ -92,10 +92,10 @@ public class DockerManager : IDockerManager
 
         if (containerListResponse == null)
         {
-            return Result.Fail<ContainerListResponse>(ResultCode.NotFound, $"Could not find container \"{name}\".");
+            return Result<ContainerListResponse>.Fail(ResultCode.NotFound, $"Could not find container \"{name}\".");
         }
 
-        return Result.Ok(containerListResponse);
+        return Result<ContainerListResponse>.Ok(containerListResponse);
     }
 
     public async Task<Result<ContainerListResponse>> GetContainerById(string id)
@@ -104,20 +104,20 @@ public class DockerManager : IDockerManager
 
         if (containerListResponse == null)
         {
-            return Result.Fail<ContainerListResponse>(ResultCode.NotFound, $"Could not find container {id}.");
+            return Result<ContainerListResponse>.Fail(ResultCode.NotFound, $"Could not find container {id}.");
         }
 
-        return Result.Ok(containerListResponse);
+        return Result<ContainerListResponse>.Ok(containerListResponse);
     }
 
     public async Task<Result<ContainerInspectResponse>> InspectContainerById(string id)
     {
         if (!await ContainerExists(id))
         {
-            return Result.Fail<ContainerInspectResponse>(ResultCode.NotFound, $"Could not find container {id}.");
+            return Result<ContainerInspectResponse>.Fail(ResultCode.NotFound, $"Could not find container {id}.");
         }
 
-        return Result.Ok(await Client.Containers.InspectContainerAsync(id));
+        return Result<ContainerInspectResponse>.Ok(await Client.Containers.InspectContainerAsync(id));
     }
 
     public async Task<bool> ContainerRunning(string id)
@@ -143,7 +143,7 @@ public class DockerManager : IDockerManager
             foreach (KeyValuePair<string, string> portMapping in parameters.PortMappings)
             {
                 if (portMapping.Key == "" || portMapping.Value == "")
-                    return Result.Fail<CreateContainerResponse>(ResultCode.BadRequest, "Ports were empty");
+                    return Result<CreateContainerResponse>.Fail(ResultCode.BadRequest, "Ports were empty");
                 
                 string hostPort = portMapping.Key;
                 string containerPort = portMapping.Value;
@@ -190,40 +190,40 @@ public class DockerManager : IDockerManager
             Console.WriteLine("Something went wrong when creating a container:");
             Console.WriteLine(e.ToString());
 
-            return Result.Fail<CreateContainerResponse>(ResultCode.InternalServerError, "An unexpected error occurred while creating the container.");
+            return Result<CreateContainerResponse>.Fail(ResultCode.InternalServerError, "An unexpected error occurred while creating the container.");
         }
     }
     
-    public async Task<Result<object>> StartContainer(string containerId)
+    public async Task<Result> StartContainer(string containerId)
     {
         if (!await ContainerExists(containerId))
-            return Result.Fail<object>(ResultCode.NotFound, $"Could not find container {containerId}.");
+            return Result.Fail(ResultCode.NotFound, $"Could not find container {containerId}.");
 
         bool result = await Client.Containers.StartContainerAsync(containerId, new ContainerStartParameters());
         
         if (result)
             return Result.Ok();
 
-        return Result.Fail<object>(ResultCode.InternalServerError, $"Could not start container {containerId}.");
+        return Result.Fail(ResultCode.InternalServerError, $"Could not start container {containerId}.");
     }
 
-    public async Task<Result<object>> StopContainer(string containerId)
+    public async Task<Result> StopContainer(string containerId)
     {
         if (!await ContainerExists(containerId))
-            return Result.Fail<object>(ResultCode.NotFound, $"Could not find container {containerId}.");
+            return Result.Fail(ResultCode.NotFound, $"Could not find container {containerId}.");
         
         bool result = await Client.Containers.StopContainerAsync(containerId, new ContainerStopParameters());
         
         if (result)
             return Result.Ok();
 
-        return Result.Fail<object>(ResultCode.InternalServerError, $"Could not stop container {containerId}.");
+        return Result.Fail(ResultCode.InternalServerError, $"Could not stop container {containerId}.");
     }
 
-    public async Task<Result<object>> KillContainer(string containerId)
+    public async Task<Result> KillContainer(string containerId)
     {
         if (!await ContainerExists(containerId))
-            return Result.Fail<object>(ResultCode.NotFound, $"Could not find container {containerId}.");
+            return Result.Fail(ResultCode.NotFound, $"Could not find container {containerId}.");
 
         if (!await ContainerRunning(containerId))
             return Result.Ok();
@@ -233,18 +233,18 @@ public class DockerManager : IDockerManager
         return Result.Ok();
     }
 
-    public async Task<Result<object>> DeleteContainer(string containerId)
+    public async Task<Result> DeleteContainer(string containerId)
     {
         if (!await ContainerExists(containerId))
-            return Result.Fail<object>(ResultCode.NotFound, $"Could not find container {containerId}.");
+            return Result.Fail(ResultCode.NotFound, $"Could not find container {containerId}.");
         
         if (await ContainerRunning(containerId))
-            return Result.Fail<object>(ResultCode.InternalServerError, $"Could not delete container {containerId} because it is still running.");
+            return Result.Fail(ResultCode.InternalServerError, $"Could not delete container {containerId} because it is still running.");
 
         Result<ContainerListResponse> container = await GetContainerById(containerId);
         
         if (!container.IsSuccess || container.Value == null)
-            return Result.Fail<object>(container.ResultCode, container.Error);
+            return Result.Fail(container.ResultCode, container.Error);
         
         await Client.Containers.RemoveContainerAsync(containerId, new ContainerRemoveParameters());
         
@@ -278,12 +278,12 @@ public class DockerManager : IDockerManager
         Result<ContainerListResponse> container = await GetContainerById(id);
         
         if (!container.IsSuccess || container.Value == null)
-            return Result.Ok(0);
+            return Result<int>.Ok(0);
 
         KeyValuePair<string, EndpointSettings>? network = container.Value.NetworkSettings.Networks.FirstOrDefault();
 
         if (network == null)
-            return Result.Ok(0);
+            return Result<int>.Ok(0);
 
         return Result<int>.Ok(await HttpHelper.SendGet<int>($"http://{network.Value.Value.IPAddress}:8080/sync/device/trainCount"));
     }
@@ -293,25 +293,25 @@ public class DockerManager : IDockerManager
         Result<ContainerListResponse> container = await GetContainerById(id);
         
         if (!container.IsSuccess || container.Value == null)
-            return Result.Ok(0);
+            return Result<int>.Ok(0);
 
         KeyValuePair<string, EndpointSettings>? network = container.Value.NetworkSettings.Networks.FirstOrDefault();
 
         if (network == null)
-            return Result.Ok(0);
+            return Result<int>.Ok(0);
 
         return Result<int>.Ok( await HttpHelper.SendGet<int>($"http://{network.Value.Value.IPAddress}:8080/sync/device/allowedTrainsCount"));
     }
 
-    public async Task<Result<object>> UpdateAllowedTrains(string id, int allowedTrains)
+    public async Task<Result> UpdateAllowedTrains(string id, int allowedTrains)
     {
         if (!await ContainerExists(id))
-            return Result.Fail<object>(ResultCode.NotFound, $"Could not find container {id}.");
+            return Result.Fail(ResultCode.NotFound, $"Could not find container {id}.");
         
         Result<ContainerListResponse> container = (await GetContainerById(id));
         
         if (!container.IsSuccess || container.Value == null)
-            return Result.Fail<object>(ResultCode.NotFound, $"Could not find container {id}.");
+            return Result.Fail(ResultCode.NotFound, $"Could not find container {id}.");
         
         string dir = $"/etc/AutoTf/CentralServer/{container.Value.Names.First()}";
 

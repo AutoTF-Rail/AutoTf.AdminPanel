@@ -8,6 +8,7 @@ using AutoTf.AdminPanel.Models.Requests;
 using AutoTf.AdminPanel.Models.Requests.Authentik;
 using AutoTf.AdminPanel.Statics;
 using Docker.DotNet.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AutoTf.AdminPanel.Managers;
@@ -174,15 +175,14 @@ public class ManageManager
             return await AssembleProblem("A container with this name already exists.");
         
         // Cloudflare
-
-        Result<object> entryCreation = await _cloudflare.CreateNewEntry(request.DnsRecord);
+        Result entryCreation = await _cloudflare.CreateNewEntry(request.DnsRecord);
         if (!entryCreation.IsSuccess)
             return await AssembleProblem($"Failed to create DNS entry. {entryCreation.Error}");
 
         DnsRecord? record = _cloudflare.GetRecordByName(request.DnsRecord.Name, request.DnsRecord.Type);
 
         if (record == null)
-            return "Failed to create DNS record.";
+            return await AssembleProblem("Failed to create DNS record.");
 
         // Docker
         await _docker.CreateContainer(request.Container);
@@ -235,7 +235,7 @@ public class ManageManager
         
         // Plesk
 
-        Result<object> pleskResult = _plesk.CreateSubdomain(request.Plesk.SubDomain, request.Plesk.RootDomain, request.Plesk.Email, request.Plesk.AuthentikHost);
+        Result pleskResult = _plesk.CreateSubdomain(request.Plesk.SubDomain, request.Plesk.RootDomain, request.Plesk.Email, request.Plesk.AuthentikHost);
         
         if (!pleskResult.IsSuccess)
             return await AssembleProblem($"Something went wrong when creating the subdomain in plesk. {pleskResult.Error}", record.Id, container.ID, request.Proxy.ExternalHost);

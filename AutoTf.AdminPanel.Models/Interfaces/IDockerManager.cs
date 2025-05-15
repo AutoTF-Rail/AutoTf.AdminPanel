@@ -17,14 +17,14 @@ public interface IDockerManager
     Task<Result<ContainerInspectResponse>> InspectContainerById(string id);
     Task<bool> ContainerRunning(string id);
     Task<Result<CreateContainerResponse>> CreateContainer(CreateContainer parameters);
-    Task<Result<object>> StartContainer(string containerId);
-    Task<Result<object>> StopContainer(string containerId);
-    Task<Result<object>> KillContainer(string containerId);
-    Task<Result<object>> DeleteContainer(string containerId);
+    Task<Result> StartContainer(string containerId);
+    Task<Result> StopContainer(string containerId);
+    Task<Result> KillContainer(string containerId);
+    Task<Result> DeleteContainer(string containerId);
     Task<NetworkResponse?> GetNetwork(string name);
     Task<List<string>> GetNetworks();
     Task<string?> GetContainerNetworkIp(string containerId, string networkId);
     Task<Result<int>> GetTrainCount(string id);
     Task<Result<int>> GetAllowedTrainsCount(string id);
-    Task<Result<object>> UpdateAllowedTrains(string id, int allowedTrains);
+    Task<Result> UpdateAllowedTrains(string id, int allowedTrains);
 }

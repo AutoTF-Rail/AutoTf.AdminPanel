@@ -20,13 +20,13 @@ public class PleskController : ControllerBase
     }
 
     [HttpPost("create")]
-    public Result<object> Create([FromBody] CreateSubdomainRequest request)
+    public Result Create([FromBody] CreateSubdomainRequest request)
     {
         return _plesk.CreateSubdomain(request.SubDomain.ToLower(), request.RootDomain.ToLower(), request.Email, request.AuthentikHost);
     }
 
     [HttpDelete("{rootDomain}/{subDomain}")]
-    public Result<object> Delete(string rootDomain, string subDomain)
+    public Result Delete(string rootDomain, string subDomain)
     {
         return _plesk.DeleteSubDomain(rootDomain, subDomain);
     }
@@ -51,9 +51,9 @@ public class PleskController : ControllerBase
     }
 
     [HttpPost("{rootDomain}/{subDomain}/updateAuthHost")]
-    public Result<object> UpdateAuthHost(string rootDomain, string subDomain, [FromBody, Required] string newAuthHost)
+    public Result UpdateAuthHost(string rootDomain, string subDomain, [FromBody, Required] string newAuthHost)
     {
-        Result<object> result = _plesk.UpdateAuthHost(rootDomain, subDomain, newAuthHost);
+        Result result = _plesk.UpdateAuthHost(rootDomain, subDomain, newAuthHost);
         
         if(result.IsSuccess)
         {

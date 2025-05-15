@@ -44,12 +44,12 @@ public class CloudflareManager : ICloudflareManager
     public Result<DnsRecord> GetRecord(string id)
     {
         if(!DoesEntryExist(id))
-            return Result.Fail<DnsRecord>(ResultCode.NotFound, $"Could not find entry by id {id}.");
+            return Result<DnsRecord>.Fail(ResultCode.NotFound, $"Could not find entry by id {id}.");
         
-        return Result.Ok(Records.First(x => x.Id == id));
+        return Result<DnsRecord>.Ok(Records.First(x => x.Id == id));
     }
 
-    public async Task<Result<object>> CreateNewEntry(CreateDnsRecord record)
+    public async Task<Result> CreateNewEntry(CreateDnsRecord record)
     {
         record.Comment = "Managed by AutoTF Admin Panel. " + record.Comment;
         record.Name = record.Name.ToLower();
@@ -68,10 +68,10 @@ public class CloudflareManager : ICloudflareManager
         return Result.Ok();
     }
 
-    public async Task<Result<object>> DeleteEntry(string id)
+    public async Task<Result> DeleteEntry(string id)
     {
         if(!DoesEntryExist(id))
-            return Result.Fail<object>(ResultCode.NotFound, $"Could not find entry by id {id}.");
+            return Result.Fail(ResultCode.NotFound, $"Could not find entry by id {id}.");
         
         Result<string> result = await ApiHttpHelper.SendDelete($"https://api.cloudflare.com/client/v4/zones/{_credentials.CloudflareZone}/dns_records/{id}", _credentials.CloudflareKey);
         
@@ -85,10 +85,10 @@ public class CloudflareManager : ICloudflareManager
         return Result.Ok();
     }
 
-    public async Task<Result<object>> UpdateRecord(string id, CreateDnsRecord record)
+    public async Task<Result> UpdateRecord(string id, CreateDnsRecord record)
     {
         if(!DoesEntryExist(id))
-            return Result.Fail<object>(ResultCode.NotFound, $"Could not find entry by id {id}.");
+            return Result.Fail(ResultCode.NotFound, $"Could not find entry by id {id}.");
         
         record.Name = record.Name.ToLower();
         

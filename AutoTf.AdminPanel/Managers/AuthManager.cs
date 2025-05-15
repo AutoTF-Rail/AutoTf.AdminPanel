@@ -79,16 +79,16 @@ public class AuthManager : IAuthManager
             TransactionalCreationResponse? result = await ApiHttpHelper.SendPut<TransactionalCreationResponse>($"{_credentials.AuthUrl}/api/v3/core/transactional/applications/", content, _apiKey, true);
             
             if(result == null)
-                return Result.Fail<TransactionalCreationResponse>(ResultCode.InternalServerError, "Failed to create the proxy.");
+                return Result<TransactionalCreationResponse>.Fail(ResultCode.InternalServerError, "Failed to create the proxy.");
             
-            return Result.Ok(result);
+            return Result<TransactionalCreationResponse>.Ok(result);
         }
         catch (Exception e)
         {
             Console.WriteLine("Something went wrong when creating a application with proxy:");
             Console.WriteLine(e.ToString());
 
-            return Result.Fail<TransactionalCreationResponse>(ResultCode.InternalServerError, "An unexpected error occurred while creating the proxy.");
+            return Result<TransactionalCreationResponse>.Fail(ResultCode.InternalServerError, "An unexpected error occurred while creating the proxy.");
         }
     }
 
@@ -115,10 +115,10 @@ public class AuthManager : IAuthManager
 
         if (!result.IsSuccess || result.Value?.Results == null)
         {
-            return Result.Fail<List<Flow>>(result.ResultCode, result.Error);
+            return Result<List<Flow>>.Fail(result.ResultCode, result.Error);
         }
 
-        return Result.Ok(result.Value.Results);
+        return Result<List<Flow>>.Ok(result.Value.Results);
     }
 
     public async Task<Result<List<Flow>>> GetInvalidationFlows()
@@ -127,10 +127,10 @@ public class AuthManager : IAuthManager
         
         if (!result.IsSuccess || result.Value?.Results == null)
         {
-            return Result.Fail<List<Flow>>(result.ResultCode, result.Error);
+            return Result<List<Flow>>.Fail(result.ResultCode, result.Error);
         }
 
-        return Result.Ok(result.Value.Results);
+        return Result<List<Flow>>.Ok(result.Value.Results);
     }
 
     public async Task<Result<List<Group>>> GetGroups()
@@ -139,10 +139,10 @@ public class AuthManager : IAuthManager
         
         if (!result.IsSuccess || result.Value?.Results == null)
         {
-            return Result.Fail<List<Group>>(result.ResultCode, result.Error);
+            return Result<List<Group>>.Fail(result.ResultCode, result.Error);
         }
 
-        return Result.Ok(result.Value.Results);
+        return Result<List<Group>>.Ok(result.Value.Results);
     }
 
     public async Task<Result<ProviderPaginationResult>> GetProviders()
@@ -164,7 +164,7 @@ public class AuthManager : IAuthManager
             Results = result.Value.Results.Where(x => x.Name.Contains("Managed provider for")).ToList()
         };
 
-        return Result.Ok(filtered);
+        return Result<ProviderPaginationResult>.Ok(filtered);
     }
 
     public async Task<Result<Provider>> GetProvider(string pk)
@@ -173,18 +173,18 @@ public class AuthManager : IAuthManager
         
         if (!result.IsSuccess || result.Value?.Results == null)
         {
-            return Result.Fail<Provider>(result.ResultCode, result.Error);
+            return Result<Provider>.Fail(result.ResultCode, result.Error);
         }
         
         if (!result.Value.Results.Any())
-            return Result.Fail<Provider>(ResultCode.NotFound, "Did not find any providers.");
+            return Result<Provider>.Fail(ResultCode.NotFound, "Did not find any providers.");
 
         Provider? provider = result.Value.Results.FirstOrDefault(x => x.Pk != null && x.Pk == pk);
 
         if (provider == null)
-            return Result.Fail<Provider>(ResultCode.NotFound, $"Could not find a provider by the given id {pk}.");
+            return Result<Provider>.Fail(ResultCode.NotFound, $"Could not find a provider by the given id {pk}.");
 
-        return Result.Ok(provider);
+        return Result<Provider>.Ok(provider);
     }
 
     public async Task<Result<ApplicationPaginationResult>> GetApplications()
@@ -206,7 +206,7 @@ public class AuthManager : IAuthManager
             Results = result.Value.Results.Where(x => x.Name.Contains("Managed application for ")).ToList()
         };
 
-        return Result.Ok(filtered);
+        return Result<ApplicationPaginationResult>.Ok(filtered);
     }
 
     public async Task<Result<bool>> DoesApplicationExist(string slug)
@@ -214,14 +214,14 @@ public class AuthManager : IAuthManager
         Result<ApplicationPaginationResult> applications = await GetApplications();
 
         if (!applications.IsSuccess || applications.Value == null)
-            return Result.Fail<bool>(applications.ResultCode, applications.Error);
+            return Result<bool>.Fail(applications.ResultCode, applications.Error);
 
         slug = slug.ToLower();
         
         if (applications.Value.Results.Any(x => x.Slug.ToLower() == slug))
-            return Result.Ok(true);
+            return Result<bool>.Ok(true);
         
-        return Result.Ok(false);
+        return Result<bool>.Ok(false);
     }
 
     public async Task<Result<string>> DeleteProvider(string id)
@@ -234,7 +234,7 @@ public class AuthManager : IAuthManager
         Result<bool> doesApplicationExist = await DoesApplicationExist(slug);
         
         if(!doesApplicationExist.IsSuccess)
-            return Result.Fail<string>(doesApplicationExist.ResultCode, doesApplicationExist.Error);
+            return Result<string>.Fail(doesApplicationExist.ResultCode, doesApplicationExist.Error);
         
         return await ApiHttpHelper.SendDelete($"{_credentials.AuthUrl}/api/v3/core/applications/{slug}/", _apiKey);
     }
@@ -245,19 +245,19 @@ public class AuthManager : IAuthManager
         
         if (!result.IsSuccess || result.Value?.Results == null)
         {
-            return Result.Fail<string>(result.ResultCode, result.Error);
+            return Result<string>.Fail(result.ResultCode, result.Error);
         }
 
         externalHost = externalHost.ToLower();
         Provider? provider = result.Value.Results.FirstOrDefault(x => x.ExternalHost.ToLower() == externalHost);
         
         if (provider == null)
-            return Result.Fail<string>(ResultCode.NotFound, $"Could not find a provider by the given external host \"{externalHost}\".");
+            return Result<string>.Fail(ResultCode.NotFound, $"Could not find a provider by the given external host \"{externalHost}\".");
         
         if (string.IsNullOrEmpty(provider.Pk))
-            return Result.Fail<string>(ResultCode.InternalServerError, "Provider found but had an invalid ID.");
+            return Result<string>.Fail(ResultCode.InternalServerError, "Provider found but had an invalid ID.");
 
-        return Result.Ok(provider.Pk);
+        return Result<string>.Ok(provider.Pk);
     }
 
     public async Task<Result<string>> GetApplicationSlugByLaunchUrl(string launchUrl)
@@ -266,16 +266,16 @@ public class AuthManager : IAuthManager
         
         if (!result.IsSuccess || result.Value?.Results == null)
         {
-            return Result.Fail<string>(result.ResultCode, result.Error);
+            return Result<string>.Fail(result.ResultCode, result.Error);
         }
 
         launchUrl = launchUrl.ToLower();
         Application? app = result.Value.Results.FirstOrDefault(x => x.LaunchUrl != null && x.LaunchUrl.ToLower() == launchUrl);
        
         if (app == null)
-            return Result.Fail<string>(ResultCode.NotFound, $"Could not find a application by the given launch url \"{launchUrl}\".");
+            return Result<string>.Fail(ResultCode.NotFound, $"Could not find a application by the given launch url \"{launchUrl}\".");
         
-        return Result.Ok(app.Slug);
+        return Result<string>.Ok(app.Slug);
     }
 
     public async Task<Result<string>> AssignToOutpost(string outpostId, string providerPk)
@@ -285,7 +285,7 @@ public class AuthManager : IAuthManager
 
         if (!result.IsSuccess || result.Value == null)
         {
-            return Result.Fail<string>(result.ResultCode, result.Error);
+            return Result<string>.Fail(result.ResultCode, result.Error);
         }
         
         // TODO: Check for provider existance 
@@ -301,7 +301,7 @@ public class AuthManager : IAuthManager
         
         if (!result.IsSuccess || result.Value == null)
         {
-            return Result.Fail<string>(result.ResultCode, result.Error);
+            return Result<string>.Fail(result.ResultCode, result.Error);
         }
         
         // TODO: Check for provider existance 

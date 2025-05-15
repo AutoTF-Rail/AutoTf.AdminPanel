@@ -33,19 +33,19 @@ public class DockerController : ControllerBase
     }
 
     [HttpPost("{id}/start")]
-    public async Task<Result<object>> StartContainer(string id)
+    public async Task<Result> StartContainer(string id)
     {
         return await _docker.StartContainer(id);
     }
 
     [HttpPost("{id}/stop")]
-    public async Task<Result<object>> StopContainer(string id)
+    public async Task<Result> StopContainer(string id)
     {
         return await _docker.StopContainer(id);
     }
 
     [HttpPost("{id}/kill")]
-    public async Task<Result<object>> KillContainer(string id)
+    public async Task<Result> KillContainer(string id)
     {
         return await _docker.KillContainer(id);
     }
@@ -63,7 +63,7 @@ public class DockerController : ControllerBase
     }
 
     [HttpPost("{id}/delete")]
-    public async Task<Result<object>> DeleteContainer(string id)
+    public async Task<Result> DeleteContainer(string id)
     {
         return await _docker.DeleteContainer(id);
     }
@@ -105,7 +105,7 @@ public class DockerController : ControllerBase
     }
     
     [HttpPost("{id}/updateAllowedTrains")]
-    public async Task<Result<object>> UpdateAllowedTrains(string id, [FromBody, Required] int allowedTrains)
+    public async Task<Result> UpdateAllowedTrains(string id, [FromBody, Required] int allowedTrains)
     {
         return await _docker.UpdateAllowedTrains(id, allowedTrains);
     }

@@ -126,9 +126,9 @@ public class DockerStatsManager : IDockerStatsManager
         ContainerStatsResponse? response = _docker.GetCachedStats(containerId);
 
         if (response == null)
-            return Result.Fail<MemoryStats>(ResultCode.NotFound, $"Could not find container {containerId}.");
+            return Result<MemoryStats>.Fail(ResultCode.NotFound, $"Could not find container {containerId}.");
 
-        return Result.Ok(Memory(response));
+        return Result<MemoryStats>.Ok(Memory(response));
     }
 
     public Result<double> Cpu(string containerId)
@@ -136,9 +136,9 @@ public class DockerStatsManager : IDockerStatsManager
         ContainerStatsResponse? response = _docker.GetCachedStats(containerId);
 
         if (response == null)
-            return Result.Fail<double>(ResultCode.NotFound, $"Could not find container {containerId}.");
+            return Result<double>.Fail(ResultCode.NotFound, $"Could not find container {containerId}.");
 
-        return Result.Ok(Cpu(response));
+        return Result<double>.Ok(Cpu(response));
     }
 
     public Result<NetworkStats> Network(string containerId)
@@ -146,9 +146,9 @@ public class DockerStatsManager : IDockerStatsManager
         ContainerStatsResponse? response = _docker.GetCachedStats(containerId);
 
         if (response == null)
-            return Result.Fail<NetworkStats>(ResultCode.NotFound, $"Could not find container {containerId}.");
+            return Result<NetworkStats>.Fail(ResultCode.NotFound, $"Could not find container {containerId}.");
 
-        return Result.Ok(Network(response));
+        return Result<NetworkStats>.Ok(Network(response));
     }
 
     public Result<ContainerStats> Stats(string containerId)
@@ -156,13 +156,13 @@ public class DockerStatsManager : IDockerStatsManager
         ContainerStatsResponse? response = _docker.GetCachedStats(containerId);
 
         if (response == null)
-            return Result.Fail<ContainerStats>(ResultCode.NotFound, $"Could not find container {containerId}.");
+            return Result<ContainerStats>.Fail(ResultCode.NotFound, $"Could not find container {containerId}.");
 
         NetworkStats network = Network(response);
         MemoryStats memory = Memory(response);
         double cpuUsage = Cpu(response);
 
-        return Result.Ok(new ContainerStats()
+        return Result<ContainerStats>.Ok(new ContainerStats()
         {
             Network = network,
             Memory = memory,

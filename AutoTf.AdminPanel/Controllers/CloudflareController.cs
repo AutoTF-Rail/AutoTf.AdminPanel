@@ -19,13 +19,13 @@ public class CloudflareController : ControllerBase
 
     // TODO: Check that the new values don't already exist
     [HttpPost("create")]
-    public async Task<Result<object>> CreateRecord([FromBody] CreateDnsRecord record)
+    public async Task<Result> CreateRecord([FromBody] CreateDnsRecord record)
     {
         return await _cloudflare.CreateNewEntry(record);
     }
 
     [HttpDelete("{id}")]
-    public async Task<Result<object>> DeleteRecord(string id)
+    public async Task<Result> DeleteRecord(string id)
     {
         return await _cloudflare.DeleteEntry(id);
     }
@@ -38,7 +38,7 @@ public class CloudflareController : ControllerBase
     
     // TODO: Check that the new values don't already exist
     [HttpPatch("{id}")]
-    public async Task<Result<object>> UpdateRecord(string id, [FromBody] CreateDnsRecord record)
+    public async Task<Result> UpdateRecord(string id, [FromBody] CreateDnsRecord record)
     {
         return await _cloudflare.UpdateRecord(id, record);
     }

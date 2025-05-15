@@ -7,9 +7,9 @@ public interface ICloudflareManager : IHostedService
 {
     public List<DnsRecord> Records { get; }
 
-    public Task<Result<object>> CreateNewEntry(CreateDnsRecord record);
+    public Task<Result> CreateNewEntry(CreateDnsRecord record);
     
-    public Task<Result<object>> DeleteEntry(string id);
+    public Task<Result> DeleteEntry(string id);
     
     public bool DoesEntryExistByName(string name);
     
@@ -19,7 +19,7 @@ public interface ICloudflareManager : IHostedService
     
     public Result<DnsRecord> GetRecord(string id);
     
-    public Task<Result<object>> UpdateRecord(string id, CreateDnsRecord record);
+    public Task<Result> UpdateRecord(string id, CreateDnsRecord record);
     
     public Task UpdateCache();
 }

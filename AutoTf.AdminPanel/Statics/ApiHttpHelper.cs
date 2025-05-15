@@ -20,13 +20,13 @@ public class ApiHttpHelper
             string content = await response.Content.ReadAsStringAsync();
 
             if (response.IsSuccessStatusCode)
-                return Result.Ok(content);
+                return Result<string>.Ok(content);
 
-            return Result.Fail<string>(Result.MapStatusToResultCode(response.StatusCode), content);
+            return Result<string>.Fail(Result.MapStatusToResultCode(response.StatusCode), content);
         }
         catch (Exception ex)
         {
-            return Result.Fail<string>(ResultCode.InternalServerError, $"Exception occurred: {ex.Message}");
+            return Result<string>.Fail(ResultCode.InternalServerError, $"Exception occurred: {ex.Message}");
         }
     }
     
@@ -43,13 +43,13 @@ public class ApiHttpHelper
             string content = await response.Content.ReadAsStringAsync();
 
             if (response.IsSuccessStatusCode)
-                return Result.Ok(content);
+                return Result<string>.Ok(content);
 
-            return Result.Fail<string>(Result.MapStatusToResultCode(response.StatusCode), content);
+            return Result<string>.Fail(Result.MapStatusToResultCode(response.StatusCode), content);
         }
         catch (Exception ex)
         {
-            return Result.Fail<string>(ResultCode.InternalServerError, $"Exception occurred: {ex.Message}");
+            return Result<string>.Fail(ResultCode.InternalServerError, $"Exception occurred: {ex.Message}");
         }
     }
     
@@ -70,16 +70,16 @@ public class ApiHttpHelper
                 T? value = JsonSerializer.Deserialize<T>(content);
 
                 if (value == null)
-                    return Result.Fail<T>(ResultCode.InternalServerError, "Deserialization returned null.");
+                    return Result<T>.Fail(ResultCode.InternalServerError, "Deserialization returned null.");
 
-                return Result.Ok(value);
+                return Result<T>.Ok(value);
             }
 
-            return Result.Fail<T>(Result.MapStatusToResultCode(response.StatusCode), content);
+            return Result<T>.Fail(Result.MapStatusToResultCode(response.StatusCode), content);
         }
         catch (Exception ex)
         {
-            return Result.Fail<T>(ResultCode.InternalServerError, $"Exception occurred: {ex.Message}");
+            return Result<T>.Fail(ResultCode.InternalServerError, $"Exception occurred: {ex.Message}");
         }
     }
     
@@ -100,16 +100,16 @@ public class ApiHttpHelper
                 T? value = JsonSerializer.Deserialize<T>(result);
 
                 if (value == null)
-                    return Result.Fail<T>(ResultCode.InternalServerError, "Deserialization returned null.");
+                    return Result<T>.Fail(ResultCode.InternalServerError, "Deserialization returned null.");
 
-                return Result.Ok(value);
+                return Result<T>.Ok(value);
             }
 
-            return Result.Fail<T>(Result.MapStatusToResultCode(response.StatusCode), result);
+            return Result<T>.Fail(Result.MapStatusToResultCode(response.StatusCode), result);
         }
         catch (Exception ex)
         {
-            return Result.Fail<T>(ResultCode.InternalServerError, $"Exception occurred: {ex.Message}");
+            return Result<T>.Fail(ResultCode.InternalServerError, $"Exception occurred: {ex.Message}");
         }
     }
     
@@ -149,14 +149,14 @@ public class ApiHttpHelper
             
             if (response.IsSuccessStatusCode)
             {
-                return Result.Ok(result);
+                return Result<string>.Ok(result);
             }
 
-            return Result.Fail<string>(Result.MapStatusToResultCode(response.StatusCode), result);
+            return Result<string>.Fail(Result.MapStatusToResultCode(response.StatusCode), result);
         }
         catch (Exception ex)
         {
-            return Result.Fail<string>(ResultCode.InternalServerError, $"Exception occurred: {ex.Message}");
+            return Result<string>.Fail(ResultCode.InternalServerError, $"Exception occurred: {ex.Message}");
         }
     }
     
@@ -174,14 +174,14 @@ public class ApiHttpHelper
             
             if (response.IsSuccessStatusCode)
             {
-                return Result.Ok(result);
+                return Result<string>.Ok(result);
             }
 
-            return Result.Fail<string>(Result.MapStatusToResultCode(response.StatusCode), result);
+            return Result<string>.Fail(Result.MapStatusToResultCode(response.StatusCode), result);
         }
         catch (Exception ex)
         {
-            return Result.Fail<string>(ResultCode.InternalServerError, $"Exception occurred: {ex.Message}");
+            return Result<string>.Fail(ResultCode.InternalServerError, $"Exception occurred: {ex.Message}");
         }
     }
     
