@@ -5,14 +5,14 @@ namespace AutoTf.AdminPanel.Models.Requests;
 public class CreateSubdomainRequest
 {
     [JsonPropertyName("subDomain")]
-    public string SubDomain { get; set; }
+    public required string SubDomain { get; set; }
     
     [JsonPropertyName("rootDomain")]
-    public string RootDomain { get; set; }
+    public required string RootDomain { get; set; }
     
     [JsonPropertyName("email")]
-    public string Email { get; set; }
+    public required string Email { get; set; }
     
     [JsonPropertyName("authentikHost")]
-    public string AuthentikHost { get; set; }
+    public required string AuthentikHost { get; set; }
 }

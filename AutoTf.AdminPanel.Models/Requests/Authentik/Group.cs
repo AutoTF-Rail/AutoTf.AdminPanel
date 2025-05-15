@@ -5,8 +5,8 @@ namespace AutoTf.AdminPanel.Models.Requests.Authentik;
 public class Group
 {
     [JsonPropertyName("name")]
-    public string Name { get; set; }
+    public required string Name { get; set; }
     
     [JsonPropertyName("pk")]
-    public string Pk { get; set; }
+    public required string Pk { get; set; }
 }

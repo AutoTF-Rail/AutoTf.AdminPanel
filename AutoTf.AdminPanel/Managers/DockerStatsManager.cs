@@ -58,13 +58,7 @@ public class DockerStatsManager : IDockerStatsManager
 
         await Task.WhenAll(statsTasks);
         
-        return new ContainerStats()
-        {
-            Network = network,
-            Memory = memory,
-            CpuUsage = cpuUsage,
-            SystemStats = _server.GetLatestStats()
-        };
+        return new ContainerStats(network, memory, cpuUsage, _server.GetLatestStats());
     }
 
     public async Task<MemoryStats> Memory()
@@ -162,12 +156,7 @@ public class DockerStatsManager : IDockerStatsManager
         MemoryStats memory = Memory(response);
         double cpuUsage = Cpu(response);
 
-        return Result<ContainerStats>.Ok(new ContainerStats()
-        {
-            Network = network,
-            Memory = memory,
-            CpuUsage = cpuUsage
-        });
+        return Result<ContainerStats>.Ok(new ContainerStats(network, memory, cpuUsage));
     }
     
     #region Core

@@ -4,11 +4,11 @@ namespace AutoTf.AdminPanel.Models.Manage;
 
 public class TotalCreationRequest
 {
-    public CreateDnsRecord DnsRecord { get; set; }
+    public required CreateDnsRecord DnsRecord { get; set; }
     
-    public CreateContainer Container { get; set; }
+    public required CreateContainer Container { get; set; }
     
-    public Proxy Proxy { get; set; }
+    public required Proxy Proxy { get; set; }
     
-    public CreateSubdomainRequest Plesk { get; set; }
+    public required CreateSubdomainRequest Plesk { get; set; }
 }

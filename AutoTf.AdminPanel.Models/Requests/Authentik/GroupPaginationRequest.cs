@@ -5,8 +5,8 @@ namespace AutoTf.AdminPanel.Models.Requests.Authentik;
 public class GroupPaginationRequest
 {
     [JsonPropertyName("pagination")]
-    public object Pagination { get; set; }
+    public required object Pagination { get; set; }
     
     [JsonPropertyName("results")]
-    public List<Group> Results { get; set; }
+    public required List<Group> Results { get; set; }
 }

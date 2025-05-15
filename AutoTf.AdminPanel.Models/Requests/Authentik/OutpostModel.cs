@@ -9,10 +9,10 @@ public class OutpostModel
     public string? Pk { get; set; } = null;
     
     [JsonPropertyName("name")]
-    public string Name { get; set; }
+    public required string Name { get; set; }
     
     [JsonPropertyName("type")]
-    public string Type { get; set; }
+    public required string Type { get; set; }
 
     [JsonPropertyName("providers")] 
     [JsonConverter(typeof(StringListConverter))]
@@ -23,7 +23,7 @@ public class OutpostModel
     public List<object>? ProvidersObject { get; set; } = null;
     
     [JsonPropertyName("service_connection")]
-    public string ServiceConnection { get; set; }
+    public required string ServiceConnection { get; set; }
 
     [JsonPropertyName("service_connection_obj")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -38,7 +38,7 @@ public class OutpostModel
     public string? TokenIdentifier { get; set; } = null;
     
     [JsonPropertyName("config")]
-    public OutpostConfig Config { get; set; }
+    public required OutpostConfig Config { get; set; }
 
     [JsonPropertyName("managed")] 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

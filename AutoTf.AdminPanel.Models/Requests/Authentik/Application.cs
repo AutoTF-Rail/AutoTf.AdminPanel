@@ -5,13 +5,13 @@ namespace AutoTf.AdminPanel.Models.Requests.Authentik;
 public class Application
 {
     [JsonPropertyName("pk")]
-    public string Pk { get; set; }
+    public required string Pk { get; set; }
 
     [JsonPropertyName("name")]
-    public string Name { get; set; }
+    public required string Name { get; set; }
 
     [JsonPropertyName("slug")]
-    public string Slug { get; set; }
+    public required string Slug { get; set; }
 
     [JsonPropertyName("launch_url")]
     public string? LaunchUrl { get; set; }

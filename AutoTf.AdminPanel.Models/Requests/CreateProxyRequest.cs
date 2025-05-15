@@ -6,23 +6,23 @@ namespace AutoTf.AdminPanel.Models.Requests;
 public class CreateProxyRequest
 {
     [JsonPropertyName("name")]
-    public string Name { get; set; }
+    public required string Name { get; set; }
     
     [JsonPropertyName("launchUrl")]
-    public string LaunchUrl { get; set; }
+    public required string LaunchUrl { get; set; }
     
     [JsonPropertyName("authorizationFlow")]
-    public string AuthorizationFlow { get; set; }
+    public required string AuthorizationFlow { get; set; }
     
     [JsonPropertyName("invalidationFlow")]
-    public string InvalidationFlow { get; set; }
+    public required string InvalidationFlow { get; set; }
     
     [JsonPropertyName("internalHost")]
-    public string InternalHost { get; set; }
+    public required string InternalHost { get; set; }
     
     [JsonPropertyName("externalHost")]
-    public string ExternalHost { get; set; }
+    public required string ExternalHost { get; set; }
     
     [JsonPropertyName("policyBindings")]
-    public List<PolicyBinding> PolicyBindings { get; set; }
+    public required List<PolicyBinding> PolicyBindings { get; set; }
 }

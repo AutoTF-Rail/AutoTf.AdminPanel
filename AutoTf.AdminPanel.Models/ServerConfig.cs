@@ -2,21 +2,22 @@ namespace AutoTf.AdminPanel.Models;
 
 public class ServerConfig
 {
-    public string DefaultDnsType { get; set; }
-    public string DefaultTarget { get; set; }
+    public required string DefaultDnsType { get; set; }
+    public required string DefaultTarget { get; set; }
+    
     public bool DefaultProxySetting { get; set; }
     public int DefaultTtl { get; set; }
     
-    public string DefaultNetwork { get; set; }
-    public string DefaultAdditionalNetwork { get; set; }
-    public string DefaultImage { get; set; }
+    public required string DefaultNetwork { get; set; }
+    public required string DefaultAdditionalNetwork { get; set; }
+    public required string DefaultImage { get; set; }
     
-    public string DefaultAuthorizationFlow { get; set; }
-    public string DefaultInvalidationFlow { get; set; }
+    public required string DefaultAuthorizationFlow { get; set; }
+    public required string DefaultInvalidationFlow { get; set; }
 
-    public string DefaultOutpost { get; set; }
+    public required string DefaultOutpost { get; set; }
     
-    public string DefaultCertificateEmail { get; set; }
+    public required string DefaultCertificateEmail { get; set; }
     
-    public string DefaultAuthentikHost { get; set; }
+    public required string DefaultAuthentikHost { get; set; }
 }

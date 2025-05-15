@@ -5,16 +5,16 @@ namespace AutoTf.AdminPanel.Models.Requests;
 public class DnsRecord
 {
     [JsonPropertyName("id")]
-    public string Id { get; set; }
+    public required string Id { get; set; }
 
     [JsonPropertyName("name")]
-    public string Name { get; set; }
+    public required string Name { get; set; }
 
     [JsonPropertyName("type")]
-    public string Type { get; set; }
+    public required string Type { get; set; }
 
     [JsonPropertyName("content")]
-    public string Content { get; set; }
+    public required string Content { get; set; }
 
     [JsonPropertyName("proxiable")]
     public bool Proxiable { get; set; }
@@ -26,16 +26,16 @@ public class DnsRecord
     public int Ttl { get; set; }
 
     [JsonPropertyName("settings")]
-    public Dictionary<string, object> Settings { get; set; }
+    public required Dictionary<string, object> Settings { get; set; }
 
     [JsonPropertyName("meta")]
-    public Dictionary<string, object> Meta { get; set; }
+    public required Dictionary<string, object> Meta { get; set; }
 
     [JsonPropertyName("comment")]
     public string? Comment { get; set; }
 
     [JsonPropertyName("tags")]
-    public List<string> Tags { get; set; }
+    public required List<string> Tags { get; set; }
 
     [JsonPropertyName("created_on")]
     public DateTime CreatedOn { get; set; }

@@ -24,22 +24,21 @@ public class AuthManager : IAuthManager
     {
         _credentials = credentials.Value;
     }
-    
+
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         await GrabNewToken();
         StartTimer(300);
     }
 
-    public async Task<Result<TransactionalCreationResponse>>CreateProxy(CreateProxyRequest request)
+    public async Task<Result<TransactionalCreationResponse>> CreateProxy(CreateProxyRequest request)
     {
         try
         {
             request.Name = request.Name.ToLower();
-            
-            CreateAppWithProviderModel model = new CreateAppWithProviderModel
-            {
-                App =
+
+            CreateAppWithProviderModel model = new CreateAppWithProviderModel(
+                new AppModel
                 {
                     Name = $"Managed application for {request.Name}",
                     Slug = Regex.Replace(request.Name.ToLower(), "[^a-z]", ""),
@@ -48,7 +47,7 @@ public class AuthManager : IAuthManager
                     PolicyEngineMode = "any",
                     Group = "AutoTF-Managed"
                 },
-                Provider =
+                new Provider
                 {
                     Name = $"Managed provider for {request.Name}",
                     AuthenticationFlow = null,
@@ -70,17 +69,18 @@ public class AuthManager : IAuthManager
                     JwtFederationProviders = [],
                     AccessTokenValidity = "hours=24",
                     ProviderModel = "authentik_providers_proxy.proxyprovider"
-                },
-                PolicyBindings = request.PolicyBindings
-            };
+                }, 
+                request.PolicyBindings);
 
             HttpContent content = new StringContent(JsonSerializer.Serialize(model), Encoding.UTF8, "application/json");
 
-            TransactionalCreationResponse? result = await ApiHttpHelper.SendPut<TransactionalCreationResponse>($"{_credentials.AuthUrl}/api/v3/core/transactional/applications/", content, _apiKey, true);
-            
-            if(result == null)
+            TransactionalCreationResponse? result =
+                await ApiHttpHelper.SendPut<TransactionalCreationResponse>(
+                    $"{_credentials.AuthUrl}/api/v3/core/transactional/applications/", content, _apiKey, true);
+
+            if (result == null)
                 return Result<TransactionalCreationResponse>.Fail(ResultCode.InternalServerError, "Failed to create the proxy.");
-            
+
             return Result<TransactionalCreationResponse>.Ok(result);
         }
         catch (Exception e)
@@ -88,13 +88,15 @@ public class AuthManager : IAuthManager
             Console.WriteLine("Something went wrong when creating a application with proxy:");
             Console.WriteLine(e.ToString());
 
-            return Result<TransactionalCreationResponse>.Fail(ResultCode.InternalServerError, "An unexpected error occurred while creating the proxy.");
+            return Result<TransactionalCreationResponse>.Fail(ResultCode.InternalServerError,
+                "An unexpected error occurred while creating the proxy.");
         }
     }
 
     public async Task<Result<string>> GetOutposts()
     {
-        return await ApiHttpHelper.SendGet($"{_credentials.AuthUrl}/api/v3/outposts/instances/?ordering=name&page=1&page_size=200&search=", _apiKey);
+        return await ApiHttpHelper.SendGet($"{_credentials.AuthUrl}/api/v3/outposts/instances/?ordering=name&page=1&page_size=200&search=",
+            _apiKey);
     }
 
     public async Task<Result<OutpostModel>> GetOutpost(string id)
@@ -111,7 +113,9 @@ public class AuthManager : IAuthManager
 
     public async Task<Result<List<Flow>>> GetAuthorizationFlows()
     {
-        Result<FlowPaginationRequest> result = await ApiHttpHelper.SendGet<FlowPaginationRequest>($"{_credentials.AuthUrl}/api/v3/flows/instances/?designation=authorization&ordering=slug", _apiKey);
+        Result<FlowPaginationRequest> result =
+            await ApiHttpHelper.SendGet<FlowPaginationRequest>(
+                $"{_credentials.AuthUrl}/api/v3/flows/instances/?designation=authorization&ordering=slug", _apiKey);
 
         if (!result.IsSuccess || result.Value?.Results == null)
         {
@@ -123,8 +127,10 @@ public class AuthManager : IAuthManager
 
     public async Task<Result<List<Flow>>> GetInvalidationFlows()
     {
-        Result<FlowPaginationRequest> result = await ApiHttpHelper.SendGet<FlowPaginationRequest>($"{_credentials.AuthUrl}/api/v3/flows/instances/?designation=invalidation&ordering=slug", _apiKey);
-        
+        Result<FlowPaginationRequest> result =
+            await ApiHttpHelper.SendGet<FlowPaginationRequest>(
+                $"{_credentials.AuthUrl}/api/v3/flows/instances/?designation=invalidation&ordering=slug", _apiKey);
+
         if (!result.IsSuccess || result.Value?.Results == null)
         {
             return Result<List<Flow>>.Fail(result.ResultCode, result.Error);
@@ -135,8 +141,10 @@ public class AuthManager : IAuthManager
 
     public async Task<Result<List<Group>>> GetGroups()
     {
-        Result<GroupPaginationRequest> result = await ApiHttpHelper.SendGet<GroupPaginationRequest>($"{_credentials.AuthUrl}/api/v3/core/groups/?include_users=false&ordering=name", _apiKey);
-        
+        Result<GroupPaginationRequest> result =
+            await ApiHttpHelper.SendGet<GroupPaginationRequest>(
+                $"{_credentials.AuthUrl}/api/v3/core/groups/?include_users=false&ordering=name", _apiKey);
+
         if (!result.IsSuccess || result.Value?.Results == null)
         {
             return Result<List<Group>>.Fail(result.ResultCode, result.Error);
@@ -147,8 +155,10 @@ public class AuthManager : IAuthManager
 
     public async Task<Result<ProviderPaginationResult>> GetProviders()
     {
-        Result<ProviderPaginationResult> result = await ApiHttpHelper.SendGet<ProviderPaginationResult>($"{_credentials.AuthUrl}/api/v3/providers/proxy/?application__isnull=false&ordering=name&page=1&page_size=200&search=", _apiKey);
-        
+        Result<ProviderPaginationResult> result = await ApiHttpHelper.SendGet<ProviderPaginationResult>(
+            $"{_credentials.AuthUrl}/api/v3/providers/proxy/?application__isnull=false&ordering=name&page=1&page_size=200&search=",
+            _apiKey);
+
         if (!result.IsSuccess || result.Value?.Results == null)
         {
             return result;
@@ -170,12 +180,12 @@ public class AuthManager : IAuthManager
     public async Task<Result<Provider>> GetProvider(string pk)
     {
         Result<ProviderPaginationResult> result = await GetProviders();
-        
+
         if (!result.IsSuccess || result.Value?.Results == null)
         {
             return Result<Provider>.Fail(result.ResultCode, result.Error);
         }
-        
+
         if (!result.Value.Results.Any())
             return Result<Provider>.Fail(ResultCode.NotFound, "Did not find any providers.");
 
@@ -189,8 +199,10 @@ public class AuthManager : IAuthManager
 
     public async Task<Result<ApplicationPaginationResult>> GetApplications()
     {
-        Result<ApplicationPaginationResult> result = await ApiHttpHelper.SendGet<ApplicationPaginationResult>($"{_credentials.AuthUrl}/api/v3/core/applications/?ordering=name&page=1&page_size=200&search=&superuser_full_list=true", _apiKey);
-        
+        Result<ApplicationPaginationResult> result = await ApiHttpHelper.SendGet<ApplicationPaginationResult>(
+            $"{_credentials.AuthUrl}/api/v3/core/applications/?ordering=name&page=1&page_size=200&search=&superuser_full_list=true",
+            _apiKey);
+
         if (!result.IsSuccess || result.Value?.Results == null)
         {
             return result;
@@ -217,10 +229,10 @@ public class AuthManager : IAuthManager
             return Result<bool>.Fail(applications.ResultCode, applications.Error);
 
         slug = slug.ToLower();
-        
+
         if (applications.Value.Results.Any(x => x.Slug.ToLower() == slug))
             return Result<bool>.Ok(true);
-        
+
         return Result<bool>.Ok(false);
     }
 
@@ -232,17 +244,17 @@ public class AuthManager : IAuthManager
     public async Task<Result<string>> DeleteApplication(string slug)
     {
         Result<bool> doesApplicationExist = await DoesApplicationExist(slug);
-        
-        if(!doesApplicationExist.IsSuccess)
+
+        if (!doesApplicationExist.IsSuccess)
             return Result<string>.Fail(doesApplicationExist.ResultCode, doesApplicationExist.Error);
-        
+
         return await ApiHttpHelper.SendDelete($"{_credentials.AuthUrl}/api/v3/core/applications/{slug}/", _apiKey);
     }
 
     public async Task<Result<string>> GetProviderIdByExternalHost(string externalHost)
     {
         Result<ProviderPaginationResult> result = await GetProviders();
-        
+
         if (!result.IsSuccess || result.Value?.Results == null)
         {
             return Result<string>.Fail(result.ResultCode, result.Error);
@@ -250,10 +262,10 @@ public class AuthManager : IAuthManager
 
         externalHost = externalHost.ToLower();
         Provider? provider = result.Value.Results.FirstOrDefault(x => x.ExternalHost.ToLower() == externalHost);
-        
+
         if (provider == null)
             return Result<string>.Fail(ResultCode.NotFound, $"Could not find a provider by the given external host \"{externalHost}\".");
-        
+
         if (string.IsNullOrEmpty(provider.Pk))
             return Result<string>.Fail(ResultCode.InternalServerError, "Provider found but had an invalid ID.");
 
@@ -263,7 +275,7 @@ public class AuthManager : IAuthManager
     public async Task<Result<string>> GetApplicationSlugByLaunchUrl(string launchUrl)
     {
         Result<ApplicationPaginationResult> result = await GetApplications();
-        
+
         if (!result.IsSuccess || result.Value?.Results == null)
         {
             return Result<string>.Fail(result.ResultCode, result.Error);
@@ -271,10 +283,10 @@ public class AuthManager : IAuthManager
 
         launchUrl = launchUrl.ToLower();
         Application? app = result.Value.Results.FirstOrDefault(x => x.LaunchUrl != null && x.LaunchUrl.ToLower() == launchUrl);
-       
+
         if (app == null)
             return Result<string>.Fail(ResultCode.NotFound, $"Could not find a application by the given launch url \"{launchUrl}\".");
-        
+
         return Result<string>.Ok(app.Slug);
     }
 
@@ -287,7 +299,7 @@ public class AuthManager : IAuthManager
         {
             return Result<string>.Fail(result.ResultCode, result.Error);
         }
-        
+
         // TODO: Check for provider existance 
         result.Value!.Providers.Add(providerPk);
 
@@ -298,26 +310,26 @@ public class AuthManager : IAuthManager
     {
         // TODO: Check for existance
         Result<OutpostModel> result = await GetOutpost(outpostId);
-        
+
         if (!result.IsSuccess || result.Value == null)
         {
             return Result<string>.Fail(result.ResultCode, result.Error);
         }
-        
+
         // TODO: Check for provider existance 
         result.Value.Providers.Remove(providerPk);
 
         return await UpdateOutpost(outpostId, result.Value);
     }
-    
+
     #region Core
 
     private async Task GrabNewToken()
     {
         Console.WriteLine("Trying to grab a new API token.");
-        
+
         List<KeyValuePair<string, string>> headers = new List<KeyValuePair<string, string>>();
-        
+
         headers.Add(new KeyValuePair<string, string>("grant_type", "client_credentials"));
         // Provider client ID
         headers.Add(new KeyValuePair<string, string>("client_id", _credentials.ClientId));
@@ -327,11 +339,13 @@ public class AuthManager : IAuthManager
         headers.Add(new KeyValuePair<string, string>("password", _credentials.Password));
         // Scope, needs to be added under Advanced procotol settings in the provider.
         headers.Add(new KeyValuePair<string, string>("scope", "goauthentik.io/api"));
-        
+
         HttpContent content = new FormUrlEncodedContent(headers);
 
-        TokenRequestModel response = await HttpHelper.SendPost<TokenRequestModel>($"{_credentials.AuthUrl}/application/o/token/", content) ?? new TokenRequestModel();
-        
+        TokenRequestModel response =
+            await HttpHelper.SendPost<TokenRequestModel>($"{_credentials.AuthUrl}/application/o/token/", content) ??
+            TokenRequestModel.Empty();
+
         if (response.ExpiresIn == 0)
         {
             Console.WriteLine("Cannot get token from authentik instance.");
@@ -340,7 +354,7 @@ public class AuthManager : IAuthManager
         }
 
         _apiKey = response.AccessToken;
-        
+
         Console.WriteLine("Successfully retrieved API token from authentik instance.");
     }
 
@@ -351,7 +365,7 @@ public class AuthManager : IAuthManager
         _currentTimer.Elapsed += async (_, _) => await GrabNewToken();
         _currentTimer.Start();
     }
-    
+
     #endregion
 
     public Task StopAsync(CancellationToken cancellationToken)

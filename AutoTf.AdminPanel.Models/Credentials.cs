@@ -2,15 +2,15 @@ namespace AutoTf.AdminPanel.Models;
 
 public class Credentials
 {
-    public string ClientId { get; set; }
-    public string Username { get; set; }
-    public string Password { get; set; }
-    public string AuthUrl { get; set; }
-    public string CloudflareZone { get; set; }
-    public string CloudflareKey { get; set; }
+    public required string ClientId { get; set; }
+    public required string Username { get; set; }
+    public required string Password { get; set; }
+    public required string AuthUrl { get; set; }
+    public required string CloudflareZone { get; set; }
+    public required string CloudflareKey { get; set; }
     
-    public ServerConfig DefaultConfig { get; set; }
+    public required ServerConfig DefaultConfig { get; set; }
     
-    public string AuthServerContainerId { get; set; }
-    public string AuthDefaultNetworkId { get; set; }
+    public required string AuthServerContainerId { get; set; }
+    public required string AuthDefaultNetworkId { get; set; }
 }

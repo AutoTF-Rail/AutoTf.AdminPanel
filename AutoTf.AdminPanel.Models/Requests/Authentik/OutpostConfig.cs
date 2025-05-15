@@ -5,13 +5,13 @@ namespace AutoTf.AdminPanel.Models.Requests.Authentik;
 public class OutpostConfig
 {
     [JsonPropertyName("log_level")]
-    public string LogLevel { get; set; }
+    public required string LogLevel { get; set; }
     
     [JsonPropertyName("docker_labels")]
     public List<object>? DockerLabels { get; set; }
     
     [JsonPropertyName("authentik_host")]
-    public string AuthentikHost { get; set; }
+    public required string AuthentikHost { get; set; }
     
     [JsonPropertyName("docker_network")]
     public object? DockerNetwork { get; set; }
@@ -23,19 +23,19 @@ public class OutpostConfig
     public bool DockerMapPorts { get; set; }
     
     [JsonPropertyName("refresh_interval")]
-    public string RefreshInterval { get; set; }
+    public required string RefreshInterval { get; set; }
     
     [JsonPropertyName("kubernetes_replicas")]
     public int KubernetesReplicas { get; set; }
     
     [JsonPropertyName("kubernetes_namespace")]
-    public string KubernetesNamespace { get; set; }
+    public required string KubernetesNamespace { get; set; }
     
     [JsonPropertyName("authentik_host_browser")]
-    public string AuthentikHostBrowser { get; set; }
+    public required string AuthentikHostBrowser { get; set; }
     
     [JsonPropertyName("object_naming_template")]
-    public string ObjectNamingTemplate { get; set; }
+    public required string ObjectNamingTemplate { get; set; }
     
     [JsonPropertyName("authentik_host_insecure")]
     public bool AuthentikHostInsecure { get; set; }
@@ -44,20 +44,20 @@ public class OutpostConfig
     public object? KubernetesJsonPatches { get; set; }
     
     [JsonPropertyName("kubernetes_service_type")]
-    public string KubernetesServiceType { get; set; }
+    public required string KubernetesServiceType { get; set; }
     
     [JsonPropertyName("kubernetes_image_pull_secrets")]
-    public List<object> KubernetesImagePullSecrets { get; set; }
+    public required List<object> KubernetesImagePullSecrets { get; set; }
     
     [JsonPropertyName("kubernetes_ingress_class_name")]
     public object? KubernetesIngressClassName { get; set; }
     
     [JsonPropertyName("kubernetes_disabled_components")]
-    public List<object> KubernetesDisabledComponents { get; set; }
+    public required List<object> KubernetesDisabledComponents { get; set; }
     
     [JsonPropertyName("kubernetes_ingress_annotations")]
-    public object KubernetesIngressAnnotations { get; set; }
+    public required object KubernetesIngressAnnotations { get; set; }
     
     [JsonPropertyName("kubernetes_ingress_secret_name")]
-    public string KubernetesIngressSecretName { get; set; }
+    public required string KubernetesIngressSecretName { get; set; }
 }
