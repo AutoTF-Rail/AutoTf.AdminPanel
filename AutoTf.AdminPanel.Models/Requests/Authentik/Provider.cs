@@ -67,5 +67,5 @@ public class Provider
     public required string AccessTokenValidity { get; set; }
 
     [JsonPropertyName("providerModel")]
-    public required string ProviderModel { get; set; }
+    public string? ProviderModel { get; set; }
 }

@@ -8,16 +8,16 @@ public class TokenRequestModel
     public required string AccessToken { get; set; }
     
     [JsonPropertyName("token_type")]
-    public required string TokenType { get; set; }
+    public string? TokenType { get; set; }
     
     [JsonPropertyName("scope")]
-    public required string Scope { get; set; }
+    public string? Scope { get; set; }
     
     [JsonPropertyName("expires_in")]
     public int ExpiresIn { get; set; }
     
     [JsonPropertyName("token_id")]
-    public required string TokenId { get; set; }
+    public string? TokenId { get; set; }
 
     public static TokenRequestModel Empty()
     {
@@ -25,9 +25,6 @@ public class TokenRequestModel
         {
             AccessToken = "",
             ExpiresIn = 0,
-            Scope = "",
-            TokenId = "",
-            TokenType = ""
         };
     }
 }
