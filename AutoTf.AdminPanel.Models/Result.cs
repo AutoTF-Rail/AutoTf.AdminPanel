@@ -15,7 +15,42 @@ public class Result<T> : ResultBase
 
     public static Result<T> Ok(T value) => new(ResultCode.Success, value, "");
 
-    public static Result<T> Fail(ResultCode resultCode, string error) => new(resultCode, default, error);
+    public static Result<T> Fail(ResultCode resultCode, string error = "") => new(resultCode, default, error);
+    
+    public static implicit operator Result<T>(T value) => Ok(value);
+    
+    public static implicit operator bool(Result<T> result)
+    {
+        if (result.IsSuccess)
+        {
+            if (typeof(T) == typeof(bool) && result.Value != null)
+                return bool.Parse(result.Value!.ToString()!);
+        }
+
+        return false;
+    }
+
+    public T GetValue(T replacement)
+    {
+        if(IsSuccess)
+            return Value!;
+            
+        return replacement;
+    }
+    
+    public static implicit operator bool?(Result<T> result)
+    {
+        if (result.IsSuccess)
+        {
+            if (result.Value == null)
+                return null;
+            
+            if (typeof(T) == typeof(bool))
+                return bool.Parse(result.Value.ToString()!);
+        }
+
+        return false;
+    }
     
     public override IActionResult Convert()
     {
@@ -40,6 +75,16 @@ public class Result : ResultBase
     }
     
     public static Result Ok() => new(ResultCode.Success, "");
+    
+    public static implicit operator Result(bool value)
+    {
+        return value ? Ok() : Fail(ResultCode.Unknown, "Operation failed.");
+    }
+    
+    public static implicit operator bool(Result result)
+    {
+        return result.IsSuccess;
+    }
 
-    public static Result Fail(ResultCode resultCode, string error) => new(resultCode, error);
+    public static Result Fail(ResultCode resultCode, string error = "") => new(resultCode, error);
 }
